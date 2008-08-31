@@ -1,0 +1,20 @@
+0.1:
+* initial release.
+
+0.2:
+* configurable text shadows.
+* buttons animation support.
+* buttons shift support.
+* new theme managemnt tab which lets you install themes in a snap, even from the web.
+* few other options in the config dialog.
+
+0.3:
+* better masking, for how to use it properly look at the Bushido-Yellow-theme inside the tarball.
+* new hue colorizing method, proposed by Azzali Matteo AKA mattepiu.
+* if supplied transparent images deKorator will fill it with the style background color, this will allow some "powder" style windec, this idea was proposed by the autor of powder,Remi VillatelAKA Maxilys.
+* support for title bar wheel mouse action as introduced in kde 3.5.1, patch supplied by Morten Johansson.
+* global themes support, this feature allows rpms and debs builders to build themes packages as proposed by loki, deKorator will look for the global themes at $KDEDIR/share/apps/deKorator/themes.
+* much more configureabilty when regarding to active and inactive decos and buttons.
+* custom colors for buttons.
+* new theme The K-style:Infinity-theme, done by Zoran Karavla, included in the tarball and shown in the screenshots.
+* few other options in the config dialog.

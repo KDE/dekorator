@@ -1,0 +1,94 @@
+Example Installation
+====================
+
+The example themes requires the KDE 3.2 or greater libraries. This
+can be found at <http://www.kde.org>. These are also included with
+many Linux, BSD and Unix systems.
+
+You also need GNU make, and not your standard make. On many systems,
+GNU make has been installed as "gmake" If this is your situation,
+substitute "gmake" for every occurance of "make" in these
+instructions.
+
+====================================================================
+
+To save room in the distribution, the admin directory is not included
+nor any of its included files. Before you can build the example, this
+must be added. The simplest way is to copy one over from another KDE
+package.
+
+====================================================================
+
+The themes use the 'configure' script to attempt a reasonable and
+correct configuration for compilation on your system. It creates an
+appropriate 'Makefile' for each directory in this package, along with
+one or more headerfiles containing system-dependent definitions. It
+also creates 'config.status','config.cache' and 'config.log' files
+that are useful for recreating or debugging the configuration.
+
+Sincerely,
+David Johnson
+
+Example Installation in a Nutshell:
+====================================
+
+1)  Type './configure'
+
+2)  Type 'make'
+
+3)  Type 'make install'
+
+Example Installation in More Detail:
+=====================================
+
+0)  Make sure that the prerequisite KDE 3.2 development libraries and
+headers    are installed first. These can be found at
+<http://www.kde.org>.
+
+1)  Unzip and untar the package into its own directory. Change into
+this    directory, and read the README file. (I'm assuming that
+you've read this,    the INSTALL file :-))
+
+2)  Type './configure --help", and peruse the configure options
+available.    It may be necessary to use one or more of these options
+on your system.
+
+3)  Type './configure' to configure the software for your system. If
+you're    using `csh' on an old version of System V, you might need
+to type    `sh ./configure' instead.
+
+4)  Type 'make' to compile the package.
+
+5)  If you are not logged in as root, type 'su' and enter the root
+password    to switch over to the root account. This is not necessary
+if you    configured the software to install to your home directory/
+
+6)  Type 'make install' to install the software.
+
+7)  Activate the styles, decorations and color schemes through the
+KDE Control    Center or the Preferences menu.
+
+8)  You can uninstall the software by typing 'make uninstall'.
+
+A Note on the KDE Library
+========================
+
+If you are having problems configuring the software, first make sure
+that the required KDE 3.0 or greater libraries are installed. Several
+systems have broken this into several packages. You will need both
+the runtime and the development packages.
+
+If you still have problems, set the KDEDIR environment variable and
+the --prefix configure option to the location where you installed
+KDE. Also makesure that you are using GNU make and not the standard
+make everyone else uses.
+
+Rebuilding the Configuration
+============================
+
+If you ever need to rebuild the configuration files, type the
+following in thebase directory of the distribution:
+    make -f Makefile.cvs
+
+You will need the current automake/autoconf set of programs.
+

@@ -1,0 +1,33 @@
+2008-08-28, christoph
+
+	* themes.cpp: fix deletion of files when deleting themes.
+	* deKorator: replaced some obsolete Qt3Support calls.
+	* configdialog.ui: move some options to new Effects tab to make
+		dialog smaller.
+	* configdialog.ui: fix spacing and margins.
+
+
+2008-08-27, christoph
+
+	* deKoratorclient.cc: force 16 pixel icons.
+	* shadow.cpp: fix black frame around title when using shadows.
+	* RELEASE: 0.4.0.1 on KDE-Look.org
+
+
+2008-08-26, christoph
+
+	* deKoratorconfig.cc: use KUrlRequester->url().path() so that we can
+		actually load the images.
+	* RELEASE: 0.4.0 on KDE-Look.org
+
+
+2008-08-25, christoph
+
+	* deKorator: convert to KDE 4/Qt 4; compiles, but does not work.
+
+
+2008-07-29, christoph
+
+	* deKorator: import KDE 3 deKorator, convert to CMake.
+
+

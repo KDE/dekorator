@@ -1,0 +1,5 @@
+# KDE Desktop Entry
+[Desktop Entry]
+Encoding=UTF-8
+Name=DeKorator
+X-KDE-Library=kwin3_deKorator

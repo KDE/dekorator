@@ -1,0 +1,8 @@
+this is the deKorator kwin deco,
+deKorator is based on the HOWTO: KWin Window Manager Decorations posted in here: http://kde-look.org/content/show.php?content=6332
+and done by Brandybuck, 10x david:)
+the man that responsiable for all the art design is jon clarke AKA ArbitraryReason.
+the nice thing about deKorator is that it loads the images from
+some user defined directory(something quiet similar to what iceWM is doing ),
+thats means that everything is themeable with no time and no programming knowledge is needed.
+one thing to note is that if u would like to see the changes instantly when designing the tiles, u need to run "kwin --replace&".

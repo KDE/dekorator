@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+	<head>
+		<title>deKorator guide</title>
+	</head>
+	<body>
+		<h1>Summary</h1>
+		<p>deKorator is a kwin engine that takes several user-defined images and presents them as a window decoration. deKorator expects to find those in a theme. Here is a guide for building such a theme.</p>
+		<h1>In the package</h1>
+		<p>deKorator comes with:</p>
+		<ul>
+			<li><strong>default-theme</strong> - Used by default, illustrates some of deKorator's features.</li>
+			<li><strong>ugly-theme</strong> - It's purpose is to understand the way deKorator paints the decorations.</li>
+		</ul>
+		<h1>Names</h1>
+		<p>deKorator expects the same directory structure and file names as the ones in default-theme. Every theme file should end with "-theme" (as in "default-theme"), and should contain all the folders that are in default-theme (deco, buttons, masks).</p>
+		<h1>Sizes</h1>
+		<p>deKorator determines the 4 borders' sizes from:</p>
+		<table border="1" frame="border" rules="all" summary="Border sizes">
+			<thead>
+				<tr>
+					<th>Property</th>
+					<th>Source</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr><td>the left border width</td><td>midLeftFrameBg's width</td></tr>
+				<tr><td>the right border width</td><td>midRightFrameBg's width</td></tr>
+				<tr><td>the top bar height</td><td>midTitleBg's height</td></tr>
+				<tr><td>the bottom border height</td><td>midBottomFrameBg's height</td></tr>
+			</tbody>
+		</table>
+		<p>All parts that build up a specific border should be in the same width or height correspondingly. An example follows for a window decoration with a 10px high top bar, a 20px wide left border, a 30px wide right border and a 40px high bottom border.</p>
+		<p>All tiles in the top bar should be 10 pixel high:</p>
+		<ul>
+			<li>topLeftCornerBg</li>
+			<li>leftButtonsBg</li>
+			<li>leftTitleBg</li>
+			<li>midTitleBg</li>
+			<li>rightTitleBg</li>
+			<li>rightButtonsBg</li>
+			<li>topRightCornerBg</li>
+		</ul>
+		<p>All tiles in the left border should be 20 pixel wide:</p>
+		<ul>
+			<li>topLeftFrameBg</li>
+			<li>midLeftFrameBg</li>
+			<li>bottomLeftFrameBg</li>
+		</ul>
+		<p>All tiles in the right border should be 30 pixel wide:</p>
+		<ul>
+			<li>topRightFrameBg</li>
+			<li>midRightFrameBg</li>
+			<li>bottomRightFrameBg</li>
+		</ul>
+		<p>All tiles in the bottom border should be 40 pixel high:</p>
+		<ul>
+			<li>leftBottomFrameBg</li>
+			<li>midBottomFrameBg</li>
+			<li>rightBottomFrameBg</li>
+		</ul>
+		<p>The corner tiles should fit into the tile grid:</p>
+		<table summary="Corner tiles' sizes">
+			<thead>
+				<tr>
+					<th>Tile</th>
+					<th>Height</th>
+					<th>Width</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>topLeftCornerBg</td>
+					<td>10</td>
+					<td>20</td>
+				</tr>
+				<tr>
+					<td>topRightCornerBg</td>
+					<td>10</td>
+					<td>30</td>
+				</tr>
+				<tr>
+					<td>leftBottomFrameBg</td>
+					<td>40</td>
+					<td>20</td>
+				</tr>
+				<tr>
+					<td>rightBottomFrameBg</td>
+					<td>40</td>
+					<td>30</td>
+				</tr>
+			</tbody>
+		</table>
+		<h1>Buttons</h1>
+		<p>The button images are separated into background and foreground ones.</p>
+		<h2>Background</h2>
+		<p>The button background uses the leftButtonsBg and the rightButtonsBg tiles. Their height should be the same as the top bar's. The background's repeated horizontally to fit the buttons in.</p>
+		<h2>Foreground</h2> 
+		<p>The width is determined by the button width. This way theme makers can put the buttons as close as they wish. To make space between buttons you can add transparent pixels to the right and left. A button with a smaller height than the top bar's gets centered vertically. To place the button in a custom height use transparent pixels, too.</p>
+		<h1>Masks</h1>
+		<p>Masks contain only black and white. Black pixels are subtracted from the decoration.</p>
+		<h1>Image format</h1>
+		<p>All images should be in PNG.</p>
+	</body>
+</html>

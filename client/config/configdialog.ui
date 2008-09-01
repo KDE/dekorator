@@ -442,7 +442,7 @@
               </item>
               <item>
                <property name="text" >
-                <string>Hue Adgustment</string>
+                <string>Hue Adjustment</string>
                </property>
               </item>
              </widget>
@@ -1445,7 +1445,7 @@ deKorator comes with:
       features.
     * ugly-theme - It's purpose is to understand the way deKorator paints the
       decorations.
-    * template-theme - this theme  is meant to be a template theme for other themes,this theme features all possible buttons.
+    * template-theme - this theme  is meant to be a template theme for other themes, this theme features all possible buttons.
     * Bushido-Yellow-theme - shows how masking can be done.
 
 ****** Names ******
@@ -1554,7 +1554,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align="center" style=" margin-top:14px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:large; font-weight:600;">&lt;span style=" font-size:large;">deKorator Window's Decoration Version 0.3&lt;/span>&lt;/p>
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;br />&lt;/p>
 &lt;p align="center" style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Art Designer: jon clarke AKA ArbitraryReason&lt;br />Email: &lt;a href="mailto:jjclarke2003@yahoo.com">&lt;span style=" text-decoration: underline; color:#ff0000;">jjclarke2003@yahoo.com&lt;/span>&lt;/a>&lt;br />&lt;/p>
-&lt;p align="center" style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Theme contributer: Zoran Karavla AKA the-error&lt;br />Email: &lt;a href="mailto:webmaster@the-error.net">&lt;span style=" text-decoration: underline; color:#ff0000;">webmaster@the-error.net&lt;/span>&lt;/a>&lt;br />&lt;/p>
+&lt;p align="center" style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Theme contributor: Zoran Karavla AKA the-error&lt;br />Email: &lt;a href="mailto:webmaster@the-error.net">&lt;span style=" text-decoration: underline; color:#ff0000;">webmaster@the-error.net&lt;/span>&lt;/a>&lt;br />&lt;/p>
 &lt;p align="center" style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Author: moty rahamim&lt;br />Email: &lt;a href="mailto:moty.rahamim@gmail.com">&lt;span style=" text-decoration: underline; color:#ff0000;">moty.rahamim@gmail.com&lt;/span>&lt;/a>&lt;br />&lt;/p>
 &lt;p align="center" style=" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">KDE 4 port: Christoph Feck&lt;br />Email: &lt;a href="mailto:christoph@maxiom.de">&lt;span style=" text-decoration: underline; color:#ff0000;">christoph@maxiom.de&lt;/span>&lt;/a>&lt;/p>&lt;/td>&lt;/tr>&lt;/table>&lt;/body>&lt;/html></string>
          </property>

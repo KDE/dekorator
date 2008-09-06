@@ -40,9 +40,6 @@
             <property name="text" >
              <string>L&amp;eft</string>
             </property>
-            <property name="shortcut" >
-             <string>Alt+E</string>
-            </property>
            </widget>
           </item>
           <item>
@@ -52,9 +49,6 @@
             </property>
             <property name="text" >
              <string>&amp;Center</string>
-            </property>
-            <property name="shortcut" >
-             <string>Alt+C</string>
             </property>
             <property name="checked" >
              <bool>false</bool>
@@ -68,9 +62,6 @@
             </property>
             <property name="text" >
              <string>Ri&amp;ght</string>
-            </property>
-            <property name="shortcut" >
-             <string>Alt+G</string>
             </property>
            </widget>
           </item>
@@ -291,9 +282,6 @@
          <property name="text" >
           <string>Use menu button image instead o&amp;f application icon</string>
          </property>
-         <property name="shortcut" >
-          <string>Alt+F</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -301,18 +289,12 @@
          <property name="text" >
           <string>Close &amp;window by double clicking the menu button</string>
          </property>
-         <property name="shortcut" >
-          <string>Alt+W</string>
-         </property>
         </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="showBtmBorderChkBox" >
          <property name="text" >
           <string>Show &amp;bottom border when window is shaded</string>
-         </property>
-         <property name="shortcut" >
-          <string>Alt+B</string>
          </property>
         </widget>
        </item>
@@ -358,18 +340,12 @@
                  <property name="text" >
                   <string>Colorize &amp;frames</string>
                  </property>
-                 <property name="shortcut" >
-                  <string>Alt+F</string>
-                 </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="colorizeActButtonsChkBox" >
                  <property name="text" >
                   <string>Colorize &amp;buttons</string>
-                 </property>
-                 <property name="shortcut" >
-                  <string>Alt+B</string>
                  </property>
                 </widget>
                </item>
@@ -387,18 +363,12 @@
                  <property name="text" >
                   <string>Colorize &amp;frames</string>
                  </property>
-                 <property name="shortcut" >
-                  <string>Alt+F</string>
-                 </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="colorizeInActButtonsChkBox" >
                  <property name="text" >
                   <string>Colorize &amp;buttons</string>
-                 </property>
-                 <property name="shortcut" >
-                  <string>Alt+B</string>
                  </property>
                 </widget>
                </item>
@@ -578,9 +548,6 @@
         <widget class="QCheckBox" name="useAnimChkBox" >
          <property name="text" >
           <string>&amp;Use buttons animation</string>
-         </property>
-         <property name="shortcut" >
-          <string>Alt+U</string>
          </property>
         </widget>
        </item>
@@ -1257,9 +1224,6 @@
          <property name="text" >
           <string>&amp;Use Masks</string>
          </property>
-         <property name="shortcut" >
-          <string>Alt+U</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -1407,18 +1371,12 @@
            <property name="text" >
             <string>R&amp;emove Theme</string>
            </property>
-           <property name="shortcut" >
-            <string>Alt+E</string>
-           </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="applyThemeBtn" >
            <property name="text" >
             <string>Apply The&amp;me Paths</string>
-           </property>
-           <property name="shortcut" >
-            <string>Alt+M</string>
            </property>
           </widget>
          </item>

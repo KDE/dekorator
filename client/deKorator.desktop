@@ -2,4 +2,6 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=DeKorator
+Name[sv]=Dekorator
+Name[x-test]=xxDeKoratorxx
 X-KDE-Library=kwin3_deKorator

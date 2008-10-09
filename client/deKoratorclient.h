@@ -251,7 +251,7 @@ inline Qt::MouseButton DeKoratorButton::lastMousePress() const
 
 inline void DeKoratorButton::reset()
 {
-    repaint( FALSE );
+    repaint();
 }
 
 

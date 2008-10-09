@@ -1258,7 +1258,7 @@ void DeKoratorButton::setPixmap( buttonTypeAll btnType )
     //     deco_ = new QBitmap(DECOSIZE, DECOSIZE, bitmap, TRUE);
     //     deco_->setMask(*deco_);
     //   }
-    repaint( FALSE );
+    repaint();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1285,7 +1285,7 @@ void DeKoratorButton::enterEvent( QEvent * e )
     if ( USEANIMATION )
         animate();
     else
-        repaint( FALSE );
+        repaint();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1304,7 +1304,7 @@ void DeKoratorButton::leaveEvent( QEvent * e )
     if ( USEANIMATION )
         animate();
     else
-        repaint( FALSE );
+        repaint();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1577,7 +1577,7 @@ void DeKoratorButton::animate()
     //qWarning( "STEPS: %d", STEPS );
     //qWarning( "animProgress: %d", animProgress );
     //qWarning( "INTERVAL: %d", INTERVAL );
-    repaint( false );
+    repaint();
 }
 
 
@@ -1947,7 +1947,7 @@ void DeKoratorClient::activeChange()
     for ( int n = 0; n < ButtonTypeCount; n++ )
         if ( button[ n ] )
             button[ n ] ->reset();
-    widget() ->repaint( FALSE );
+    widget() ->repaint();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1996,7 +1996,7 @@ void DeKoratorClient::iconChange()
     if ( !USEMENUEIMAGE && button[ ButtonMenu ] )
     {
         //button[ ButtonMenu ] ->setPixmap( 0 );
-        button[ ButtonMenu ] ->repaint( FALSE );
+        button[ ButtonMenu ] ->repaint();
     }
 }
 
@@ -2057,7 +2057,7 @@ void DeKoratorClient::shadeChange()
     for ( int n = 0; n < ButtonTypeCount; n++ )
         if ( button[ n ] )
             button[ n ] ->reset();
-    widget() ->repaint( FALSE );
+    widget() ->repaint();
 
     //mainlayout_->setRowSpacing( 3, isSetShade() ? 0 : MARGIN );
     //     if ( DeKoratorFactory::useMasks_ )

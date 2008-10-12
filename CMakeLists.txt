@@ -5,8 +5,6 @@ find_package (KDE4 REQUIRED)
 find_package (QImageBlitz REQUIRED)
 
 #add_definitions (-DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_TO_ASCII)
-add_definitions (-DQT3_SUPPORT)
-add_definitions (-DQT3_SUPPORT_WARNINGS)
 
 include (KDE4Defaults)
 include (MacroLibrary)

@@ -1208,7 +1208,7 @@ DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight
     hover_ = false;
     setAttribute( Qt::WA_NoBackground, true );
     setFixedSize( buttonWidth_, BUTTONSHEIGHT );
-    setCursor( Qt::arrowCursor );
+    setCursor( Qt::ArrowCursor );
     setObjectName( QString::fromAscii(name) );
 
 
@@ -1351,7 +1351,6 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
     if ( !DeKoratorFactory::initialized() )
         return ;
 
-    QColorGroup group;
     int dx = 0, dy = 0;
     bool act = client_->isActive();
     QImage buttonImgBak;
@@ -1635,7 +1634,7 @@ DeKoratorClient::~DeKoratorClient()
 
 void DeKoratorClient::init()
 {
-    createMainWidget( Qt::WNoAutoErase );
+    createMainWidget();
     widget() ->installEventFilter( this );
 
     widget() ->setAttribute( Qt::WA_NoBackground, true );

@@ -1,3 +1,10 @@
+2008-10-12, christoph
+
+        * deKorator: removed Qt3Support dependency.
+        * deKorator: fix Krazy issues.
+        * configdialog.ui: use KDE classes.
+
+
 2008-08-28, christoph
 
 	* themes.cpp: fix deletion of files when deleting themes.

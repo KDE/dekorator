@@ -20,7 +20,7 @@
      </property>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
-       <string>T&amp;itle</string>
+       <string>Title</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -318,7 +318,7 @@
      </widget>
      <widget class="QWidget" name="TabPage" >
       <attribute name="title" >
-       <string>Color&amp;s</string>
+       <string>Colors</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -482,7 +482,7 @@
      </widget>
      <widget class="QWidget" name="Seite" >
       <attribute name="title" >
-       <string>E&amp;ffects</string>
+       <string>Effects</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout" >
        <item>
@@ -1190,7 +1190,7 @@
      </widget>
      <widget class="QWidget" name="TabPage" >
       <attribute name="title" >
-       <string>&amp;Paths</string>
+       <string>Paths</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -1266,7 +1266,7 @@
      </widget>
      <widget class="QWidget" name="TabPage" >
       <attribute name="title" >
-       <string>&amp;Themes</string>
+       <string>Themes</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -1383,7 +1383,7 @@
      </widget>
      <widget class="QWidget" name="TabPage" >
       <attribute name="title" >
-       <string>&amp;Help</string>
+       <string>Help</string>
       </attribute>
       <layout class="QVBoxLayout" >
        <item>
@@ -1493,7 +1493,7 @@ Always start up building your theme from the template-theme.
      </widget>
      <widget class="QWidget" name="tab" >
       <attribute name="title" >
-       <string>&amp;About</string>
+       <string>About</string>
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >

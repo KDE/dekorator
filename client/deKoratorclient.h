@@ -46,15 +46,15 @@
 #include <qtimer.h>
 #include <qcursor.h>
 //Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <Q3BoxLayout>
+class QHBoxLayout;
+class QBoxLayout;
 #include <QShowEvent>
 #include <QWheelEvent>
 #include <QPaintEvent>
 #include <QResizeEvent>
 #include <QMouseEvent>
 #include <QEvent>
-#include <Q3VBoxLayout>
+class QVBoxLayout;
 
 #include <kdecoration.h>
 #include <kdecorationfactory.h>
@@ -289,7 +289,7 @@ public:
     virtual Position mousePosition( const QPoint &point ) const;
 
 private:
-    void addButtons( Q3BoxLayout* layout, const QString& buttons, bool isLeft );
+    void addButtons( QBoxLayout* layout, const QString& buttons, bool isLeft );
 
     bool eventFilter( QObject *obj, QEvent *e );
     void mouseDoubleClickEvent( QMouseEvent *e );
@@ -313,9 +313,9 @@ private slots:
 
 private:
     DeKoratorButton *button[ ButtonTypeCount ];
-    Q3VBoxLayout *mainLayout_;
-    Q3HBoxLayout *titleLayout_ ;
-    Q3HBoxLayout *midLayout_;
+    QVBoxLayout *mainLayout_;
+    QHBoxLayout *titleLayout_ ;
+    QHBoxLayout *midLayout_;
     QSpacerItem *leftTitleBarSpacer_, *titleBarSpacer_, *rightTitleBarSpacer_, *leftSpacer_, *rightSpacer_, *bottomSpacer_;
     bool closing_;
     QPixmap *captionBufferPix_;

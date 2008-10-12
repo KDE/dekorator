@@ -40,15 +40,15 @@
 #include <qsettings.h>
 //Added by qt3to4:
 #include <QResizeEvent>
-#include <Q3BoxLayout>
+#include <QtGui/QBoxLayout>
 #include <QLabel>
 #include <QWheelEvent>
 #include <QPixmap>
 #include <QMouseEvent>
 #include <QShowEvent>
-#include <Q3HBoxLayout>
+#include <QtGui/QHBoxLayout>
 #include <QEvent>
-#include <Q3VBoxLayout>
+#include <QtGui/QVBoxLayout>
 #include <QPaintEvent>
 #include <kiconloader.h>
 #include <QTime>
@@ -1672,9 +1672,17 @@ void DeKoratorClient::init()
             buttomRightFrameBg[ normal ] ->load( decoPixDir + "/bottomRightFrameBg.png" );*/
 
     // layouts
-    mainLayout_ = new Q3VBoxLayout( widget(), 0, 0 );
-    titleLayout_ = new Q3HBoxLayout( mainLayout_, 0, 0 );
-    midLayout_ = new Q3HBoxLayout( mainLayout_, 0, 0 );
+    mainLayout_ = new QVBoxLayout( widget() );
+    mainLayout_->setSpacing( 0 );
+    mainLayout_->setContentsMargins( 0, 0, 0, 0 );
+    titleLayout_ = new QHBoxLayout();
+    titleLayout_->setSpacing( 0 );
+    titleLayout_->setContentsMargins( 0, 0, 0, 0 );
+    mainLayout_->addLayout( titleLayout_ );
+    midLayout_ = new QHBoxLayout();
+    midLayout_->setSpacing( 0 );
+    midLayout_->setContentsMargins( 0, 0, 0, 0 );
+    mainLayout_->addLayout( midLayout_ );
 
     // spacers
     leftTitleBarSpacer_ = new QSpacerItem( TOPLEFTCORNERWIDTH, TITLESIZE,
@@ -1734,7 +1742,7 @@ void DeKoratorClient::init()
 // addButtons()
 // ------------
 // Add buttons to title layout
-void DeKoratorClient::addButtons( Q3BoxLayout * layout, const QString & s, bool isLeft )
+void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool isLeft )
 {
     //const unsigned char * bitmap;
 //    QPixmap * pix1, *pix2, *pix3, *pix4;

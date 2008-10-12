@@ -44,7 +44,7 @@ class QPushButton;
 class DeviceManager;
 class QCheckBox;
 class QStringList;
-
+class KUrlRequester;
 
 
 class IconThemesConfig : public QObject

@@ -31,8 +31,8 @@
 // Boston, MA 02110-1301, USA.
 ///////////////////////////////////////////////////////////////////////
 
-#ifndef EXAMPLECONFIG_H
-#define EXAMPLECONFIG_H
+#ifndef DEKORATORCONFIG_H
+#define DEKORATORCONFIG_H
 
 #include <qobject.h>
 
@@ -79,4 +79,4 @@ private:
     ConfigDialog *dialog_;
 };
 
-#endif // EXAMPLECONFIG_H
+#endif // DEKORATORCONFIG_H

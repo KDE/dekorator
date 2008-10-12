@@ -14,7 +14,7 @@
   </property>
   <layout class="QVBoxLayout" >
    <item>
-    <widget class="QTabWidget" name="tabWidget2" >
+    <widget class="KTabWidget" name="tabWidget2" >
      <property name="currentIndex" >
       <number>0</number>
      </property>
@@ -399,7 +399,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="decoColorizeComboBox" >
+             <widget class="KComboBox" name="decoColorizeComboBox" >
               <item>
                <property name="text" >
                 <string>Liquid Method</string>
@@ -432,7 +432,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="buttonsColorizeComboBox" >
+             <widget class="KComboBox" name="buttonsColorizeComboBox" >
               <item>
                <property name="text" >
                 <string>Liquid Method</string>
@@ -560,7 +560,7 @@
            </property>
            <layout class="QVBoxLayout" name="_4" >
             <item>
-             <widget class="QComboBox" name="animateEfeectsCombo" >
+             <widget class="KComboBox" name="animateEfeectsCombo" >
               <property name="enabled" >
                <bool>false</bool>
               </property>
@@ -669,7 +669,7 @@
            </property>
            <layout class="QVBoxLayout" name="_6" >
             <item>
-             <widget class="QComboBox" name="hoverTypeCombo" >
+             <widget class="KComboBox" name="hoverTypeCombo" >
               <item>
                <property name="text" >
                 <string>To Gray</string>
@@ -1481,7 +1481,7 @@ decoration.
 All images should be in PNG.
 
 ****** Tips and Tricks ******
-Allways start up building your theme from the template-theme.
+Always start up building your theme from the template-theme.
 </string>
          </property>
          <property name="wordWrap" >
@@ -1500,7 +1500,7 @@ Allways start up building your theme from the template-theme.
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
-        <widget class="QTextBrowser" name="kActiveLabel4" >
+        <widget class="KTextBrowser" name="kActiveLabel4" >
          <property name="html" >
           <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 &lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
@@ -1557,6 +1557,21 @@ p, li { white-space: pre-wrap; }
    <extends>Q3Frame</extends>
    <header>q3textedit.h</header>
   </customwidget>
+  <customwidget>
+   <class>KTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>ktabwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KComboBox</class>
+   <extends>QComboBox</extends>
+   <header>kcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header>ktextbrowser.h</header>
+  </customwidget>
  </customwidgets>
  <includes>
   <include location="local" >kcolorbutton.h</include>
@@ -1570,6 +1585,9 @@ p, li { white-space: pre-wrap; }
   <include location="local" >klineedit.h</include>
   <include location="local" >kpushbutton.h</include>
   <include location="local" >k3listview.h</include>
+  <include location="local" >ktabwidget.h</include>
+  <include location="local" >kcombobox.h</include>
+  <include location="local" >ktextbrowser.h</include>
  </includes>
  <resources/>
  <connections>

@@ -120,16 +120,16 @@ static int BOTTOMRIGHTMASKHEIGHT = 0;
 // config
 // misc
 static Qt::Alignment TITLEALIGN = Qt::AlignHCenter;
-static bool USEMENUEIMAGE = FALSE;
-static bool IGNOREAPPICNCOL = FALSE;
-static bool DBLCLKCLOSE = FALSE;
-static bool SHOWBTMBORDER = FALSE;
-static bool USESHDTEXT = FALSE;
-static int ACTIVESHDTEXTX = FALSE;
-static int ACTIVESHDTEXTY = FALSE;
+static bool USEMENUEIMAGE = false;
+static bool IGNOREAPPICNCOL = false;
+static bool DBLCLKCLOSE = false;
+static bool SHOWBTMBORDER = false;
+static bool USESHDTEXT = false;
+static int ACTIVESHDTEXTX = 0;
+static int ACTIVESHDTEXTY = 0;
 static QColor ACTIVESHADECOLOR = QColor( 150, 150, 150 );
-static int INACTIVESHDTEXTX = FALSE;
-static int INACTIVESHDTEXTY = FALSE;
+static int INACTIVESHDTEXTX = 0;
+static int INACTIVESHDTEXTY = 0;
 static QColor INACTIVESHADECOLOR = QColor( 150, 150, 150 );
 static int BTNSHIFTX = 0;
 static int BTNSHIFTY = 0;
@@ -137,12 +137,12 @@ static int BTNSHIFTY = 0;
 
 // colors
 
-static bool USEANIMATION = TRUE;
+static bool USEANIMATION = true;
 static QString ANIMATIONTYPE = "Intensity";
 
 static int STEPS = 5;
 static int INTERVAL = 5;
-static int KEEPANIMATING = FALSE;
+static bool KEEPANIMATING = false;
 
 static QString BUTTONHOVERTYPE = "To Gray";
 static float EFFECTAMOUNT = 5;
@@ -172,19 +172,19 @@ static QPixmap *BUTTONPIXINACTARR[ buttonTypeAllCount ][ buttonStateCount ];
 // DeKoratorFactory Class                                                     //
 //////////////////////////////////////////////////////////////////////////////
 
-bool DeKoratorFactory::initialized_ = FALSE;
-bool DeKoratorFactory::colorizeActFrames_ = FALSE;
-bool DeKoratorFactory::colorizeActButtons_ = FALSE;
-bool DeKoratorFactory::colorizeInActFrames_ = FALSE;
-bool DeKoratorFactory::colorizeInActButtons_ = FALSE;
+bool DeKoratorFactory::initialized_ = false;
+bool DeKoratorFactory::colorizeActFrames_ = false;
+bool DeKoratorFactory::colorizeActButtons_ = false;
+bool DeKoratorFactory::colorizeInActFrames_ = false;
+bool DeKoratorFactory::colorizeInActButtons_ = false;
 
-bool DeKoratorFactory::useCustomButtonsColors_ = FALSE;
-bool DeKoratorFactory::customColorsActiveButtons_ = FALSE;
-bool DeKoratorFactory::customColorsInActiveButtons_ = FALSE;
+bool DeKoratorFactory::useCustomButtonsColors_ = false;
+bool DeKoratorFactory::customColorsActiveButtons_ = false;
+bool DeKoratorFactory::customColorsInActiveButtons_ = false;
 QColor DeKoratorFactory::cusBtnCol_[ buttonTypeAllCount ];
 
-bool DeKoratorFactory::needInit_ = FALSE;
-bool DeKoratorFactory::needReload_ = FALSE;
+bool DeKoratorFactory::needInit_ = false;
+bool DeKoratorFactory::needReload_ = false;
 QString DeKoratorFactory::framesPath_ = "";
 QString DeKoratorFactory::buttonsPath_ = "";
 QString DeKoratorFactory::masksPath_ = "";
@@ -202,7 +202,7 @@ extern "C" KDE_EXPORT KDecorationFactory* create_factory()
 DeKoratorFactory::DeKoratorFactory()
 {
     readConfig();
-    initialized_ = TRUE;
+    initialized_ = true;
 
     initPixmaps();
 
@@ -231,23 +231,23 @@ DeKoratorFactory::DeKoratorFactory()
 // Destructor
 DeKoratorFactory::~DeKoratorFactory()
 {
-    initialized_ = FALSE;
+    initialized_ = false;
     int i, j, k;
 
-    for ( i = 0; i < decoCount; i++ )
+    for ( i = 0; i < decoCount; ++i )
     {
-        for ( j = 0; j < pixTypeCount; j++ )
+        for ( j = 0; j < pixTypeCount; ++j )
         {
             if ( DECOARR[ i ][ j ] )
                 delete DECOARR[ i ][ j ];
         }
     }
 
-    for ( i = 0; i < buttonTypeAllCount; i++ )
+    for ( i = 0; i < buttonTypeAllCount; ++i )
     {
-        for ( j = 0; j < buttonStateCount; j++ )
+        for ( j = 0; j < buttonStateCount; ++j )
         {
-            for ( k = 0; k < pixTypeCount; k++ )
+            for ( k = 0; k < pixTypeCount; ++k )
             {
                 if ( BUTTONSARR[ i ][ j ][ k ] )
                     delete BUTTONSARR[ i ][ j ][ k ];
@@ -268,15 +268,15 @@ KDecoration* DeKoratorFactory::createDecoration( KDecorationBridge* b )
 //////////////////////////////////////////////////////////////////////////////
 // reset()
 // -------
-// Reset the handler. Returns TRUE if decorations need to be remade, FALSE if
+// Reset the handler. Returns true if decorations need to be remade, false if
 // only a repaint is necessary
 bool DeKoratorFactory::reset( unsigned long changed )
 {
     //    captionBufferDirty_ = true;
     // read in the configuration
-    initialized_ = FALSE;
+    initialized_ = false;
     bool confchange = readConfig();
-    initialized_ = TRUE;
+    initialized_ = true;
 
 
     if ( confchange || ( changed & ( SettingDecoration | SettingButtons | SettingBorder | SettingColors ) ) )
@@ -302,7 +302,7 @@ bool DeKoratorFactory::reset( unsigned long changed )
             //
             //             chooseRightPixmaps();
             //
-            //             return TRUE;
+            //             return true;
         }
 
         //if ( DeKoratorFactory::needInit_ )
@@ -323,14 +323,14 @@ bool DeKoratorFactory::reset( unsigned long changed )
 
             chooseRightPixmaps();
 
-            //return TRUE;
+            //return true;
         }
-        return TRUE;
+        return true;
     }
     else
     {
         resetDecorations( changed );
-        return FALSE;
+        return false;
     }
 }
 
@@ -454,7 +454,7 @@ bool DeKoratorFactory::readConfig()
 
     // load buttons colors
     QColor colArr[ buttonTypeAllCount ];
-    for ( int i = 0 ; i < buttonTypeAllCount ; i++ )
+    for ( int i = 0 ; i < buttonTypeAllCount ; ++i )
     {
         colArr[ i ] = DeKoratorFactory::cusBtnCol_[ i ];
     }
@@ -474,7 +474,7 @@ bool DeKoratorFactory::readConfig()
     DeKoratorFactory::cusBtnCol_[ menu ] = config.readEntry( "MenuButtonColor", col );
 
     bool cusColChanged = false;
-    for ( int i = 0 ; i < buttonTypeAllCount ; i++ )
+    for ( int i = 0 ; i < buttonTypeAllCount ; ++i )
     {
         if ( colArr[ i ] != DeKoratorFactory::cusBtnCol_[ i ] )
         {
@@ -542,7 +542,7 @@ bool DeKoratorFactory::readConfig()
             oldUseMasks == USEMASKS &&
             oldStyleBgCol == STYLEBGCOL
        )
-        return FALSE;
+        return false;
     else
     {
         //         if ( oldColorizeActFrames != DeKoratorFactory::colorizeActFrames_ ||
@@ -554,19 +554,19 @@ bool DeKoratorFactory::readConfig()
         //                 cusColChanged == true ||
         //                 oldStyleBgCol != STYLEBGCOL
         //            )
-        //             DeKoratorFactory::needInit_ = TRUE;
+        //             DeKoratorFactory::needInit_ = true;
         //         else
-        //             DeKoratorFactory::needInit_ = FALSE;
+        //             DeKoratorFactory::needInit_ = false;
 
         if ( oldFramesPath != DeKoratorFactory::framesPath_ ||
                 oldButtonsPath != DeKoratorFactory::buttonsPath_ ||
                 oldMasksPath != DeKoratorFactory::masksPath_
            )
-            DeKoratorFactory::needReload_ = TRUE;
+            DeKoratorFactory::needReload_ = true;
         else
-            DeKoratorFactory::needReload_ = FALSE;
+            DeKoratorFactory::needReload_ = false;
 
-        return TRUE;
+        return true;
     }
 }
 
@@ -752,7 +752,7 @@ void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 
     if ( isActive )
     {
-        for ( i = 0; i < decoCount; i++ )
+        for ( i = 0; i < decoCount; ++i )
         {
             *( DECOARR[ i ][ actCol ] ) = *( DECOARR[ i ][ orig ] );
             colorizePixmap( DECOARR[ i ][ actCol ], col, DECOCOLORIZE );
@@ -760,7 +760,7 @@ void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
     }
     else
     {
-        for ( i = 0; i < decoCount; i++ )
+        for ( i = 0; i < decoCount; ++i )
         {
             *( DECOARR[ i ][ inActCol ] ) = *( DECOARR[ i ][ orig ] );
             colorizePixmap( DECOARR[ i ][ inActCol ], col, DECOCOLORIZE );
@@ -784,9 +784,9 @@ void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
     {
         if ( useCustomButtonsColors_ && customColorsActiveButtons_ )
         {
-            for ( i = 0; i < buttonTypeAllCount; i++ )
+            for ( i = 0; i < buttonTypeAllCount; ++i )
             {
-                for ( j = 0; j < buttonStateCount; j++ )
+                for ( j = 0; j < buttonStateCount; ++j )
                 {
                     *( BUTTONSARR[ i ][ j ][ actCol ] ) = *( BUTTONSARR[ i ][ j ][ normal ] );
                     colorizePixmap( BUTTONSARR[ i ][ j ][ actCol ], cusBtnCol_[ i ], BUTTONSCOLORIZE );
@@ -795,9 +795,9 @@ void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
         }
         else
         {
-            for ( i = 0; i < buttonTypeAllCount; i++ )
+            for ( i = 0; i < buttonTypeAllCount; ++i )
             {
-                for ( j = 0; j < buttonStateCount; j++ )
+                for ( j = 0; j < buttonStateCount; ++j )
                 {
                     *( BUTTONSARR[ i ][ j ][ actCol ] ) = *( BUTTONSARR[ i ][ j ][ normal ] );
                     colorizePixmap( BUTTONSARR[ i ][ j ][ actCol ], col, BUTTONSCOLORIZE );
@@ -809,9 +809,9 @@ void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
     {
         if ( ( useCustomButtonsColors_ && customColorsInActiveButtons_ ) )
         {
-            for ( i = 0; i < buttonTypeAllCount; i++ )
+            for ( i = 0; i < buttonTypeAllCount; ++i )
             {
-                for ( j = 0; j < buttonStateCount; j++ )
+                for ( j = 0; j < buttonStateCount; ++j )
                 {
                     *( BUTTONSARR[ i ][ j ][ inActCol ] ) = *( BUTTONSARR[ i ][ j ][ normal ] );
                     colorizePixmap( BUTTONSARR[ i ][ j ][ inActCol ], cusBtnCol_[ i ], BUTTONSCOLORIZE );
@@ -820,9 +820,9 @@ void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
         }
         else
         {
-            for ( i = 0; i < buttonTypeAllCount; i++ )
+            for ( i = 0; i < buttonTypeAllCount; ++i )
             {
-                for ( j = 0; j < buttonStateCount; j++ )
+                for ( j = 0; j < buttonStateCount; ++j )
                 {
                     *( BUTTONSARR[ i ][ j ][ inActCol ] ) = *( BUTTONSARR[ i ][ j ][ normal ] );
                     colorizePixmap( BUTTONSARR[ i ][ j ][ inActCol ], col, BUTTONSCOLORIZE );
@@ -848,7 +848,7 @@ void DeKoratorFactory::colorizePixmap( QPixmap *pix, QColor c, QString colorizeM
         if ( img.depth() != 32 )
             img = img.convertDepth( 32 );
         QImage *dest = new QImage( img.width(), img.height(), 32 );
-        dest->setAlphaBuffer( TRUE );
+        dest->setAlphaBuffer( true );
         unsigned int *data = ( unsigned int * ) img.bits();
         unsigned int *destData = ( unsigned int* ) dest->bits();
         int total = img.width() * img.height();
@@ -907,7 +907,7 @@ void DeKoratorFactory::colorizePixmap( QPixmap *pix, QColor c, QString colorizeM
         //         QImage *dest;
         //         *dest = img;
         QImage *dest = new QImage( img.width(), img.height(), 32 );
-        dest->setAlphaBuffer( TRUE );
+        dest->setAlphaBuffer( true );
         unsigned int *data = ( unsigned int * ) img.bits();
         unsigned int *destData = ( unsigned int* ) dest->bits();
         int total = img.width() * img.height();
@@ -981,19 +981,19 @@ void DeKoratorFactory::initPixmaps()
 {
     int i, j, k;
 
-    for ( i = 0; i < decoCount; i++ )
+    for ( i = 0; i < decoCount; ++i )
     {
-        for ( j = 0; j < pixTypeCount; j++ )
+        for ( j = 0; j < pixTypeCount; ++j )
         {
             DECOARR[ i ][ j ] = new QPixmap();
         }
     }
 
-    for ( i = 0; i < buttonTypeAllCount; i++ )
+    for ( i = 0; i < buttonTypeAllCount; ++i )
     {
-        for ( j = 0; j < buttonStateCount; j++ )
+        for ( j = 0; j < buttonStateCount; ++j )
         {
-            for ( k = 0; k < pixTypeCount; k++ )
+            for ( k = 0; k < pixTypeCount; ++k )
             {
                 BUTTONSARR[ i ][ j ][ k ] = new QPixmap();
             }
@@ -1010,14 +1010,14 @@ void DeKoratorFactory::chooseRightPixmaps()
 
     if ( DeKoratorFactory::colorizeActFrames_ )
     {
-        for ( i = 0; i < decoCount; i++ )
+        for ( i = 0; i < decoCount; ++i )
         {
             DECOPIXACTARR[ i ] = DECOARR[ i ][ actCol ];
         }
     }
     else
     {
-        for ( i = 0; i < decoCount; i++ )
+        for ( i = 0; i < decoCount; ++i )
         {
             DECOPIXACTARR[ i ] = DECOARR[ i ][ normal ];
         }
@@ -1025,14 +1025,14 @@ void DeKoratorFactory::chooseRightPixmaps()
 
     if ( DeKoratorFactory::colorizeInActFrames_ )
     {
-        for ( i = 0; i < decoCount; i++ )
+        for ( i = 0; i < decoCount; ++i )
         {
             DECOPIXINACTARR[ i ] = DECOARR[ i ][ inActCol ];
         }
     }
     else
     {
-        for ( i = 0; i < decoCount; i++ )
+        for ( i = 0; i < decoCount; ++i )
         {
             DECOPIXINACTARR[ i ] = DECOARR[ i ][ normal ];
         }
@@ -1043,9 +1043,9 @@ void DeKoratorFactory::chooseRightPixmaps()
     if ( DeKoratorFactory::colorizeActButtons_ )
     {
 
-        for ( i = 0; i < buttonTypeAllCount; i++ )
+        for ( i = 0; i < buttonTypeAllCount; ++i )
         {
-            for ( j = 0; j < buttonStateCount; j++ )
+            for ( j = 0; j < buttonStateCount; ++j )
             {
                 BUTTONPIXACTARR[ i ][ j ] = BUTTONSARR[ i ][ j ][ actCol ];
             }
@@ -1053,9 +1053,9 @@ void DeKoratorFactory::chooseRightPixmaps()
     }
     else
     {
-        for ( i = 0; i < buttonTypeAllCount; i++ )
+        for ( i = 0; i < buttonTypeAllCount; ++i )
         {
-            for ( j = 0; j < buttonStateCount; j++ )
+            for ( j = 0; j < buttonStateCount; ++j )
             {
                 BUTTONPIXACTARR[ i ][ j ] = BUTTONSARR[ i ][ j ][ normal ];
             }
@@ -1065,9 +1065,9 @@ void DeKoratorFactory::chooseRightPixmaps()
 
     if ( DeKoratorFactory::colorizeInActButtons_ )
     {
-        for ( i = 0; i < buttonTypeAllCount; i++ )
+        for ( i = 0; i < buttonTypeAllCount; ++i )
         {
-            for ( j = 0; j < buttonStateCount; j++ )
+            for ( j = 0; j < buttonStateCount; ++j )
             {
                 BUTTONPIXINACTARR[ i ][ j ] = BUTTONSARR[ i ][ j ][ inActCol ];
             }
@@ -1075,9 +1075,9 @@ void DeKoratorFactory::chooseRightPixmaps()
     }
     else
     {
-        for ( i = 0; i < buttonTypeAllCount; i++ )
+        for ( i = 0; i < buttonTypeAllCount; ++i )
         {
-            for ( j = 0; j < buttonStateCount; j++ )
+            for ( j = 0; j < buttonStateCount; ++j )
             {
                 BUTTONPIXINACTARR[ i ][ j ] = BUTTONSARR[ i ][ j ][ normal ];
             }
@@ -1100,7 +1100,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 
     if ( DeKoratorFactory::colorizeActFrames_ )
     {
-        for ( i = 0 ; i < decoCount ; i++ )
+        for ( i = 0 ; i < decoCount ; ++i )
         {
             tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
@@ -1117,7 +1117,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     }
     else
     {
-        for ( i = 0 ; i < decoCount ; i++ )
+        for ( i = 0 ; i < decoCount ; ++i )
         {
             tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
@@ -1135,7 +1135,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 
     if ( DeKoratorFactory::colorizeInActFrames_ )
     {
-        for ( i = 0 ; i < decoCount ; i++ )
+        for ( i = 0 ; i < decoCount ; ++i )
         {
             tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
@@ -1152,7 +1152,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     }
     else
     {
-        for ( i = 0 ; i < decoCount ; i++ )
+        for ( i = 0 ; i < decoCount ; ++i )
         {
             tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
@@ -1171,7 +1171,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 
     //     if ( !DeKoratorFactory::colorizeActFrames_ || !DeKoratorFactory::colorizeInActFrames_ )
     //     {
-    //         for ( i = 0 ; i < decoCount ; i++ )
+    //         for ( i = 0 ; i < decoCount ; ++i )
     //         {
     //             tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
     //
@@ -1207,7 +1207,7 @@ DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight
 {
     //decoPixInAct_ = buttonPixInAct;
     animProgress = 0;
-    hover_ = FALSE;
+    hover_ = false;
     setBackgroundMode( Qt::NoBackground );
     setFixedSize( buttonWidth_, BUTTONSHEIGHT );
     setCursor( Qt::arrowCursor );
@@ -1255,7 +1255,7 @@ void DeKoratorButton::setPixmap( buttonTypeAll btnType )
     //   }
     //   else
     //   {
-    //     deco_ = new QBitmap(DECOSIZE, DECOSIZE, bitmap, TRUE);
+    //     deco_ = new QBitmap(DECOSIZE, DECOSIZE, bitmap, true);
     //     deco_->setMask(*deco_);
     //   }
     repaint();
@@ -1279,7 +1279,7 @@ void DeKoratorButton::enterEvent( QEvent * e )
     // if we wanted to do mouseovers, we would keep track of it here
     Q3Button::enterEvent( e );
     s = STEPS;
-    hover_ = TRUE;
+    hover_ = true;
     setCursor( Qt::PointingHandCursor );
 
     if ( USEANIMATION )
@@ -1298,7 +1298,7 @@ void DeKoratorButton::leaveEvent( QEvent * e )
 
     Q3Button::leaveEvent( e );
     //STEPS = s;
-    hover_ = FALSE;
+    hover_ = false;
     unsetCursor ();
 
     if ( USEANIMATION )
@@ -1607,7 +1607,7 @@ DeKoratorClient::DeKoratorClient( KDecorationBridge * b, KDecorationFactory * f 
 
 DeKoratorClient::~DeKoratorClient()
 {
-    for ( int n = 0; n < ButtonTypeCount; n++ )
+    for ( int n = 0; n < ButtonTypeCount; ++n )
     {
         if ( button[ n ] )
             delete button[ n ];
@@ -1698,11 +1698,11 @@ void DeKoratorClient::init()
     //left spacer
     titleLayout_->addItem( leftTitleBarSpacer_ );
     // setup titlebar buttons
-    for ( int n = 0; n < ButtonTypeCount; n++ )
+    for ( int n = 0; n < ButtonTypeCount; ++n )
         button[ n ] = 0;
-    addButtons( titleLayout_, options() ->titleButtonsLeft(), TRUE );
+    addButtons( titleLayout_, options() ->titleButtonsLeft(), true );
     titleLayout_->addItem( titleBarSpacer_ );
-    addButtons( titleLayout_, options() ->titleButtonsRight(), FALSE );
+    addButtons( titleLayout_, options() ->titleButtonsRight(), false );
     //right spacer
     titleLayout_->addItem( rightTitleBarSpacer_ );
 
@@ -1745,7 +1745,7 @@ void DeKoratorClient::addButtons( Q3BoxLayout * layout, const QString & s, bool 
 
     if ( s.length() > 0 )
     {
-        for ( int n = 0; n < s.length(); n++ )
+        for ( int n = 0; n < s.length(); ++n )
         {
             switch ( s[ n ].toAscii() )
             {
@@ -1944,7 +1944,7 @@ void DeKoratorClient::addButtons( Q3BoxLayout * layout, const QString & s, bool 
 // window active state has changed
 void DeKoratorClient::activeChange()
 {
-    for ( int n = 0; n < ButtonTypeCount; n++ )
+    for ( int n = 0; n < ButtonTypeCount; ++n )
         if ( button[ n ] )
             button[ n ] ->reset();
     widget() ->repaint();
@@ -2054,7 +2054,7 @@ void DeKoratorClient::shadeChange()
     }
 
     //mainlayout_->setRowSpacing( 3, isSetShade() ? 0 : MARGIN );
-    for ( int n = 0; n < ButtonTypeCount; n++ )
+    for ( int n = 0; n < ButtonTypeCount; ++n )
         if ( button[ n ] )
             button[ n ] ->reset();
     widget() ->repaint();
@@ -2163,7 +2163,7 @@ QSize DeKoratorClient::minimumSize() const
 // Return logical mouse position
 KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) const
 {
-    //    bool res = TRUE;
+    //    bool res = true;
     Position pos;
     if ( isShade() )
     {
@@ -2256,7 +2256,7 @@ KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) con
 bool DeKoratorClient::eventFilter( QObject * obj, QEvent * e )
 {
     if ( obj != widget() )
-        return FALSE;
+        return false;
 
     switch ( e->type() )
     {
@@ -2264,42 +2264,42 @@ bool DeKoratorClient::eventFilter( QObject * obj, QEvent * e )
     case QEvent::MouseButtonDblClick:
         {
             mouseDoubleClickEvent( static_cast<QMouseEvent *>( e ) );
-            return TRUE;
+            return true;
         }
     case QEvent::Wheel:
         {
             wheelEvent( static_cast<QWheelEvent *>( e ) );
-            return TRUE;
+            return true;
         }
     case QEvent::MouseButtonPress:
         {
             processMousePressEvent( static_cast<QMouseEvent *>( e ) );
             if ( USEMASKS )
                 doShape();
-            return TRUE;
+            return true;
         }
     case QEvent::Paint:
         {
             paintEvent( static_cast<QPaintEvent *>( e ) );
-            return TRUE;
+            return true;
         }
     case QEvent::Resize:
         {
             resizeEvent( static_cast<QResizeEvent *>( e ) );
-            return TRUE;
+            return true;
         }
     case QEvent::Show:
         {
             showEvent( static_cast<QShowEvent *>( e ) );
-            return TRUE;
+            return true;
         }
     default:
         {
-            return FALSE;
+            return false;
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2438,7 +2438,7 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
 
 
             //draw titleR text
-            painter2.setFont( options() ->font( isActive(), FALSE ) );
+            painter2.setFont( options() ->font( isActive(), false ) );
             painter2.setPen( options() ->color( KDecoration::ColorFont, isActive() ) );
 
             Qt::Alignment titleAlignBak = TITLEALIGN;
@@ -2571,9 +2571,9 @@ void DeKoratorClient::updateCaptionBuffer()
     // prepare the shadow
     textPixmap = QPixmap( captionWidth + ( MARGIN * 2 ) , captionHeight ); // 2*2 px shadow space
     textPixmap.fill( QColor( 0, 0, 0 ) );
-    textPixmap.setMask( textPixmap.createHeuristicMask( TRUE ) );
+    textPixmap.setMask( textPixmap.createHeuristicMask( true ) );
     painter.begin( &textPixmap );
-    painter.setFont( options() ->font( isActive(), FALSE ) );
+    painter.setFont( options() ->font( isActive(), false ) );
     painter.setPen( Qt::white );
     painter.drawText( textPixmap.rect(), Qt::AlignCenter, caption() );
     painter.end();
@@ -2714,7 +2714,7 @@ void DeKoratorClient::menuButtonPressed()
     //         KDecorationFactory* f = factory();
     //         showWindowMenu( button[ ButtonMenu ] ->mapToGlobal( p ) );
     //         if ( !f->exists( this ) ) return ; // decoration was destroyed
-    //         button[ ButtonMenu ] ->setDown( FALSE );
+    //         button[ ButtonMenu ] ->setDown( false );
     //     }
 
     static QTime * t = NULL;
@@ -2732,7 +2732,7 @@ void DeKoratorClient::menuButtonPressed()
         showWindowMenu( button[ ButtonMenu ] ->mapToGlobal( p ) );
         if ( !f->exists( this ) )
             return ; // decoration was destroyed
-        button[ ButtonMenu ] ->setDown( FALSE );
+        button[ ButtonMenu ] ->setDown( false );
     }
     else
         closing_ = true;
@@ -2776,7 +2776,7 @@ void DeKoratorClient::doShape()
             m = QRegion( decoFactory_->topMidBitmap_ );
             QRegion mBak = m;
 
-            for ( int i = 0 ; i < rep ; i++ )
+            for ( int i = 0 ; i < rep ; ++i )
             {
                 m = mBak;
                 m.translate( TOPLEFTMASKWIDTH + ( i * TOPMIDMASKWIDTH ), 0 );
@@ -2816,7 +2816,7 @@ void DeKoratorClient::doShape()
                 m = QRegion( decoFactory_->buttomMidBitmap_ );
                 QRegion mBak = m;
 
-                for ( int i = 0 ; i < rep ; i++ )
+                for ( int i = 0 ; i < rep ; ++i )
                 {
                     m = mBak;
                     m.translate( BOTTOMLEFTMASKWIDTH + ( i * BOTTOMMIDMASKWIDTH ), hm );

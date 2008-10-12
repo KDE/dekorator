@@ -33,6 +33,7 @@
 
 //#include <config.h>
 
+#include "themes.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -69,7 +70,6 @@
 #include <qpainter.h>
 #include <qregexp.h>
 
-#include "themes.h"
 #include <kurlrequester.h>
 
 
@@ -165,7 +165,7 @@ void IconThemesConfig::loadThemes()
 void IconThemesConfig::installNewTheme()
 {
 
-    KUrl themeURL = KUrlRequesterDialog::getUrl( QString::null, parent_,
+    KUrl themeURL = KUrlRequesterDialog::getUrl( QString(), parent_,
                     i18n( "Drag or Type Theme URL" ) );
     kDebug() << themeURL.prettyUrl() << endl;
 
@@ -179,11 +179,11 @@ void IconThemesConfig::installNewTheme()
     {
         QString sorryText;
         if ( themeURL.isLocalFile() )
-            sorryText = i18n( "Unable to find the deKorator theme archive %1." );
+            sorryText = i18n( "Unable to find the deKorator theme archive %1.", themeURL.prettyUrl() );
         else
             sorryText = i18n( "Unable to download deKorator theme archive;\n"
-                              "please check that address %1 is correct." );
-        KMessageBox::sorry( parent_, sorryText.arg( themeURL.prettyUrl() ) );
+                    "please check that address %1 is correct.", themeURL.prettyUrl() );
+        KMessageBox::sorry( parent_, sorryText );
         return ;
     }
 
@@ -246,8 +246,8 @@ bool IconThemesConfig::installThemes( const QStringList &themes, const QString &
     for ( QStringList::ConstIterator it = themes.begin(); it != themes.end(); ++it )
     {
         progressDiag.setLabelText(
-            i18n( "<qt>Installing <strong>%1</strong> theme</qt>" )
-            .arg( *it ) );
+            i18n( "<qt>Installing <strong>%1</strong> theme</qt>", *it )
+            );
         kapp->processEvents();
 
         if ( progressDiag.wasCancelled() )
@@ -329,10 +329,9 @@ void IconThemesConfig::removeSelectedTheme()
         return ;
 
     QString question = i18n( "<qt>Are you sure you want to remove the "
-                             "<strong>%1</strong> theme?<br>"
-                             "<br>"
-                             "This will delete the files installed by this theme.</qt>" ).
-                       arg( selected->text( 0 ) );
+            "<strong>%1</strong> theme?<br>"
+            "<br>"
+            "This will delete the files installed by this theme.</qt>", selected->text( 0 ) );
 
     int r = KMessageBox::warningContinueCancel( parent_, question, i18n( "Confirmation" ), KStandardGuiItem::del() );
     if ( r != KMessageBox::Continue ) return ;

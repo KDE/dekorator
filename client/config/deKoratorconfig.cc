@@ -31,6 +31,7 @@
 // Boston, MA 02110-1301, USA.
 ///////////////////////////////////////////////////////////////////////
 
+#include "deKoratorconfig.h"
 #include <kconfig.h>
 #include <klocale.h>
 #include <kglobal.h>
@@ -41,11 +42,9 @@
 #include <qcheckbox.h>
 #include <qcombobox.h>
 #include <qspinbox.h>
-#include <qcheckbox.h>
 #include <kcolorbutton.h>
 #include <k3listview.h>
 
-#include "deKoratorconfig.h"
 #include "ui_configdialog.h"
 #include <themes.h>
 
@@ -189,13 +188,13 @@ void DeKoratorConfig::load( const KConfigGroup & )
 
     QString value = config_->readEntry( "TitleAlignment", "AlignHCenter" );
     QRadioButton *button = ( QRadioButton* ) dialog_->titlealign->findChild<QRadioButton *>( value );
-    if ( button ) button->setChecked( TRUE );
-    dialog_->useMenuImageChkBox->setChecked( config_->readEntry( "UseMenuImage", FALSE ) );
-	dialog_->ignoreAppIcnCol->setChecked( config_->readEntry( "IgnoreAppIconCol", FALSE ) );
-    dialog_->dblClkCloseChkBox->setChecked( config_->readEntry( "DblClkClose", FALSE ) );
-    dialog_->showBtmBorderChkBox->setChecked( config_->readEntry( "ShowBtmBorder", FALSE ) );
+    if ( button ) button->setChecked( true );
+    dialog_->useMenuImageChkBox->setChecked( config_->readEntry( "UseMenuImage", false ) );
+	dialog_->ignoreAppIcnCol->setChecked( config_->readEntry( "IgnoreAppIconCol", false ) );
+    dialog_->dblClkCloseChkBox->setChecked( config_->readEntry( "DblClkClose", false ) );
+    dialog_->showBtmBorderChkBox->setChecked( config_->readEntry( "ShowBtmBorder", false ) );
     QColor color = QColor( 150, 150, 150 );
-    dialog_->useShdtextChkBox->setChecked( config_->readEntry( "UseShdtext", FALSE ) );
+    dialog_->useShdtextChkBox->setChecked( config_->readEntry( "UseShdtext", false ) );
     dialog_->activeShdtextXSpinBox->setValue( config_->readEntry( "ActiveShdtextX", 0 ) );
     dialog_->activeShdtextYSpinBox->setValue( config_->readEntry( "ActiveShdtextY", 0 ) );
     dialog_->activeShdColBtn->setColor( config_->readEntry( "ActiveShadowColor", color ) );
@@ -209,16 +208,16 @@ void DeKoratorConfig::load( const KConfigGroup & )
     // colors
     KConfigGroup groupColors(conf, "COLORS" ); config_ = &groupColors;
 
-    dialog_->colorizeActFramesChkBox->setChecked( config_->readEntry( "ColorizeActFrames", FALSE ) );
-    dialog_->colorizeActButtonsChkBox->setChecked( config_->readEntry( "ColorizeActButtons", FALSE ) );
-    dialog_->colorizeInActFramesChkBox->setChecked( config_->readEntry( "ColorizeInActFrames", FALSE ) );
-    dialog_->colorizeInActButtonsChkBox->setChecked( config_->readEntry( "ColorizeInActButtons", FALSE ) );
-    dialog_->useAnimChkBox->setChecked( config_->readEntry( "UseAnimation", FALSE ) );
+    dialog_->colorizeActFramesChkBox->setChecked( config_->readEntry( "ColorizeActFrames", false ) );
+    dialog_->colorizeActButtonsChkBox->setChecked( config_->readEntry( "ColorizeActButtons", false ) );
+    dialog_->colorizeInActFramesChkBox->setChecked( config_->readEntry( "ColorizeInActFrames", false ) );
+    dialog_->colorizeInActButtonsChkBox->setChecked( config_->readEntry( "ColorizeInActButtons", false ) );
+    dialog_->useAnimChkBox->setChecked( config_->readEntry( "UseAnimation", false ) );
     dialog_->animateEfeectsCombo->setCurrentIndex( dialog_->animateEfeectsCombo->findText( config_->readEntry( "AnimationType", "Intensity" ) ) );
 
     dialog_->stepsSpinBox->setValue( config_->readEntry( "AnimSteps", 5 ) );
     dialog_->intervalSpinBox->setValue( config_->readEntry( "AnimInterval", 30 ) );
-    dialog_->KeepAnimateChkBox->setChecked( config_->readEntry( "KeepAnimating", FALSE ) );
+    dialog_->KeepAnimateChkBox->setChecked( config_->readEntry( "KeepAnimating", false ) );
 
     dialog_->activeHighlightClrBtn->setColor( config_->readEntry( "ActiveHighlightColor", color ) );
     dialog_->inActiveHighlightClrBtn->setColor( config_->readEntry( "InActiveHighlightColor", color ) );
@@ -231,9 +230,9 @@ void DeKoratorConfig::load( const KConfigGroup & )
     // buttons
     KConfigGroup groupButtons(conf, "BUTTONS" ); config_ = &groupButtons;
 
-    dialog_->useCusBtnClrChkBox->setChecked( config_->readEntry( "UseCustomButtonsColors", FALSE ) );
-    dialog_->cusColActBtnChkBox->setChecked( config_->readEntry( "customColorsActiveButtons", FALSE ) );
-    dialog_->cusColInActBtnChkBox->setChecked( config_->readEntry( "customColorsInActiveButtons", FALSE ) );
+    dialog_->useCusBtnClrChkBox->setChecked( config_->readEntry( "UseCustomButtonsColors", false ) );
+    dialog_->cusColActBtnChkBox->setChecked( config_->readEntry( "customColorsActiveButtons", false ) );
+    dialog_->cusColInActBtnChkBox->setChecked( config_->readEntry( "customColorsInActiveButtons", false ) );
     dialog_->closeClrBtn->setColor( config_->readEntry( "CloseButtonColor", color ) );
     dialog_->minClrBtn->setColor( config_->readEntry( "MinButtonColor", color ) );
     dialog_->maxClrBtn->setColor( config_->readEntry( "MaxButtonColor", color ) );
@@ -254,7 +253,7 @@ void DeKoratorConfig::load( const KConfigGroup & )
 
     dialog_->framesPathKurl->setUrl( config_->readEntry( "FramesPath", "" ) );
     dialog_->buttonsPathKurl->setUrl( config_->readEntry( "ButtonsPath", "" ) );
-    dialog_->useMasks_Chkbox->setChecked( config_->readEntry( "UseMasks", FALSE ) );
+    dialog_->useMasks_Chkbox->setChecked( config_->readEntry( "UseMasks", false ) );
     dialog_->masksPathKurl->setUrl( config_->readEntry( "MasksPath", "" ) );
 }
 
@@ -350,12 +349,12 @@ void DeKoratorConfig::defaults()
     // misc
     QRadioButton * button =
         ( QRadioButton* ) dialog_->titlealign->findChild<QRadioButton *>( "AlignHCenter" );
-    if ( button ) button->setChecked( TRUE );
-    dialog_->useMenuImageChkBox->setChecked( FALSE );
-	dialog_->ignoreAppIcnCol->setChecked( FALSE );
-    dialog_->dblClkCloseChkBox->setChecked( FALSE );
-    dialog_->showBtmBorderChkBox->setChecked( FALSE );
-    dialog_->useShdtextChkBox->setChecked( FALSE );
+    if ( button ) button->setChecked( true );
+    dialog_->useMenuImageChkBox->setChecked( false );
+	dialog_->ignoreAppIcnCol->setChecked( false );
+    dialog_->dblClkCloseChkBox->setChecked( false );
+    dialog_->showBtmBorderChkBox->setChecked( false );
+    dialog_->useShdtextChkBox->setChecked( false );
     dialog_->activeShdtextXSpinBox->setValue( 0 );
     dialog_->activeShdtextYSpinBox->setValue( 0 );
     dialog_->activeShdColBtn->setColor( QColor( 150, 150, 150 ) );
@@ -366,16 +365,16 @@ void DeKoratorConfig::defaults()
     dialog_->btnShiftYSpinBox->setValue( 0 );
 
     // colors
-    dialog_->colorizeActFramesChkBox->setChecked( FALSE );
-    dialog_->colorizeActButtonsChkBox->setChecked( FALSE );
-    dialog_->colorizeInActFramesChkBox->setChecked( FALSE );
-    dialog_->colorizeInActButtonsChkBox->setChecked( FALSE );
-    dialog_->useAnimChkBox->setChecked( FALSE );
+    dialog_->colorizeActFramesChkBox->setChecked( false );
+    dialog_->colorizeActButtonsChkBox->setChecked( false );
+    dialog_->colorizeInActFramesChkBox->setChecked( false );
+    dialog_->colorizeInActButtonsChkBox->setChecked( false );
+    dialog_->useAnimChkBox->setChecked( false );
     dialog_->animateEfeectsCombo->setCurrentIndex( dialog_->animateEfeectsCombo->findText( "Intensity" ) );
 
     dialog_->stepsSpinBox->setValue( 5 );
     dialog_->intervalSpinBox->setValue( 30 );
-    dialog_->KeepAnimateChkBox->setChecked( FALSE );
+    dialog_->KeepAnimateChkBox->setChecked( false );
 
     dialog_->hoverTypeCombo->setCurrentIndex( dialog_->hoverTypeCombo->findText( "To Gray" ) );
     dialog_->effectsAmount_SpinBox->setValue( 5 );
@@ -386,9 +385,9 @@ void DeKoratorConfig::defaults()
     //  dialog_->buttonsHoverColorizeComboBox->setCurrentText( "Liquid Method" );
 
     // buttons
-    dialog_->useCusBtnClrChkBox->setChecked( FALSE );
-    dialog_->cusColActBtnChkBox->setChecked( FALSE );
-    dialog_->cusColInActBtnChkBox->setChecked( FALSE );
+    dialog_->useCusBtnClrChkBox->setChecked( false );
+    dialog_->cusColActBtnChkBox->setChecked( false );
+    dialog_->cusColInActBtnChkBox->setChecked( false );
     dialog_->closeClrBtn->setColor( QColor( 150, 150, 150 ) );
     dialog_->minClrBtn->setColor( QColor( 150, 150, 150 ) );
     dialog_->maxClrBtn->setColor( QColor( 150, 150, 150 ) );
@@ -407,7 +406,7 @@ void DeKoratorConfig::defaults()
     // path's
     dialog_->framesPathKurl->setUrl( KUrl() );
     dialog_->buttonsPathKurl->setUrl( KUrl() );
-    dialog_->useMasks_Chkbox->setChecked( KConfigGroup(config_, "PATHS").readEntry( "UseMasks", FALSE ) );
+    dialog_->useMasks_Chkbox->setChecked( KConfigGroup(config_, "PATHS").readEntry( "UseMasks", false ) );
     dialog_->masksPathKurl->setUrl( KUrl() );
 }
 

@@ -407,7 +407,7 @@
               </item>
               <item>
                <property name="text" >
-                <string>Kde Method</string>
+                <string>KDE Method</string>
                </property>
               </item>
               <item>
@@ -440,12 +440,12 @@
               </item>
               <item>
                <property name="text" >
-                <string>Kde Method</string>
+                <string>KDE Method</string>
                </property>
               </item>
               <item>
                <property name="text" >
-                <string>Hue Adgustment</string>
+                <string>Hue Adjustment</string>
                </property>
               </item>
              </widget>
@@ -847,7 +847,7 @@
             <item>
              <widget class="QCheckBox" name="cusColInActBtnChkBox" >
               <property name="text" >
-               <string>InActive buttons</string>
+               <string>Inactive buttons</string>
               </property>
              </widget>
             </item>
@@ -1306,9 +1306,6 @@
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="whatsThis" >
-               <string>This is a Screen shot of what KDM will look like when you go to log in.</string>
               </property>
               <property name="scaledContents" >
                <bool>true</bool>

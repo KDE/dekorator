@@ -504,7 +504,7 @@ bool DeKoratorFactory::readConfig()
     //style backgrond
     QColor oldStyleBgCol = STYLEBGCOL;
 
-    QString colStr = QSettings().readEntry( "/Qt/Palette/active", "aaaa" );
+    QString colStr = QSettings().value( "/Qt/Palette/active", "aaaa" ).toString();
     colStr = colStr.section( "#", 3, 3 ) ;
     colStr.insert( 0, '#' );
     colStr.truncate( 7 );
@@ -748,7 +748,7 @@ void DeKoratorFactory::determineSizes()
 void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 {
     int i;
-    QColor col = options() ->palette( KDecoration::ColorTitleBar, isActive ).background();
+    QColor col = options() ->palette( KDecoration::ColorTitleBar, isActive ).background().color();
 
     if ( isActive )
     {
@@ -778,7 +778,7 @@ void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
 {
     int i, j;
-    QColor col = options() ->palette( KDecoration::ColorButtonBg, isActive ).background();
+    QColor col = options() ->palette( KDecoration::ColorButtonBg, isActive ).background().color();
 
     if ( isActive )
     {
@@ -842,13 +842,12 @@ void DeKoratorFactory::colorizePixmap( QPixmap *pix, QColor c, QString colorizeM
     QImage img;
     if ( colorizeMethod == "Liquid Method" )
     {
-        img = pix->convertToImage();
+        img = pix->toImage();
         //KIconEffect::toGray( img, 1.0 );
 
         if ( img.depth() != 32 )
-            img = img.convertDepth( 32 );
-        QImage *dest = new QImage( img.width(), img.height(), 32 );
-        dest->setAlphaBuffer( true );
+            img = img.convertToFormat( QImage::Format_ARGB32 );
+        QImage *dest = new QImage( img.width(), img.height(), QImage::Format_ARGB32 );
         unsigned int *data = ( unsigned int * ) img.bits();
         unsigned int *destData = ( unsigned int* ) dest->bits();
         int total = img.width() * img.height();
@@ -888,26 +887,25 @@ void DeKoratorFactory::colorizePixmap( QPixmap *pix, QColor c, QString colorizeM
                 destB = 255;
             destData[ current ] = qRgba( destR, destG, destB, alpha );
         }
-        pix->convertFromImage( *dest );
+        *pix = QPixmap::fromImage( *dest );
     }
-    else if ( colorizeMethod == "Kde Method" )
+    else if ( colorizeMethod == "KDE Method" )
     {
-        img = pix->convertToImage();
+        img = pix->toImage();
         KIconEffect::colorize( img, c, 1.0 );
-        pix->convertFromImage( img, 0 );
+        *pix = QPixmap::fromImage( img );
     }
-    else if ( colorizeMethod == "Hue Adgustment" )
+    else if ( colorizeMethod == "Hue Adjustment" )
     {
-        img = pix->convertToImage();
+        img = pix->toImage();
         //KIconEffect::toGray( img, 1.0 );
 
         if ( img.depth() != 32 )
-            img = img.convertDepth( 32 );
+            img = img.convertToFormat( QImage::Format_ARGB32 );
 
         //         QImage *dest;
         //         *dest = img;
-        QImage *dest = new QImage( img.width(), img.height(), 32 );
-        dest->setAlphaBuffer( true );
+        QImage *dest = new QImage( img.width(), img.height(), QImage::Format_ARGB32 );
         unsigned int *data = ( unsigned int * ) img.bits();
         unsigned int *destData = ( unsigned int* ) dest->bits();
         int total = img.width() * img.height();
@@ -941,9 +939,9 @@ void DeKoratorFactory::colorizePixmap( QPixmap *pix, QColor c, QString colorizeM
 
             col.setRgb( data[ current ] );
             //col = Qt::red;
-            c.hsv( &h, &s, &v );
+            c.getHsv( &h, &s, &v );
             ch = h;
-            col.hsv( &h, &s, &v );
+            col.getHsv( &h, &s, &v );
             //             s = 0;
             //v += 100;
             col.setHsv( ch, s, v );
@@ -969,7 +967,7 @@ void DeKoratorFactory::colorizePixmap( QPixmap *pix, QColor c, QString colorizeM
             destData[ current ] = qRgba( destR, destG, destB, alpha );
             //destData[ current ] = data[ current ];
         }
-        pix->convertFromImage( *dest,                                                             /*Qt::ColorOnly | Qt::DiffuseDither | Qt::DiffuseAlphaDither |*/ Qt::AvoidDither );
+        *pix = QPixmap::fromImage( *dest, /*Qt::ColorOnly | Qt::DiffuseDither | Qt::DiffuseAlphaDither |*/ Qt::AvoidDither );
     }
 }
 
@@ -1087,22 +1085,22 @@ void DeKoratorFactory::chooseRightPixmaps()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// prepareDecoWithBbCol()
+// prepareDecoWithBgCol()
 //
 void DeKoratorFactory::prepareDecoWithBgCol()
 {
     int i;
     QPainter painter;
     QPixmap tempPix;
-    QWidget widget;
-    QColor col = widget.colorGroup().background();
+    QPalette palette;
+    QColor col = palette.color(QPalette::Window);
 
 
     if ( DeKoratorFactory::colorizeActFrames_ )
     {
         for ( i = 0 ; i < decoCount ; ++i )
         {
-            tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
+            tempPix = QPixmap( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
             tempPix.fill( col );
 
@@ -1119,7 +1117,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     {
         for ( i = 0 ; i < decoCount ; ++i )
         {
-            tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
+            tempPix = QPixmap( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
             tempPix.fill( col );
 
@@ -1137,7 +1135,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     {
         for ( i = 0 ; i < decoCount ; ++i )
         {
-            tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
+            tempPix = QPixmap( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
             tempPix.fill( col );
 
@@ -1154,7 +1152,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     {
         for ( i = 0 ; i < decoCount ; ++i )
         {
-            tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
+            tempPix = QPixmap( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
 
             tempPix.fill( col );
 
@@ -1173,7 +1171,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     //     {
     //         for ( i = 0 ; i < decoCount ; ++i )
     //         {
-    //             tempPix.resize( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
+    //             tempPix = QPixmap( DECOARR[ i ][ orig ] ->width(), DECOARR[ i ][ orig ] ->height() );
     //
     //             tempPix.fill( col );
     //
@@ -1216,9 +1214,9 @@ DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight
 
     //if ( buttonPix )
     setPixmap( btnType );
-    QToolTip::add
-        ( this, tip );
+    setToolTip( tip );
     animTmr = new QTimer( this );
+    animTmr->setSingleShot( true );
     connect( animTmr, SIGNAL( timeout() ), this, SLOT( animate() ) );
 }
 
@@ -1316,13 +1314,13 @@ void DeKoratorButton::mousePressEvent( QMouseEvent * e )
     lastmouse_ = e->button();
 
     // translate and pass on mouse event
-    int button = Qt::LeftButton;
+    Qt::MouseButton button = Qt::LeftButton;
     if ( ( type_ != ButtonMax ) && ( e->button() != Qt::LeftButton ) )
     {
         button = Qt::NoButton; // middle & right buttons inappropriate
     }
     QMouseEvent me( e->type(), e->pos(), e->globalPos(),
-                    button, e->state() );
+                    button, e->buttons(), e->modifiers() );
     Q3Button::mousePressEvent( &me );
 }
 
@@ -1335,12 +1333,12 @@ void DeKoratorButton::mouseReleaseEvent( QMouseEvent * e )
     lastmouse_ = e->button();
 
     // translate and pass on mouse event
-    int button = Qt::LeftButton;
+    Qt::MouseButton button = Qt::LeftButton;
     if ( ( type_ != ButtonMax ) && ( e->button() != Qt::LeftButton ) )
     {
         button = Qt::NoButton; // middle & right buttons inappropriate
     }
-    QMouseEvent me( e->type(), e->pos(), e->globalPos(), button, e->state() );
+    QMouseEvent me( e->type(), e->pos(), e->globalPos(), button, e->buttons(), e->modifiers() );
     Q3Button::mouseReleaseEvent( &me );
 }
 
@@ -1381,7 +1379,7 @@ void DeKoratorButton::drawButton( QPainter * painter )
                 }
                 else if ( client_->decoFactory_->colorizeActButtons_ )
                 {
-                    QColor col = client_->decoFactory_->options() ->palette( KDecoration::ColorButtonBg, act ).background();
+                    QColor col = client_->decoFactory_->options() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
 
                     DeKoratorFactory::colorizePixmap( &appIconPix, col, BUTTONSCOLORIZE );
                 }
@@ -1394,13 +1392,13 @@ void DeKoratorButton::drawButton( QPainter * painter )
                 }
                 else if ( client_->decoFactory_->colorizeInActButtons_ )
                 {
-                    QColor col = client_->decoFactory_->options() ->palette( KDecoration::ColorButtonBg, act ).background();
+                    QColor col = client_->decoFactory_->options() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
 
                     DeKoratorFactory::colorizePixmap( &appIconPix, col, BUTTONSCOLORIZE );
                 }
             }
         }
-        buttonImgBak = appIconPix;
+        buttonImgBak = appIconPix.toImage();
 
     }
     else
@@ -1414,7 +1412,7 @@ void DeKoratorButton::drawButton( QPainter * painter )
     {
         if ( !( type_ == ButtonMenu && !USEMENUEIMAGE ) )
         {
-            buttonImgBak = act ? *( BUTTONPIXACTARR[ btnType_ ][ press ] ) : *( BUTTONPIXINACTARR[ btnType_ ][ press ] );
+            buttonImgBak = (act ? *( BUTTONPIXACTARR[ btnType_ ][ press ] ) : *( BUTTONPIXINACTARR[ btnType_ ][ press ] )).toImage();
         }
         dx += BTNSHIFTX;
         dy += BTNSHIFTY;
@@ -1426,7 +1424,7 @@ void DeKoratorButton::drawButton( QPainter * painter )
     {
         if ( !( type_ == ButtonMenu && !USEMENUEIMAGE ) )
         {
-            buttonImgBak = act ? *( BUTTONPIXACTARR[ btnType_ ][ hover ] ) : *( BUTTONPIXINACTARR[ btnType_ ][ hover ] );
+            buttonImgBak = (act ? *( BUTTONPIXACTARR[ btnType_ ][ hover ] ) : *( BUTTONPIXINACTARR[ btnType_ ][ hover ] )).toImage();
         }
         chooseRightHoverEffect( &buttonImgBak, USEANIMATION ? ANIMATIONTYPE : BUTTONHOVERTYPE );
     }
@@ -1435,7 +1433,7 @@ void DeKoratorButton::drawButton( QPainter * painter )
     {
         if ( !( type_ == ButtonMenu && !USEMENUEIMAGE ) )
         {
-            buttonImgBak = act ? *( BUTTONPIXACTARR[ btnType_ ][ regular ] ) : *( BUTTONPIXINACTARR[ btnType_ ][ regular ] );
+            buttonImgBak = (act ? *( BUTTONPIXACTARR[ btnType_ ][ regular ] ) : *( BUTTONPIXINACTARR[ btnType_ ][ regular ] )).toImage();
         }
 
         if ( USEANIMATION && animProgress > 0 )
@@ -1497,13 +1495,13 @@ QImage* DeKoratorButton::chooseRightHoverEffect( QImage * img, QString res )
             QColor col ;
             int shift = ( int ) ( animProgress * 3.5 );
             col.setRgb( 255, 0, 0 );
-            col.hsv( &h, &s, &v );
+            col.getHsv( &h, &s, &v );
             col.setHsv( shift, s, v );
 
             QPixmap pix;
-            pix.convertFromImage( *img, Qt::AvoidDither );
-            DeKoratorFactory::colorizePixmap( &pix, col, "Hue Adgustment" );
-            *img = pix.convertToImage();
+            pix = QPixmap::fromImage( *img, Qt::AvoidDither );
+            DeKoratorFactory::colorizePixmap( &pix, col, "Hue Adjustment" );
+            *img = pix.toImage();
         }
     }
     else
@@ -1515,9 +1513,9 @@ QImage* DeKoratorButton::chooseRightHoverEffect( QImage * img, QString res )
             QColor col = client_->isActive() ? ACTIVEHIGHLIGHTCOLOR : INACTIVEHIGHLIGHTCOLOR;
 
             QPixmap pix;
-            pix.convertFromImage( *img, Qt::AvoidDither );
+            pix = QPixmap::fromImage( *img, Qt::AvoidDither );
             DeKoratorFactory::colorizePixmap( &pix, col, BUTTONSCOLORIZE );
-            *img = pix.convertToImage();
+            *img = pix.toImage();
         }
         else if ( BUTTONHOVERTYPE == "DeSaturate" )
             KIconEffect::deSaturate( *img, EFFECTAMOUNT );
@@ -1546,7 +1544,7 @@ void DeKoratorButton::animate()
             {
                 s *= -1;
             }
-            animTmr->start( INTERVAL, true ); // single-shot
+            animTmr->start( INTERVAL );
         }
         else
         {
@@ -1560,7 +1558,7 @@ void DeKoratorButton::animate()
                 }
             }
             if ( animProgress < ANIMATIONSTEPS )
-                animTmr->start( INTERVAL, true ); // single-shot
+                animTmr->start( INTERVAL );
         }
     }
     else
@@ -1572,7 +1570,7 @@ void DeKoratorButton::animate()
             animProgress = 0;
         }
         if ( animProgress > 0 )
-            animTmr->start( INTERVAL, true ); // single-shot
+            animTmr->start( INTERVAL );
     }
     //qWarning( "STEPS: %d", STEPS );
     //qWarning( "animProgress: %d", animProgress );
@@ -1980,10 +1978,7 @@ void DeKoratorClient::desktopChange()
     if ( button[ ButtonSticky ] )
     {
         button[ ButtonSticky ] ->setPixmap( btnType );
-        QToolTip::remove
-            ( button[ ButtonSticky ] );
-        QToolTip::add
-            ( button[ ButtonSticky ], d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ) );
+        button[ ButtonSticky ] ->setToolTip( d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ) );
     }
 }
 
@@ -2020,10 +2015,7 @@ void DeKoratorClient::maximizeChange()
     if ( button[ ButtonMax ] )
     {
         button[ ButtonMax ] ->setPixmap( btnType );
-        QToolTip::remove
-            ( button[ ButtonMax ] );
-        QToolTip::add
-            ( button[ ButtonMax ], m ? i18n( "Restore" ) : i18n( "Maximize" ) );
+        button[ ButtonMax ] ->setToolTip( m ? i18n( "Restore" ) : i18n( "Maximize" ) );
     }
 }
 
@@ -2047,10 +2039,7 @@ void DeKoratorClient::shadeChange()
     if ( button[ ButtonShade ] )
     {
         button[ ButtonShade ] ->setPixmap( btnType );
-        QToolTip::remove
-            ( button[ ButtonShade ] );
-        QToolTip::add
-            ( button[ ButtonShade ], s ? i18n( "Unshade" ) : i18n( "Shade" ) );
+        button[ ButtonShade ] ->setToolTip( s ? i18n( "Unshade" ) : i18n( "Shade" ) );
     }
 
     //mainlayout_->setRowSpacing( 3, isSetShade() ? 0 : MARGIN );
@@ -2342,7 +2331,7 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
         QRect titleR( titleBarSpacer_->geometry() );
         QRect leftTitleR( leftTitleBarSpacer_->geometry() );
         QRect rightTitleR( rightTitleBarSpacer_->geometry() );
-        titleR.rect( &tx, &ty, &tw, &th );
+        titleR.getRect( &tx, &ty, &tw, &th );
         QRect rect;
 
         QPainter painter2;
@@ -2594,11 +2583,11 @@ void DeKoratorClient::updateCaptionBuffer()
 // Window is being resized
 void DeKoratorClient::resizeEvent( QResizeEvent *e )
 {
-    if ( widget() ->isShown() )
+    if ( widget() ->isVisible() )
     {
         QRegion region = widget() ->rect();
         region = region.subtract( titleBarSpacer_->geometry() );
-        widget() ->erase( region );
+        widget() ->update( region );
     }
     if ( USEMASKS )
     {

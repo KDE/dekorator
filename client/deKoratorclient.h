@@ -35,7 +35,7 @@
 #ifndef DEKORATORCLIENT_H
 #define DEKORATORCLIENT_H
 
-#include <q3button.h>
+#include <QtGui/QAbstractButton>
 #include <qbitmap.h>
 #include <qlabel.h>
 #include <qlayout.h>
@@ -204,7 +204,7 @@ inline bool DeKoratorFactory::initialized()
 
 // DeKoratorButton //////////////////////////////////////////////////////////////
 
-class DeKoratorButton : public Q3Button
+class DeKoratorButton : public QAbstractButton
 {
     Q_OBJECT
 public:
@@ -225,7 +225,7 @@ private:
     void leaveEvent( QEvent *e );
     void mousePressEvent( QMouseEvent *e );
     void mouseReleaseEvent( QMouseEvent *e );
-    void drawButton( QPainter *painter );
+    void paintEvent( QPaintEvent *e );
     QImage* chooseRightHoverEffect( QImage *img, QString res );
 
 private:

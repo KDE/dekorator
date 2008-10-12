@@ -1201,15 +1201,15 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 // Constructor
 DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight, DeKoratorClient * parent, const char * name,
                                   const QString & tip, ButtonType type, buttonTypeAll btnType )
-        : Q3Button( parent->widget(), name ), isLeft_( isLeft ), buttonWidth_( buttonWidth ), client_( parent ), type_( type ), lastmouse_( Qt::NoButton ), decoPixHeight_( buttonHeight )
+        : QAbstractButton( parent->widget() ), isLeft_( isLeft ), buttonWidth_( buttonWidth ), client_( parent ), type_( type ), lastmouse_( Qt::NoButton ), decoPixHeight_( buttonHeight )
 {
     //decoPixInAct_ = buttonPixInAct;
     animProgress = 0;
     hover_ = false;
-    setBackgroundMode( Qt::NoBackground );
+    setAttribute( Qt::WA_NoBackground, true );
     setFixedSize( buttonWidth_, BUTTONSHEIGHT );
     setCursor( Qt::arrowCursor );
-
+    setObjectName( QString::fromAscii(name) );
 
 
     //if ( buttonPix )
@@ -1275,7 +1275,7 @@ QSize DeKoratorButton::sizeHint() const
 void DeKoratorButton::enterEvent( QEvent * e )
 {
     // if we wanted to do mouseovers, we would keep track of it here
-    Q3Button::enterEvent( e );
+    QAbstractButton::enterEvent( e );
     s = STEPS;
     hover_ = true;
     setCursor( Qt::PointingHandCursor );
@@ -1294,7 +1294,7 @@ void DeKoratorButton::leaveEvent( QEvent * e )
 {
     // if we wanted to do mouseovers, we would keep track of it here
 
-    Q3Button::leaveEvent( e );
+    QAbstractButton::leaveEvent( e );
     //STEPS = s;
     hover_ = false;
     unsetCursor ();
@@ -1321,7 +1321,7 @@ void DeKoratorButton::mousePressEvent( QMouseEvent * e )
     }
     QMouseEvent me( e->type(), e->pos(), e->globalPos(),
                     button, e->buttons(), e->modifiers() );
-    Q3Button::mousePressEvent( &me );
+    QAbstractButton::mousePressEvent( &me );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1339,14 +1339,14 @@ void DeKoratorButton::mouseReleaseEvent( QMouseEvent * e )
         button = Qt::NoButton; // middle & right buttons inappropriate
     }
     QMouseEvent me( e->type(), e->pos(), e->globalPos(), button, e->buttons(), e->modifiers() );
-    Q3Button::mouseReleaseEvent( &me );
+    QAbstractButton::mouseReleaseEvent( &me );
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// drawButton()
+// paintEvent()
 // ------------
 // Draw the button
-void DeKoratorButton::drawButton( QPainter * painter )
+void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
 {
     if ( !DeKoratorFactory::initialized() )
         return ;
@@ -1355,12 +1355,13 @@ void DeKoratorButton::drawButton( QPainter * painter )
     int dx = 0, dy = 0;
     bool act = client_->isActive();
     QImage buttonImgBak;
+    QPainter painter( this );
 
     // fill background
     if ( isLeft_ )
-        painter->drawTiledPixmap( rect(), act ? *( DECOPIXACTARR[ leftButtons ] ) : *( DECOPIXINACTARR[ leftButtons ] ) );
+        painter.drawTiledPixmap( rect(), act ? *( DECOPIXACTARR[ leftButtons ] ) : *( DECOPIXINACTARR[ leftButtons ] ) );
     else
-        painter->drawTiledPixmap( rect(), act ? *( DECOPIXACTARR[ rightButtons ] ) : *( DECOPIXINACTARR[ rightButtons ] ) );
+        painter.drawTiledPixmap( rect(), act ? *( DECOPIXACTARR[ rightButtons ] ) : *( DECOPIXINACTARR[ rightButtons ] ) );
 
     // apply app icon effects
     if ( type_ == ButtonMenu && !USEMENUEIMAGE )
@@ -1440,13 +1441,13 @@ void DeKoratorButton::drawButton( QPainter * painter )
             chooseRightHoverEffect( &buttonImgBak, ANIMATIONTYPE );
     }
 
-    painter->drawPixmap( dx, dy, QPixmap::fromImage(buttonImgBak) );
+    painter.drawPixmap( dx, dy, QPixmap::fromImage(buttonImgBak) );
 
 
     if ( client_->isShade() && !SHOWBTMBORDER )
     {
-        painter->setPen( QColor( 70, 70, 70 ) );
-        painter->drawLine( 0, BUTTONSHEIGHT - 1, buttonWidth_ - 1, BUTTONSHEIGHT - 1 );
+        painter.setPen( QColor( 70, 70, 70 ) );
+        painter.drawLine( 0, BUTTONSHEIGHT - 1, buttonWidth_ - 1, BUTTONSHEIGHT - 1 );
     }
 }
 
@@ -1637,8 +1638,7 @@ void DeKoratorClient::init()
     createMainWidget( Qt::WNoAutoErase );
     widget() ->installEventFilter( this );
 
-    // for flicker-free redraws
-    widget() ->setBackgroundMode( Qt::NoBackground );
+    widget() ->setAttribute( Qt::WA_NoBackground, true );
 
     // layouts
     delete mainLayout_;

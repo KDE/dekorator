@@ -134,12 +134,14 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     dialog_->masksPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
 
     // themes
-    connect( dialog_->themesKlstView, SIGNAL( itemClicked( QListWidgetItem * ) ),
-             SLOT( themeSelected( QListWidgetItem * ) ) );
+    connect( dialog_->themesKlstView, SIGNAL( itemSelectionChanged() ),
+             SLOT( themeSelectionChanged() ) );
     connect( dialog_->installthemeBtn, SIGNAL( clicked( ) ), SLOT( installNewTheme() ) );
     connect( dialog_->removeThemBtn, SIGNAL( clicked( ) ), SLOT( removeSelectedTheme() ) );
     connect( dialog_->applyThemeBtn, SIGNAL( clicked( ) ), SLOT( setTheme() ) );
 
+    // force state of theme buttons
+    themeSelectionChanged();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -402,9 +404,16 @@ void DeKoratorConfig::defaults()
 // ----------
 //
 
-void DeKoratorConfig::themeSelected( QListWidgetItem *item )
+void DeKoratorConfig::themeSelectionChanged()
 {
-	themes_->themeSelected( item, dialog_->previewLabael, dialog_->removeThemBtn );
+    QList<QListWidgetItem *> selection = dialog_->themesKlstView->selectedItems();
+    if ( selection.isEmpty() ) {
+        dialog_->removeThemBtn->setEnabled( false );
+        dialog_->applyThemeBtn->setEnabled( false );
+    } else {
+        dialog_->applyThemeBtn->setEnabled( true );
+        themes_->themeSelected( selection.at(0), dialog_->previewLabel, dialog_->removeThemBtn );
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////

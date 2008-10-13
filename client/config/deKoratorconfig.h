@@ -69,7 +69,7 @@ public slots:
 
 
 protected slots:
-    void themeSelected( QListWidgetItem *item );
+    void themeSelectionChanged();
     void installNewTheme();
     void removeSelectedTheme();
     void setTheme();

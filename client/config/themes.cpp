@@ -299,9 +299,11 @@ QStringList IconThemesConfig::findThemeDirs( const QString &archiveName )
 
 void IconThemesConfig::removeSelectedTheme()
 {
-    QListWidgetItem * selected = themesView_->currentItem();
-    if ( !selected )
-        return ;
+    QList<QListWidgetItem *> selection = themesView_->selectedItems();
+    if ( selection.isEmpty() ) {
+        return;
+    }
+    QListWidgetItem *selected = selection.at( 0 );
 
     QString question = i18n( "<qt>Are you sure you want to remove the "
             "<strong>%1</strong> theme?<br>"
@@ -412,9 +414,11 @@ void IconThemesConfig::themeSelected( QListWidgetItem *item, QLabel *previewLabe
 
 void IconThemesConfig::setTheme( KUrlRequester *framesPath, KUrlRequester *buttonsPath, KUrlRequester *masksPath )
 {
-    QListWidgetItem * selected = themesView_->currentItem();
-    if ( !selected )
-        return ;
+    QList<QListWidgetItem *> selection = themesView_->selectedItems();
+    if ( selection.isEmpty() ) {
+        return;
+    }
+    QListWidgetItem *selected = selection.at( 0 );
 
     QString dirName( m_themeNames[ selected->text() ] );
 

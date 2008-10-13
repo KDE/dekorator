@@ -77,8 +77,10 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     // setup the connections
 
     // misc
-    connect( dialog_->titlealign, SIGNAL( clicked( int ) ),
-             this, SLOT( selectionChanged( int ) ) );
+    QList<QRadioButton *> buttons = dialog_->titlealign->findChildren<QRadioButton *>();
+    foreach (QRadioButton *button, buttons) {
+        connect( button, SIGNAL( clicked() ), this, SIGNAL( changed() ) );
+    }
     connect( dialog_->useMenuImageChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
 	connect( dialog_->ignoreAppIcnCol, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->dblClkCloseChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
@@ -163,16 +165,6 @@ DeKoratorConfig::~DeKoratorConfig()
     if ( dialog_ ) delete dialog_;
     if ( config_ ) delete config_;
     if ( themes_ ) delete themes_;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// selectionChanged()
-// ------------------
-// Selection has changed
-
-void DeKoratorConfig::selectionChanged( int )
-{
-    emit changed();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -268,7 +260,15 @@ void DeKoratorConfig::save( KConfigGroup & )
     // misc
     KConfigGroup *config_; KConfigGroup groupMisc(conf, "MISC" ); config_ = &groupMisc;
 
-    QRadioButton *button = ( QRadioButton* ) dialog_->titlealign->selected();
+    QRadioButton *button = 0;
+    QList<QRadioButton *> buttons = dialog_->titlealign->findChildren<QRadioButton *>();
+    foreach (QRadioButton *b, buttons) {
+        if (b->isChecked()) {
+            button = b;
+            break;
+        }
+    }
+
     if ( button ) config_->writeEntry( "TitleAlignment", QString( button->objectName() ) );
     config_->writeEntry( "UseMenuImage", dialog_->useMenuImageChkBox->isChecked() );
 	config_->writeEntry( "IgnoreAppIconCol", dialog_->ignoreAppIcnCol->isChecked() );

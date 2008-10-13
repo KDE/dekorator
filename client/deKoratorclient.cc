@@ -157,7 +157,7 @@ static const uint ANIMATIONSTEPS = 100;
 //
 
 // paths
-static bool USEMASKS = FALSE;
+static bool USEMASKS = false;
 
 // pix arrays
 static QPixmap *DECOARR[ decoCount ][ pixTypeCount ];

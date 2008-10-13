@@ -69,7 +69,6 @@ public slots:
 
 protected slots:
     void themeSelected( Q3ListViewItem *item );
-    void selectionChanged( int );
     void installNewTheme();
     void removeSelectedTheme();
     void setTheme();

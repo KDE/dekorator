@@ -52,7 +52,8 @@
 #include <ksimpleconfig.h>
 #undef Unsorted
 
-#include <k3listview.h>
+#include <QtGui/QListWidget>
+#include <QtGui/QListWidgetItem>
 #include <kurlrequesterdlg.h>
 #include <kmessagebox.h>
 #include <kprogressdialog.h>
@@ -78,7 +79,7 @@
 // ----------
 //
 
-IconThemesConfig::IconThemesConfig( QWidget *parent, K3ListView *themesView /*, QPushButton *removethemeBtn*/ )
+IconThemesConfig::IconThemesConfig( QWidget *parent, QListWidget *themesView /*, QPushButton *removethemeBtn*/ )
 {
     parent_ = parent;
     themesView_ = themesView;
@@ -100,13 +101,13 @@ IconThemesConfig::~IconThemesConfig()
 // ----------
 //
 
-Q3ListViewItem *IconThemesConfig::iconThemeItem( const QString &name )
+QListWidgetItem *IconThemesConfig::iconThemeItem( const QString &name )
 {
-    Q3ListViewItem * item;
-    for ( item = themesView_->firstChild(); item ; item = item->nextSibling() )
-        if ( item->text( 0 )  == name ) return item;
-
-    return 0L;
+    QList<QListWidgetItem *> items = themesView_->findItems( name, Qt::MatchExactly );
+    if ( !items.isEmpty() ) {
+        return items.at( 0 );
+    }
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -150,7 +151,7 @@ void IconThemesConfig::loadThemes()
 
             name = ( QString ) * itj;
 
-            themesView_->insertItem( new Q3ListViewItem( themesView_, name ) );
+            themesView_->addItem( name );
 
             m_themeNames.insert( name, place );
         }
@@ -214,8 +215,8 @@ void IconThemesConfig::installNewTheme()
 
     QString cur = themesNames.at( 0 );
 
-    Q3ListViewItem *item = iconThemeItem( cur );
-    themesView_->setSelected( item, true );
+    QListWidgetItem *item = iconThemeItem( cur );
+    themesView_->setCurrentItem( item );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -324,19 +325,19 @@ QStringList IconThemesConfig::findThemeDirs( const QString &archiveName )
 
 void IconThemesConfig::removeSelectedTheme()
 {
-    Q3ListViewItem * selected = themesView_->selectedItem();
+    QListWidgetItem * selected = themesView_->currentItem();
     if ( !selected )
         return ;
 
     QString question = i18n( "<qt>Are you sure you want to remove the "
             "<strong>%1</strong> theme?<br>"
             "<br>"
-            "This will delete the files installed by this theme.</qt>", selected->text( 0 ) );
+            "This will delete the files installed by this theme.</qt>", selected->text() );
 
     int r = KMessageBox::warningContinueCancel( parent_, question, i18n( "Confirmation" ), KStandardGuiItem::del() );
     if ( r != KMessageBox::Continue ) return ;
 
-    QString delTheme = selected->text( 0 );
+    QString delTheme = selected->text();
     QString deldirStr = QDir::homePath() + "/.kde/share/apps/deKorator/themes/" + delTheme;
     QDir dir = QDir( deldirStr );
     dir.rename( deldirStr, deldirStr + "del" );
@@ -351,12 +352,12 @@ void IconThemesConfig::removeSelectedTheme()
 // ----------
 //
 
-void IconThemesConfig::themeSelected( Q3ListViewItem *item, QLabel *previewLabel, QPushButton *btn )
+void IconThemesConfig::themeSelected( QListWidgetItem *item, QLabel *previewLabel, QPushButton *btn )
 {
     QPixmap topLeftCornerBg, leftButtonsBg, leftTitleBg, midTitleBg, rightTitleBg, rightButtonsBg, topRightCornerBg;
     QPainter painter;
     int w, h, x;
-    QString dirName( m_themeNames[ item->text( 0 ) ] );
+    QString dirName( m_themeNames[ item->text() ] );
 
     if ( dirName.contains( "home" ) )
     {
@@ -369,7 +370,7 @@ void IconThemesConfig::themeSelected( Q3ListViewItem *item, QLabel *previewLabel
         //qWarning("false");
     }
 
-    QString dirNameStr = dirName + item->text( 0 ) + "/deco/" ;
+    QString dirNameStr = dirName + item->text() + "/deco/" ;
     topLeftCornerBg.load( dirNameStr + "topLeftCornerBg.png" );
     leftButtonsBg.load( dirNameStr + "leftButtonsBg" );
     leftTitleBg.load( dirNameStr + "leftTitleBg.png" );
@@ -440,13 +441,13 @@ void IconThemesConfig::themeSelected( Q3ListViewItem *item, QLabel *previewLabel
 
 void IconThemesConfig::setTheme( KUrlRequester *framesPath, KUrlRequester *buttonsPath, KUrlRequester *masksPath )
 {
-    Q3ListViewItem * selected = themesView_->selectedItem();
+    QListWidgetItem * selected = themesView_->currentItem();
     if ( !selected )
         return ;
 
-    QString dirName( m_themeNames[ selected->text( 0 ) ] );
+    QString dirName( m_themeNames[ selected->text() ] );
 
-    QString setTheme = selected->text( 0 );
+    QString setTheme = selected->text();
     QString setThemeStr = dirName + setTheme;
 
     framesPath->setUrl( setThemeStr + "/deco" );

@@ -38,8 +38,9 @@
 #include <qmap.h>
 //Added by qt3to4:
 #include <QLabel>
-#include <k3listview.h>
 
+class QListWidget;
+class QListWidgetItem;
 class QPushButton;
 class DeviceManager;
 class QCheckBox;
@@ -52,23 +53,23 @@ class IconThemesConfig : public QObject
     Q_OBJECT
 
 public:
-    IconThemesConfig( QWidget *parent, K3ListView *themesView/*, QPushButton *removethemeBtn*/ );
+    IconThemesConfig( QWidget *parent, QListWidget *themesView/*, QPushButton *removethemeBtn*/ );
     virtual ~IconThemesConfig();
 
     void loadThemes();
     bool installThemes( const QStringList &themes, const QString &archiveName );
     QStringList findThemeDirs( const QString &archiveName );
-    void themeSelected( Q3ListViewItem *item, QLabel *preview, QPushButton *btn );
+    void themeSelected( QListWidgetItem *item, QLabel *preview, QPushButton *btn );
     void installNewTheme();
     void removeSelectedTheme();
     void setTheme( KUrlRequester *framesPath, KUrlRequester *buttonsPath, KUrlRequester *masksPath );
 
 private:
-    Q3ListViewItem *iconThemeItem( const QString &name );
-    K3ListView *themesView_;
+    QListWidgetItem *iconThemeItem( const QString &name );
+    QListWidget *themesView_;
     QWidget *parent_;
     //QPushButton *removeThemeBtn_;
-    Q3ListViewItem *m_defaultTheme;
+    QListWidgetItem *m_defaultTheme;
     QMap <QString, QString>m_themeNames;
 };
 

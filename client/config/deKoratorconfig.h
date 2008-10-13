@@ -40,6 +40,7 @@
 class KConfig;
 #include "ui_configdialog.h"
 class IconThemesConfig;
+class QListWidgetItem;
 
 #include <QWidget>
 class ConfigDialog : public QWidget, public Ui::ConfigDialog
@@ -68,7 +69,7 @@ public slots:
 
 
 protected slots:
-    void themeSelected( Q3ListViewItem *item );
+    void themeSelected( QListWidgetItem *item );
     void installNewTheme();
     void removeSelectedTheme();
     void setTheme();

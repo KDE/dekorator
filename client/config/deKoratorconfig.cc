@@ -43,7 +43,8 @@
 #include <qcombobox.h>
 #include <qspinbox.h>
 #include <kcolorbutton.h>
-#include <k3listview.h>
+#include <QtGui/QListWidget>
+#include <QtGui/QListWidgetItem>
 
 #include "ui_configdialog.h"
 #include <themes.h>
@@ -147,8 +148,8 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     dialog_->masksPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
 
     // themes
-    connect( dialog_->themesKlstView, SIGNAL( selectionChanged( Q3ListViewItem * ) ),
-             SLOT( themeSelected( Q3ListViewItem * ) ) );
+    connect( dialog_->themesKlstView, SIGNAL( itemClicked( QListWidgetItem * ) ),
+             SLOT( themeSelected( QListWidgetItem * ) ) );
     connect( dialog_->installthemeBtn, SIGNAL( clicked( ) ), SLOT( installNewTheme() ) );
     connect( dialog_->removeThemBtn, SIGNAL( clicked( ) ), SLOT( removeSelectedTheme() ) );
     connect( dialog_->applyThemeBtn, SIGNAL( clicked( ) ), SLOT( setTheme() ) );
@@ -415,7 +416,7 @@ void DeKoratorConfig::defaults()
 // ----------
 //
 
-void DeKoratorConfig::themeSelected( Q3ListViewItem *item )
+void DeKoratorConfig::themeSelected( QListWidgetItem *item )
 {
 	themes_->themeSelected( item, dialog_->previewLabael, dialog_->removeThemBtn );
 }

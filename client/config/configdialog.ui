@@ -1542,7 +1542,6 @@ p, li { white-space: pre-wrap; }
   <include location="local" >kurlrequester.h</include>
   <include location="local" >klineedit.h</include>
   <include location="local" >kpushbutton.h</include>
-  <include location="local" >k3listview.h</include>
   <include location="local" >ktabwidget.h</include>
   <include location="local" >kcombobox.h</include>
   <include location="local" >ktextbrowser.h</include>

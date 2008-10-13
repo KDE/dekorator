@@ -8,7 +8,7 @@ find_package (QImageBlitz REQUIRED)
 
 include (KDE4Defaults)
 include (MacroLibrary)
-add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS} )
+add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
 include_directories (${KDE4_INCLUDES} ${QIMAGEBLITZ_INCLUDES})
 
 add_subdirectory (client)

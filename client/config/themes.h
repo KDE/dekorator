@@ -34,17 +34,13 @@
 #ifndef ICONTHEMES_H
 #define ICONTHEMES_H
 
-//#include <kcmodule.h>
-#include <qmap.h>
-//Added by qt3to4:
-#include <QLabel>
+#include <QtCore/QMap>
+#include <QtCore/QObject>
 
+class QLabel;
 class QListWidget;
 class QListWidgetItem;
 class QPushButton;
-class DeviceManager;
-class QCheckBox;
-class QStringList;
 class KUrlRequester;
 
 

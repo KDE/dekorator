@@ -31,47 +31,28 @@
 // Boston, MA 02110-1301, USA.
 ///////////////////////////////////////////////////////////////////////
 
-//#include <config.h>
 
 #include "themes.h"
-#include <stdlib.h>
-#include <unistd.h>
 
-#include <qfileinfo.h>
-#include <qlayout.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-//Added by qt3to4:
-#include <QPixmap>
+#include <KDE/KApplication>
+#include <KDE/KLocale>
+#include <KDE/KMessageBox>
+#include <KDE/KProgressDialog>
+#include <KDE/KStandardDirs>
+#include <KDE/KTar>
+#include <KDE/KUrlRequester>
+#include <KDE/KUrlRequesterDialog>
 
-#include <kdebug.h>
-#include <kapplication.h>
-#include <kstandarddirs.h>
-#include <kservice.h>
-#include <klocale.h>
-#include <ksimpleconfig.h>
-#undef Unsorted
+#include <KDE/KIO/Job>
+#include <KDE/KIO/NetAccess>
 
+#include <QtCore/QDir>
+#include <QtGui/QLabel>
 #include <QtGui/QListWidget>
 #include <QtGui/QListWidgetItem>
-#include <kurlrequesterdlg.h>
-#include <kmessagebox.h>
-#include <kprogressdialog.h>
-#include <kiconloader.h>
-
-#include <kio/job.h>
-#include <kio/netaccess.h>
-#include <ktar.h>
-/*
-#ifdef HAVE_LIBART
-#include <ksvgiconengine.h>
-#endif
-*/
-#include <qdir.h>
-#include <qpainter.h>
-#include <qregexp.h>
-
-#include <kurlrequester.h>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
+#include <QtGui/QPushButton>
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -129,13 +110,8 @@ void IconThemesConfig::loadThemes()
     // if no local deKorator folders
     if ( ! QDir( QDir::homePath() + "/.kde/share/apps/" ).exists( "deKorator" ) )
     {
-        qWarning( "no dirs, will make them..." );
         KIO::mkdir( QDir::homePath() + "/.kde/share/apps/deKorator/" );
         KIO::mkdir( QDir::homePath() + "/.kde/share/apps/deKorator/themes/" );
-    }
-    else
-    {
-        qWarning( "exist" );
     }
 
     themesDirs = KGlobal::dirs() ->findDirs( "data", "deKorator/themes" ) ;
@@ -168,7 +144,6 @@ void IconThemesConfig::installNewTheme()
 
     KUrl themeURL = KUrlRequesterDialog::getUrl( QString(), parent_,
                     i18n( "Drag or Type Theme URL" ) );
-    kDebug() << themeURL.prettyUrl() << endl;
 
     if ( themeURL.url().isEmpty() )
         return ;
@@ -308,7 +283,6 @@ QStringList IconThemesConfig::findThemeDirs( const QString &archiveName )
             if ( subDir && ( subDir->entry( "deco" ) != NULL && subDir->entry( "buttons" ) != NULL && subDir->entry( "masks" ) != NULL ) )
             {
                 foundThemes.append( subDir->name() );
-                //qWarning( "found" );
             }
         }
     }
@@ -361,13 +335,11 @@ void IconThemesConfig::themeSelected( QListWidgetItem *item, QLabel *previewLabe
 
     if ( dirName.contains( "home" ) )
     {
-        //qWarning("true");
         btn->setEnabled( true );
     }
     else
     {
         btn->setEnabled( false );
-        //qWarning("false");
     }
 
     QString dirNameStr = dirName + item->text() + "/deco/" ;
@@ -382,7 +354,6 @@ void IconThemesConfig::themeSelected( QListWidgetItem *item, QLabel *previewLabe
     w = topLeftCornerBg.width() + leftButtonsBg.width() + leftTitleBg.width() + midTitleBg.width() + rightTitleBg.width() + rightButtonsBg.width() + topRightCornerBg.width() + 8;
     h = midTitleBg.height() + 8;
     QPixmap previewPix(w, h);
-    //qWarning("%d",w);
     painter.begin( &previewPix );
 
     // paint outer rect

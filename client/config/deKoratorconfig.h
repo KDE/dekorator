@@ -34,15 +34,15 @@
 #ifndef DEKORATORCONFIG_H
 #define DEKORATORCONFIG_H
 
-#include <qobject.h>
+#include <QtGui/QWidget>
 
+#include "ui_configdialog.h"
 
 class KConfig;
-#include "ui_configdialog.h"
 class IconThemesConfig;
 class QListWidgetItem;
 
-#include <QWidget>
+
 class ConfigDialog : public QWidget, public Ui::ConfigDialog
 {
 	Q_OBJECT

@@ -35,42 +35,18 @@
 #ifndef DEKORATORCLIENT_H
 #define DEKORATORCLIENT_H
 
+#include <kdecorationfactory.h>
+#include <kdecoration.h>
+
 #include <QtGui/QAbstractButton>
-#include <qbitmap.h>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qpainter.h>
-#include <qtooltip.h>
-#include <qpixmap.h>
-#include <qapplication.h>
-#include <qtimer.h>
-#include <qcursor.h>
-//Added by qt3to4:
-class QHBoxLayout;
+#include <QtGui/QBitmap>
+#include <QtGui/QImage>
+
 class QBoxLayout;
-#include <QShowEvent>
-#include <QWheelEvent>
-#include <QPaintEvent>
-#include <QResizeEvent>
-#include <QMouseEvent>
-#include <QEvent>
+class QHBoxLayout;
+class QSpacerItem;
 class QVBoxLayout;
 
-#include <kdecoration.h>
-#include <kdecorationfactory.h>
-#include <kconfig.h>
-#include <kconfiggroup.h>
-#include <kdeversion.h>
-#include <kglobal.h>
-#include <kglobalsettings.h>
-#include <klocale.h>
-#include <kiconeffect.h>
-#include <qimageblitz.h>
-
-#include "shadow.h"
-
-class QSpacerItem;
-class QPoint;
 
 namespace DeKorator
 {

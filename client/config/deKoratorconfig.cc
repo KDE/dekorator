@@ -31,25 +31,11 @@
 // Boston, MA 02110-1301, USA.
 ///////////////////////////////////////////////////////////////////////
 
+
 #include "deKoratorconfig.h"
-#include <kconfig.h>
-#include <klocale.h>
-#include <kglobal.h>
-#include <q3buttongroup.h>
-#include <q3groupbox.h>
-#include <qradiobutton.h>
-#include <q3whatsthis.h>
-#include <qcheckbox.h>
-#include <qcombobox.h>
-#include <qspinbox.h>
-#include <kcolorbutton.h>
-#include <QtGui/QListWidget>
-#include <QtGui/QListWidgetItem>
 
-#include "ui_configdialog.h"
-#include <themes.h>
+#include "themes.h"
 
-#include <kurlrequester.h>
 
 //////////////////////////////////////////////////////////////////////////////
 // DeKoratorConfig()

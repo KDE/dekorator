@@ -32,9 +32,10 @@
 ///////////////////////////////////////////////////////////////////////
 
 #include "shadow.h"
-#include <qcolor.h>
-//Added by qt3to4:
-#include <QPixmap>
+
+#include <QtGui/QPixmap>
+#include <QtGui/QColor>
+
 
 ShadowEngine::ShadowEngine()
 {

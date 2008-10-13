@@ -32,28 +32,29 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-
-
-
 #include "deKoratorclient.h"
 
-#include <qsettings.h>
-//Added by qt3to4:
-#include <QResizeEvent>
+#include <KDE/KConfig>
+#include <KDE/KConfigGroup>
+#include <KDE/KIconEffect>
+#include <KDE/KLocale>
+
+#include <QtCore/QSettings>
+#include <QtCore/QTime>
+#include <QtCore/QTimer>
+#include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
-#include <QLabel>
-#include <QWheelEvent>
-#include <QPixmap>
-#include <QMouseEvent>
-#include <QShowEvent>
 #include <QtGui/QHBoxLayout>
-#include <QEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QPainter>
 #include <QtGui/QVBoxLayout>
-#include <QPaintEvent>
-#include <kiconloader.h>
-#include <QTime>
-#include <qdebug.h>
+
+#include <qimageblitz.h>
+
+#include "shadow.h"
+
 using namespace DeKorator;
+
 
 // global constants
 
@@ -281,7 +282,6 @@ bool DeKoratorFactory::reset( unsigned long changed )
 
     if ( confchange || ( changed & ( SettingDecoration | SettingButtons | SettingBorder | SettingColors ) ) )
     {
-        //qWarning( "aaaaaaaaaaaaa" );
         if ( DeKoratorFactory::needReload_ )
         {
             loadPixmaps();
@@ -480,7 +480,6 @@ bool DeKoratorFactory::readConfig()
         {
             cusColChanged = true;
             i = buttonTypeAllCount;
-            qWarning( "true" );
         }
 
     }
@@ -501,17 +500,11 @@ bool DeKoratorFactory::readConfig()
     DeKoratorFactory::masksPath_ = config.readEntry( "MasksPath", "" );
 
 
-    //style backgrond
+    //style background
     QColor oldStyleBgCol = STYLEBGCOL;
 
-    QString colStr = QSettings().value( "/Qt/Palette/active", "aaaa" ).toString();
-    colStr = colStr.section( "#", 3, 3 ) ;
-    colStr.insert( 0, '#' );
-    colStr.truncate( 7 );
-
-    QColor c;
-    c.setNamedColor( colStr );
-    STYLEBGCOL = c;
+    QPalette palette;
+    STYLEBGCOL = palette.color(QPalette::Window);
 
 
 
@@ -579,7 +572,6 @@ void DeKoratorFactory::loadPixmaps()
     QString decoPixDir = DeKoratorFactory::framesPath_;
     QString btnPixDir = DeKoratorFactory::buttonsPath_;
     QString masksPixDir = DeKoratorFactory::masksPath_;
-    qDebug() << "Frames path: " << decoPixDir;
 
     // deco
     // top bar from left to right
@@ -587,7 +579,6 @@ void DeKoratorFactory::loadPixmaps()
     DECOARR[ leftButtons ][ orig ] ->load( decoPixDir + "/leftButtonsBg.png" );
     DECOARR[ leftTitle ][ orig ] ->load( decoPixDir + "/leftTitleBg.png" );
     DECOARR[ midTitle ][ orig ] ->load( decoPixDir + "/midTitleBg.png" );
-    qDebug() << "loaded midTitleBg.png" << DECOARR[ midTitle ][ orig ]->width() << DECOARR[ midTitle ][ orig ]->height();
     DECOARR[ rightTitle ][ orig ] ->load( decoPixDir + "/rightTitleBg.png" );
     DECOARR[ rightButtons ][ orig ] ->load( decoPixDir + "/rightButtonsBg.png" );
     DECOARR[ topRightCorner ][ orig ] ->load( decoPixDir + "/topRightCornerBg.png" );
@@ -2640,24 +2631,7 @@ void DeKoratorClient::maxButtonPressed()
 {
     if ( button[ ButtonMax ] )
     {
-#if KDE_IS_VERSION(3, 3, 0)
         maximize( button[ ButtonMax ] ->lastMousePress() );
-#else
-
-        switch ( button[ ButtonMax ] ->lastMousePress() )
-        {
-        case Qt::MidButton:
-            maximize( maximizeMode() ^ MaximizeVertical );
-            break;
-        case Qt::RightButton:
-            maximize( maximizeMode() ^ MaximizeHorizontal );
-            break;
-        default:
-            ( maximizeMode() == MaximizeFull ) ? maximize( MaximizeRestore )
-            : maximize( MaximizeFull );
-        }
-#endif
-
     }
 }
 

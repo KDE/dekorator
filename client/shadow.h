@@ -34,9 +34,8 @@
 #ifndef __FX_SHADOW
 #define __FX_SHADOW
 
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qcolor.h>
+#include <QtGui/QImage>
+
 
 class ShadowEngine
 {

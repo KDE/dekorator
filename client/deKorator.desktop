@@ -1,6 +1,7 @@
 # KDE Desktop Entry
 [Desktop Entry]
 Name=DeKorator
+Name[pt_BR]=Dekorator
 Name[sv]=Dekorator
 Name[x-test]=xxDeKoratorxx
 X-KDE-Library=kwin3_deKorator

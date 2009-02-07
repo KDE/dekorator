@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>KThemeSelectorWidgets</class>
+ <widget class="QWidget" name="KThemeSelectorWidgets">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>395</width>
+    <height>224</height>
+   </rect>
+  </property>
+  <layout class="QHBoxLayout" name="_2">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QVBoxLayout" name="_3">
+     <item>
+      <widget class="KLineEdit" name="m_editFilter"/>
+     </item>
+     <item>
+      <widget class="QListWidget" name="m_view"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="_4">
+     <item>
+      <widget class="QPushButton" name="m_buttonConfigure">
+       <property name="text">
+        <string>Configure Theme ...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_buttonInstall">
+       <property name="text">
+        <string>Install Theme ...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_buttonRemove">
+       <property name="text">
+        <string>Remove Theme</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_buttonGetNew">
+       <property name="text">
+        <string>Get New Themes ...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="spacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="m_buttonAbout">
+       <property name="text">
+        <string>About Themes</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">KDE/KLineEdit</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

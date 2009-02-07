@@ -34,7 +34,10 @@
 
 #include "deKoratorconfig.h"
 
+//#include <KDE/KComponentData>
+//
 #include "themes.h"
+//#include "kthemeselector.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -56,6 +59,10 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
 
     themes_ = new IconThemesConfig( dialog_, dialog_->themesKlstView /*, dialog_->removeThemBtn*/ );
 //dialog_->setWindowFlags(Qt::Window);
+//    KThemeSelector *themeSelector = new KThemeSelector(KComponentData("deKorator"), dialog_);
+//    themeSelector->layout()->setMargin(-1);
+//    themeSelector->setConfigFileKNS("deKoratorthemes.knsrc");
+//    dialog_->tabWidget2->addTab(themeSelector, "Themes");
     dialog_->show();
 
     // load the configuration

@@ -19,6 +19,7 @@
  *
  */
 
+#include "kthemeselector.h"
 #include "ui_kthemeselectorwidgets.h"
 #include <KDE/KComponentData>
 

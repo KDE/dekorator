@@ -107,13 +107,6 @@ void IconThemesConfig::loadThemes()
     QStringList::Iterator it, itj;
     QStringList themesDirs;
 
-    // if no local deKorator folders
-    if ( ! QDir( QDir::homePath() + "/.kde/share/apps/" ).exists( "deKorator" ) )
-    {
-        KIO::mkdir( QDir::homePath() + "/.kde/share/apps/deKorator/" );
-        KIO::mkdir( QDir::homePath() + "/.kde/share/apps/deKorator/themes/" );
-    }
-
     themesDirs = KGlobal::dirs() ->findDirs( "data", "deKorator/themes" ) ;
 
     for ( it = themesDirs.begin(); it != themesDirs.end(); ++it )
@@ -202,7 +195,11 @@ void IconThemesConfig::installNewTheme()
 bool IconThemesConfig::installThemes( const QStringList &themes, const QString &archiveName )
 {
     bool everythingOk = true;
-    QString localThemesDir = QDir::homePath() + "/.kde/share/apps/deKorator/themes/";
+    QString localThemesDir = KStandardDirs::locateLocal("data", "deKorator/themes/");
+
+    if (localThemesDir.isEmpty()) {
+        return false;
+    }
     //
     KProgressDialog progressDiag( parent_);//, "themeinstallprogress",
                                 /*  i18n( "Installing icon themes" ),
@@ -314,7 +311,11 @@ void IconThemesConfig::removeSelectedTheme()
     if ( r != KMessageBox::Continue ) return ;
 
     QString delTheme = selected->text();
-    QString deldirStr = QDir::homePath() + "/.kde/share/apps/deKorator/themes/" + delTheme;
+    QString localThemesDir = KStandardDirs::locateLocal("data", "deKorator/themes/");
+    if (localThemesDir.isEmpty()) {
+        return ;
+    }
+    QString deldirStr = localThemesDir + delTheme;
     QDir dir = QDir( deldirStr );
     dir.rename( deldirStr, deldirStr + "del" );
 

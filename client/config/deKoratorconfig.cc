@@ -143,6 +143,7 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     // themes
     connect( dialog_->themesKlstView, SIGNAL( itemSelectionChanged() ),
              SLOT( themeSelectionChanged() ) );
+    connect( dialog_->getNewThemesBtn, SIGNAL( clicked( ) ), SLOT( getNewThemes() ) );
     connect( dialog_->installthemeBtn, SIGNAL( clicked( ) ), SLOT( installNewTheme() ) );
     connect( dialog_->removeThemBtn, SIGNAL( clicked( ) ), SLOT( removeSelectedTheme() ) );
     connect( dialog_->applyThemeBtn, SIGNAL( clicked( ) ), SLOT( setTheme() ) );
@@ -421,6 +422,16 @@ void DeKoratorConfig::themeSelectionChanged()
         dialog_->applyThemeBtn->setEnabled( true );
         themes_->themeSelected( selection.at(0), dialog_->previewLabel, dialog_->removeThemBtn );
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// getNewThemes()
+// ----------
+//
+
+void DeKoratorConfig::getNewThemes()
+{
+    themes_->getNewThemes();
 }
 
 //////////////////////////////////////////////////////////////////////////////

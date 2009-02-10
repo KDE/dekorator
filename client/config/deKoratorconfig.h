@@ -70,6 +70,7 @@ public slots:
 
 protected slots:
     void themeSelectionChanged();
+    void getNewThemes();
     void installNewTheme();
     void removeSelectedTheme();
     void setTheme();

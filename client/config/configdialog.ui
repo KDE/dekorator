@@ -1340,9 +1340,16 @@
        <item>
         <layout class="QHBoxLayout" >
          <item>
+          <widget class="QPushButton" name="getNewThemesBtn" >
+           <property name="text" >
+            <string>&amp;Get New Themes...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="installthemeBtn" >
            <property name="text" >
-            <string>Install Ne&amp;w Theme</string>
+            <string>&amp;Install Theme File...</string>
            </property>
           </widget>
          </item>

@@ -1,3 +1,15 @@
+2009-02-10, christoph
+
+        * deKorator: add KNS support to (old) theme selector, since it will be some
+            time until I get the new one working, this will allow me some early testing
+
+2009-02-10, christoph
+
+        * themes.cpp: use KStandardDirs::locateLocal() instead of hardcoded
+            .kde path.
+        * RELEASE: 0.4.0.2 on KDE-Look.org
+
+
 2008-10-12, christoph
 
         * deKorator: removed Qt3Support dependency.

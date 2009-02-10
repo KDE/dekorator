@@ -46,6 +46,8 @@
 #include <KDE/KIO/Job>
 #include <KDE/KIO/NetAccess>
 
+#include <KDE/KNS/Engine>
+
 #include <QtCore/QDir>
 #include <QtGui/QLabel>
 #include <QtGui/QListWidget>
@@ -123,6 +125,23 @@ void IconThemesConfig::loadThemes()
             themesView_->addItem( name );
 
             m_themeNames.insert( name, place );
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// getNewThemes()
+// ----------
+//
+
+void IconThemesConfig::getNewThemes()
+{
+    KNS::Engine engine(parent_);
+
+    if (engine.init(QLatin1String("deKoratorthemes.knsrc"))) {
+        KNS::Entry::List entries = engine.downloadDialogModal(parent_);
+        if (entries.size() > 0) {
+            loadThemes();
         }
     }
 }

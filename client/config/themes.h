@@ -56,6 +56,7 @@ public:
     bool installThemes( const QStringList &themes, const QString &archiveName );
     QStringList findThemeDirs( const QString &archiveName );
     void themeSelected( QListWidgetItem *item, QLabel *preview, QPushButton *btn );
+    void getNewThemes();
     void installNewTheme();
     void removeSelectedTheme();
     void setTheme( KUrlRequester *framesPath, KUrlRequester *buttonsPath, KUrlRequester *masksPath );

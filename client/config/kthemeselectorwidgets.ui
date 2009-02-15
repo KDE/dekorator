@@ -36,7 +36,7 @@
      <item>
       <widget class="QPushButton" name="m_buttonInstall">
        <property name="text">
-        <string>Install Theme ...</string>
+        <string>Install Theme File ...</string>
        </property>
       </widget>
      </item>

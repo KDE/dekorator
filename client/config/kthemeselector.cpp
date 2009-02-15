@@ -84,6 +84,7 @@ void KThemeSelector::Private::setup(KThemeSelector *widget)
 
     m_editFilter->setClickMessage(i18n("Filter Themes"));
     m_editFilter->setClearButtonShown(true);
+    m_editFilter->setVisible(false);
 
     m_buttonConfigure->setVisible(false);
     m_buttonConfigure->setEnabled(false);
@@ -156,7 +157,10 @@ void KThemeSelector::Private::removeClicked()
         if (m_parent->removeTheme(removed)) {
             // unselect first to allow the slot to select a different theme
             setSelected(QString());
-            // TODO m_view.removeItem();
+            QList<QListWidgetItem *> items = m_view->findItems(removed, Qt::MatchExactly);
+            if (!items.isEmpty()) {
+                m_view->takeItem(m_view->row(items.at(0)));
+            }
             emit m_parent->themeRemoved(removed);
         }
     }
@@ -182,7 +186,12 @@ void KThemeSelector::Private::setSelected(const QString &localPath)
         m_selected = localPath;
         m_buttonRemove->setEnabled(!localPath.isEmpty() && m_parent->hasProperty(localPath, RemoveEnabled));
         m_buttonConfigure->setEnabled(!localPath.isEmpty() && m_parent->hasProperty(localPath, ConfigureEnabled));
-        // TODO select item in view
+        QList<QListWidgetItem *> items = m_view->findItems(localPath, Qt::MatchExactly);
+        if (!items.isEmpty()) {
+            m_view->setCurrentItem(items.at(0), QItemSelectionModel::SelectCurrent);
+        } else {
+            m_view->clearSelection();
+        }
         emit m_parent->themeSelected(localPath);
     }
 }
@@ -335,6 +344,8 @@ void KThemeSelector::rescanThemes()
     d->m_themesScanned = false;
     QStringList oldThemes = d->m_themes;
     if (oldThemes != installedThemes()) {
+        d->m_view->clear();
+        d->m_view->addItems(d->m_themes);
         if (!installedThemes().contains(d->m_selected)) {
             d->setSelected(QString());
         } else {

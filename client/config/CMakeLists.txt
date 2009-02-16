@@ -1,4 +1,4 @@
-set (kwin_deKorator_config_SOURCES deKoratorconfig.cc themes.cpp kthemeselector.cpp)
+set (kwin_deKorator_config_SOURCES deKoratorconfig.cc deKoratorthemes.cpp themes.cpp kthemeselector.cpp)
 kde4_add_ui_files (kwin_deKorator_config_SOURCES configdialog.ui kthemeselectorwidgets.ui)
 
 kde4_add_plugin (kwin_deKorator_config ${kwin_deKorator_config_SOURCES})

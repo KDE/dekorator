@@ -34,14 +34,9 @@ class KThemeSelector : public QWidget
     Q_OBJECT
 
     public:
-        enum ViewMode {
-            NamesOnly,
-            FullPreview
-        };
-
         enum Property {
-            RemoveEnabled,
-            ConfigureEnabled
+            Removable,
+            Configurable
         };
 
     public:
@@ -57,14 +52,14 @@ class KThemeSelector : public QWidget
         bool isConfigureAllowed() const;
         void setConfigureAllowed(bool allowed);
 
+        bool isCreateAllowed() const;
+        void setCreateAllowed(bool allowed);
+
         bool isRemoveAllowed() const;
         void setRemoveAllowed(bool allowed);
 
         QString selectedTheme() const;
         void setSelectedTheme(const QString &localPath);
-
-        ViewMode viewMode() const;
-        void setViewMode(ViewMode viewMode);
 
         QByteArray saveState() const;
         void restoreState(const QByteArray &state);
@@ -76,21 +71,28 @@ class KThemeSelector : public QWidget
         void themeInstalled(const QString &localPath);
         void themeRemoved(const QString &localPath);
         void configureClicked(const QString &localPath);
+        void createClicked();
 
     public:
         virtual QString installTheme(const KUrl &themeUrl);
+        virtual void addTheme(const QString &localPath);
         virtual bool removeTheme(const QString &localPath);
 
     protected:
         virtual QStringList scanInstalledThemes();
-        virtual bool supportsViewMode(ViewMode viewMode) const;
-
-        virtual void paintThemeItem(QPainter *painter, const QStyleOptionViewItem *option,
-                                    const QString &localPath, ViewMode viewMode) const;
-        virtual QSize sizeHintThemeItem(const QStyleOptionViewItem *option,
-                                        const QString &localPath, ViewMode viewMode) const;
+        virtual bool isValidTheme(const QString &localPath) const;
         virtual QString themeName(const QString &localPath) const;
         virtual bool hasProperty(const QString &localPath, Property property) const;
+
+        friend class KThemeSelectorDelegate;
+        virtual int viewModes() const;
+        virtual QString viewModeLabel(int viewMode) const;
+        virtual void paintThemeItem(QPainter *painter, const QStyleOptionViewItem *option,
+                                    const QString &localPath, int viewMode) const;
+        virtual QSize sizeHintThemeItem(const QStyleOptionViewItem *option,
+                                        const QString &localPath, int viewMode) const;
+        int viewMode() const;
+        void setup();
 
     private:
         class Private;

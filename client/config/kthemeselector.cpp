@@ -57,8 +57,45 @@
 
 /*------------------------------------------------------------------------*/
 
+KThemeSelectorDelegate::KThemeSelectorDelegate(QObject *parent)
+    : QStyledItemDelegate(parent), selector(0)
+{
+    /* */
+}
+
+
+void KThemeSelectorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    painter->save();
+    // paint styled background
+    QStyledItemDelegate::paint(painter, option, QModelIndex());
+    QString localPath = index.data().toString();
+
+    if (selector) {
+        selector->paintThemeItem(painter, &option, localPath, selector->viewMode());
+    } else {
+        painter->setPen(option.palette.color(option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text));
+        painter->drawText(option.rect, Qt::AlignCenter, localPath);
+    }
+    painter->restore();
+}
+
+
+QSize KThemeSelectorDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (selector) {
+        QString localPath = index.data().toString();
+        return selector->sizeHintThemeItem(&option, localPath, selector->viewMode());
+    } else {
+        return QSize(-1, option.fontMetrics.height());
+    }
+}
+
+
+/*------------------------------------------------------------------------*/
+
 KThemeSelector::Private::Private(QObject *parent)
-    : QObject(parent), m_themesScanned(false), m_viewMode(NamesOnly)
+    : QObject(parent), m_themesScanned(false), m_viewMode(0), m_delegate(new KThemeSelectorDelegate(parent))
 {
     /* */
 }
@@ -73,18 +110,33 @@ KThemeSelector::Private::~Private()
 void KThemeSelector::Private::setup(KThemeSelector *widget)
 {
     m_parent = widget;
+    m_delegate->selector = widget;
+
     setupUi((QWidget *) widget);
+
+    int modes = widget->viewModes();
+    if (modes > 0) {
+        for (int i = 0; i < modes; ++i) {
+            m_viewModeChooser->addItem(widget->viewModeLabel(i));
+        }
+    } else {
+        m_viewModeChooser->setVisible(false);
+    }
 
     connect(m_editFilter, SIGNAL(textChanged(QString)), SLOT(filterChanged(QString)));
     connect(m_buttonConfigure, SIGNAL(clicked()), SLOT(configureClicked()));
     connect(m_buttonInstall, SIGNAL(clicked()), SLOT(installClicked()));
     connect(m_buttonGetNew, SIGNAL(clicked()), SLOT(getNewClicked()));
     connect(m_buttonRemove, SIGNAL(clicked()), SLOT(removeClicked()));
+    connect(m_buttonCreate, SIGNAL(clicked()), widget, SIGNAL(createClicked()));
     connect(m_view, SIGNAL(itemSelectionChanged()), SLOT(selectionChanged()));
+    connect(m_viewModeChooser, SIGNAL(currentIndexChanged(int)), SLOT(setViewMode(int)));
+
+    m_view->setUniformItemSizes(true);
+    m_view->setItemDelegate(m_delegate);
 
     m_editFilter->setClickMessage(i18n("Filter Themes"));
     m_editFilter->setClearButtonShown(true);
-    m_editFilter->setVisible(false);
 
     m_buttonConfigure->setVisible(false);
     m_buttonConfigure->setEnabled(false);
@@ -110,6 +162,21 @@ void KThemeSelector::Private::setFilter(const QString &text)
 void KThemeSelector::Private::filterChanged(const QString &filter)
 {
     // TODO
+}
+
+
+void KThemeSelector::Private::setViewMode(int viewMode)
+{
+    if (viewMode != m_viewMode) {
+        m_viewMode = viewMode;
+        m_view->reset();
+        if (!m_selected.isEmpty()) {
+            QList<QListWidgetItem *> items = m_view->findItems(m_selected, Qt::MatchExactly);
+            if (!items.isEmpty()) {
+                m_view->scrollToItem(items.at(0));
+            }
+        }
+    }
 }
 
 
@@ -184,8 +251,8 @@ void KThemeSelector::Private::setSelected(const QString &localPath)
 {
     if (m_selected != localPath) {
         m_selected = localPath;
-        m_buttonRemove->setEnabled(!localPath.isEmpty() && m_parent->hasProperty(localPath, RemoveEnabled));
-        m_buttonConfigure->setEnabled(!localPath.isEmpty() && m_parent->hasProperty(localPath, ConfigureEnabled));
+        m_buttonRemove->setEnabled(!localPath.isEmpty() && m_parent->hasProperty(localPath, Removable));
+        m_buttonConfigure->setEnabled(!localPath.isEmpty() && m_parent->hasProperty(localPath, Configurable));
         QList<QListWidgetItem *> items = m_view->findItems(localPath, Qt::MatchExactly);
         if (!items.isEmpty()) {
             m_view->setCurrentItem(items.at(0), QItemSelectionModel::SelectCurrent);
@@ -210,7 +277,6 @@ KThemeSelector::KThemeSelector(QWidget *parent)
     : QWidget(parent), d(new Private)
 {
     d->m_componentData = KGlobal::mainComponent();
-    d->setup(this);
 }
 
 
@@ -218,13 +284,18 @@ KThemeSelector::KThemeSelector(const KComponentData &componentData, QWidget *par
     : QWidget(parent), d(new Private)
 {
     d->m_componentData = componentData;
-    d->setup(this);
 }
 
 
 KThemeSelector::~KThemeSelector()
 {
     delete d;
+}
+
+
+void KThemeSelector::setup()
+{
+    d->setup(this);
 }
 
 
@@ -264,8 +335,22 @@ void KThemeSelector::setConfigureAllowed(bool allowed)
     if (allowed != !d->m_buttonConfigure->isHidden()) {
         d->m_buttonConfigure->setVisible(allowed);
         if (allowed && !d->m_selected.isEmpty()) {
-            d->m_buttonConfigure->setEnabled(hasProperty(d->m_selected, ConfigureEnabled));
+            d->m_buttonConfigure->setEnabled(hasProperty(d->m_selected, Configurable));
         }
+    }
+}
+
+
+bool KThemeSelector::isCreateAllowed() const
+{
+    return !d->m_buttonCreate->isHidden();
+}
+
+
+void KThemeSelector::setCreateAllowed(bool allowed)
+{
+    if (allowed != !d->m_buttonCreate->isHidden()) {
+        d->m_buttonCreate->setVisible(allowed);
     }
 }
 
@@ -281,7 +366,7 @@ void KThemeSelector::setRemoveAllowed(bool allowed)
     if (allowed != !d->m_buttonRemove->isHidden()) {
         d->m_buttonRemove->setVisible(allowed);
         if (allowed && !d->m_selected.isEmpty()) {
-            d->m_buttonRemove->setEnabled(hasProperty(d->m_selected, RemoveEnabled));
+            d->m_buttonRemove->setEnabled(hasProperty(d->m_selected, Removable));
         }
     }
 }
@@ -296,23 +381,6 @@ QString KThemeSelector::selectedTheme() const
 void KThemeSelector::setSelectedTheme(const QString &localPath)
 {
     d->setSelected(localPath);
-}
-
-
-KThemeSelector::ViewMode KThemeSelector::viewMode() const
-{
-    return d->m_viewMode;
-}
-
-
-void KThemeSelector::setViewMode(ViewMode viewMode)
-{
-    if (viewMode != d->m_viewMode && supportsViewMode(viewMode)) {
-        d->m_viewMode = viewMode;
-        if (d->m_view->isVisible()) {
-            d->m_view->update();
-        }
-    }
 }
 
 
@@ -333,7 +401,7 @@ void KThemeSelector::restoreState(const QByteArray &state)
     int version = state.at(0);
 
     if (version == 1) {
-        setViewMode((ViewMode) state.at(1));
+        d->setViewMode(state.at(1));
         d->setFilter(QString::fromUtf8(state.mid(2)));
     }
 }
@@ -343,14 +411,23 @@ void KThemeSelector::rescanThemes()
 {
     d->m_themesScanned = false;
     QStringList oldThemes = d->m_themes;
-    if (oldThemes != installedThemes()) {
-        d->m_view->clear();
-        d->m_view->addItems(d->m_themes);
-        if (!installedThemes().contains(d->m_selected)) {
-            d->setSelected(QString());
-        } else {
-            if (d->m_view->isVisible()) {
-                d->m_view->update();
+    QStringList newThemes = installedThemes();
+    if (!newThemes.contains(d->m_selected)) {
+        d->setSelected(QString());
+    }
+    foreach (const QString &theme, newThemes) {
+        if (!oldThemes.contains(theme)) {
+            d->m_view->addItem(theme);
+            emit themeInstalled(theme);
+            d->setSelected(theme);
+        }
+    }
+    foreach (const QString &theme, oldThemes) {
+        if (!newThemes.contains(theme)) {
+            QList<QListWidgetItem *> items = d->m_view->findItems(theme, Qt::MatchExactly);
+            if (!items.isEmpty()) {
+                d->m_view->takeItem(d->m_view->row(items.at(0)));
+                emit themeRemoved(theme);
             }
         }
     }
@@ -377,6 +454,12 @@ bool KThemeSelector::removeTheme(const QString &localPath)
 }
 
 
+void KThemeSelector::addTheme(const QString &localPath)
+{
+    // TODO
+}
+
+
 QStringList KThemeSelector::scanInstalledThemes()
 {
     QStringList directories = d->m_componentData.dirs()->findDirs("appdata", "themes");
@@ -386,43 +469,19 @@ QStringList KThemeSelector::scanInstalledThemes()
         QDir dir(directory);
         QStringList entries = dir.entryList(QDir::Dirs | QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
         foreach (QString entry, entries) {
-            themes.append(dir.absoluteFilePath(entry));
+            QString localPath = dir.absoluteFilePath(entry);
+            if (isValidTheme(localPath)) {
+                themes.append(localPath);
+            }
         }
     }
     return themes;
 }
 
 
-bool KThemeSelector::supportsViewMode(ViewMode viewMode) const
+bool KThemeSelector::isValidTheme(const QString &localPath) const
 {
-    if (viewMode == NamesOnly) {
-        return true;
-    }
-    return false;
-}
-
-
-void KThemeSelector::paintThemeItem(QPainter *painter, const QStyleOptionViewItem *option,
-                                    const QString &localPath, ViewMode viewMode) const
-{
-    Q_UNUSED(localPath); Q_UNUSED(viewMode);
-
-    style()->drawPrimitive(QStyle::PE_PanelItemViewItem, option, painter, d->m_view);
-    // TODO
-    //style()->drawItemText(themeName(localPath));
-}
-
-
-QSize KThemeSelector::sizeHintThemeItem(const QStyleOptionViewItem *option,
-                                        const QString &localPath, ViewMode viewMode) const
-{
-    Q_UNUSED(localPath);
-
-    if (viewMode == NamesOnly) {
-        return QSize(-1, option->fontMetrics.height());
-    } else {
-        return QSize(-1, 16 + 2 * option->fontMetrics.height());
-    }
+    return true;
 }
 
 
@@ -436,14 +495,55 @@ QString KThemeSelector::themeName(const QString &localPath) const
 bool KThemeSelector::hasProperty(const QString &localPath, Property property) const
 {
     switch (property) {
-        case ConfigureEnabled:
+        case Configurable:
             return true;
-        case RemoveEnabled:
+        case Removable:
             // TODO check actual permissions...
             return localPath.contains(QString::fromUtf8("/home/"));
         // no default; warn when new properties are added
     }
     return false;
+}
+
+
+int KThemeSelector::viewModes() const
+{
+    return 1;
+}
+
+
+int KThemeSelector::viewMode() const
+{
+    return d->m_viewMode;
+}
+
+
+QString KThemeSelector::viewModeLabel(int viewMode) const
+{
+    return i18n("Themes");
+}
+
+
+void KThemeSelector::paintThemeItem(QPainter *painter, const QStyleOptionViewItem *option,
+                                    const QString &localPath, int viewMode) const
+{
+    Q_UNUSED(viewMode);
+
+    painter->save();
+    QRect rect = option->rect.adjusted(3, 0, -3, 0);
+    QString text = option->fontMetrics.elidedText(themeName(localPath), Qt::ElideRight, rect.width());
+    painter->setPen(option->palette.color(option->state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text));
+    painter->drawText(rect, Qt::AlignVCenter, text);
+    painter->restore();
+}
+
+
+QSize KThemeSelector::sizeHintThemeItem(const QStyleOptionViewItem *option,
+                                        const QString &localPath, int viewMode) const
+{
+    Q_UNUSED(localPath); Q_UNUSED(viewMode);
+
+    return QSize(-1, option->fontMetrics.height());
 }
 
 

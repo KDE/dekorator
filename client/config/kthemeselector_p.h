@@ -19,9 +19,29 @@
  *
  */
 
+#ifndef KTHEMESELECTOR_PRIVATE_H
+#define KTHEMESELECTOR_PRIVATE_H
+
 #include "kthemeselector.h"
 #include "ui_kthemeselectorwidgets.h"
 #include <KDE/KComponentData>
+#include <QtGui/QStyledItemDelegate>
+
+class KThemeSelectorDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+    public:
+        KThemeSelectorDelegate(QObject *parent = 0);
+
+    public:
+        virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+        virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    public:
+        KThemeSelector *selector;
+};
+
 
 class KThemeSelector::Private : public QObject, public Ui::KThemeSelectorWidgets
 {
@@ -39,7 +59,8 @@ class KThemeSelector::Private : public QObject, public Ui::KThemeSelectorWidgets
         bool m_themesScanned;
         QString m_selected;
 
-        ViewMode m_viewMode;
+        int m_viewMode;
+        KThemeSelectorDelegate *m_delegate;
 
     public Q_SLOTS:
         void removeClicked();
@@ -48,11 +69,14 @@ class KThemeSelector::Private : public QObject, public Ui::KThemeSelectorWidgets
         void getNewClicked();
         void selectionChanged();
         void filterChanged(const QString &filter);
+        void setViewMode(int viewMode);
 
     public:
         void setup(KThemeSelector *widget);
         void setFilter(const QString &text);
         void setSelected(const QString &localPath);
 };
+
+#endif
 
 

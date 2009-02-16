@@ -280,21 +280,15 @@ KThemeSelector::KThemeSelector(QWidget *parent)
 }
 
 
-KThemeSelector::KThemeSelector(const KComponentData &componentData, QWidget *parent)
-    : QWidget(parent), d(new Private)
-{
-    d->m_componentData = componentData;
-}
-
-
 KThemeSelector::~KThemeSelector()
 {
     delete d;
 }
 
 
-void KThemeSelector::setup()
+void KThemeSelector::setup(const KComponentData &componentData)
 {
+    d->m_componentData = componentData;
     d->setup(this);
 }
 

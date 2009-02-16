@@ -1706,7 +1706,7 @@ void DeKoratorClient::init()
     midLayout_->addItem( leftSpacer_ );
     if ( isPreview() )
     {
-        midLayout_->addWidget( new QLabel( "<center><b>" + i18n( "Dekorator preview (Version 0.3)" ) + "</b></center>", widget() ) );
+        midLayout_->addWidget( new QLabel( "<center><b>" + i18n( "deKorator 0.5.0 preview" ) + "</b></center>", widget() ) );
     }
     else
     {

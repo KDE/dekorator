@@ -23,6 +23,8 @@
 #define DEKORATORTHEMES_H
 
 #include "kthemeselector.h"
+class KAboutData;
+class KComponentData;
 
 
 class deKoratorThemes : public KThemeSelector
@@ -39,6 +41,7 @@ class deKoratorThemes : public KThemeSelector
 
     public:
         explicit deKoratorThemes(QWidget *parent = 0);
+        ~deKoratorThemes();
 
     protected:
         virtual bool isValidTheme(const QString &localPath) const;
@@ -50,6 +53,10 @@ class deKoratorThemes : public KThemeSelector
                                     const QString &localPath, int viewMode) const;
         virtual QSize sizeHintThemeItem(const QStyleOptionViewItem *option,
                                         const QString &localPath, int viewMode) const;
+
+    private:
+        KAboutData *aboutData;
+        KComponentData *componentData;
 };
 
 #endif

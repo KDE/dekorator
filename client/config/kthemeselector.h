@@ -41,7 +41,6 @@ class KThemeSelector : public QWidget
 
     public:
         explicit KThemeSelector(QWidget *parent = 0);
-        explicit KThemeSelector(const KComponentData &componentData, QWidget *parent = 0);
         virtual ~KThemeSelector();
 
         QStringList installedThemes();
@@ -92,7 +91,7 @@ class KThemeSelector : public QWidget
         virtual QSize sizeHintThemeItem(const QStyleOptionViewItem *option,
                                         const QString &localPath, int viewMode) const;
         int viewMode() const;
-        void setup();
+        void setup(const KComponentData &componentData);
 
     private:
         class Private;

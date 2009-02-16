@@ -59,7 +59,6 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
 //dialog_->setWindowFlags(Qt::Window);
     deKoratorThemes *themeSelector = new deKoratorThemes(dialog_);
     themeSelector->layout()->setMargin(-1);
-    themeSelector->setConfigFileKNS("deKoratorthemes.knsrc");
     dialog_->tabWidget2->insertTab(0, themeSelector, "Themes");
     dialog_->tabWidget2->setCurrentIndex(0);
     dialog_->show();

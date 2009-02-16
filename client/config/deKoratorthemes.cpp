@@ -35,6 +35,7 @@
 
 #include "deKoratorthemes.h"
 
+#include <KDE/KAboutData>
 #include <KDE/KComponentData>
 #include <KDE/KLocale>
 
@@ -49,11 +50,32 @@
 /*------------------------------------------------------------------------*/
 
 deKoratorThemes::deKoratorThemes(QWidget *parent)
-    : KThemeSelector(KComponentData("deKorator"), parent)
+    : KThemeSelector(parent)
 {
-    setup();
+    aboutData = new KAboutData("deKorator", 0, ki18n("deKorator"), "0.5.0",
+        ki18n("Themable window decorator for KDE"),
+        KAboutData::License_GPL,
+        ki18n("(c) 2005, Moty Rahamim"), KLocalizedString(),
+        "http://www.kde-look.org/content/show.php/?content=87921");
+    aboutData->addAuthor(ki18n("Moty Rahamim"), ki18n("Developer"), "moty.rahamim@gmail.com");
+    aboutData->addAuthor(ki18n("Christoph Feck"), ki18n("KDE 4 port"), "christoph@maxiom.de");
+    aboutData->addCredit(ki18n("Jon 'ArbitraryReason' Clarke"), ki18n("Art Designer"), "jjclarke2003@yahoo.com");
+    aboutData->addCredit(ki18n("Zoran 'the-error' Karavla"), ki18n("Theme contributor"), "webmaster@the-error.net");
+    aboutData->addCredit(ki18n("David Johnson"), ki18n("Window decoration example"), "david@usermode.org");
+    aboutData->addCredit(ki18n("Sandro Giessl"), ki18n("Plastik window decoration"), "sandro@giessl.com");
+    aboutData->addCredit(ki18n("Antonio Larrosa"), ki18n("Icon theme KCM"), "larrosa@kde.org");
+    componentData = new KComponentData(aboutData);
+    setup(*componentData);
+    setConfigFileKNS("deKoratorthemes.knsrc");
     setCreateAllowed(true);
     setConfigureAllowed(true);
+}
+
+
+deKoratorThemes::~deKoratorThemes()
+{
+    delete componentData;
+    delete aboutData;
 }
 
 
@@ -102,6 +124,18 @@ QString deKoratorThemes::viewModeLabel(int viewMode) const
 }
 
 
+static void drawTiledImage(QPainter *painter, const QRect &rect, const QImage &image)
+{
+    for (int x = rect.left(); x <= rect.right(); x += image.width()) {
+        int w = qMin(image.width(), rect.right() + 1 - x);
+        for (int y = rect.top(); y <= rect.bottom(); y += image.height()) {
+            int h = qMin(image.height(), rect.bottom() + 1 - y);
+            painter->drawImage(x, y, image, 0, 0, w, h);
+        }
+    }
+}
+
+
 static void paintThemePreview(QPainter *painter, const QStyleOption *option, const QString &localPath, const QString &title, QColor bgColor)
 {
     static const char * const tileNames[] = {
@@ -135,7 +169,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
         QImage image(imagePath);
         if (i == 5) {
             x -= rightButtonsWidth;
-            painter->drawTiledPixmap(QRect(x, y, rightButtonsWidth, image.height()), QPixmap::fromImage(image));
+            drawTiledImage(painter, QRect(x, y, rightButtonsWidth, image.height()), image);
             int bx = x;
             for (int j = 0; j < 3; ++j) {
                 painter->drawImage(bx, y + ((image.height() - buttonImage[j].height()) >> 1), buttonImage[j]);
@@ -149,38 +183,34 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
     rect.setRight(x);
     QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[3]) + QLatin1String("Bg.png");
     QImage image = QImage(imagePath);
-    QPixmap pixmap = QPixmap::fromImage(image);
-    image = image.scaled(1, 1, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    rect.setTop(y); rect.setHeight(pixmap.height());
-    painter->drawTiledPixmap(rect, pixmap);
-    y = option->rect.top() + 5 + pixmap.height();
+    rect.setTop(y); rect.setHeight(image.height());
+    drawTiledImage(painter, rect, image);
+    y = option->rect.top() + 5 + image.height();
     painter->setClipRect(option->rect.adjusted(0, 0, 0, -5));
     QRect contentRect(5, 5, 10, 10);
-    contentRect.setTop(option->rect.top() + 5 + pixmap.height());
+    contentRect.setTop(option->rect.top() + 5 + image.height());
     contentRect.setBottom(option->rect.bottom());
     for (int i = 7; i < 9; ++i) {
         QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
+        QImage image(imagePath);
         if (i == 7) {
-            QImage image(imagePath);
             painter->drawImage(option->rect.left() + 5, y, image);
             contentRect.setLeft(option->rect.left() + 5 + image.width());
             y += image.height();
         } else {
-            QPixmap pixmap = QPixmap::fromImage(QImage(imagePath));
-            painter->drawTiledPixmap(QRect(option->rect.left() + 5, y, pixmap.width(), option->rect.height()), pixmap);
+            drawTiledImage(painter, QRect(option->rect.left() + 5, y, image.width(), option->rect.height()), image);
         }
     }
-    y = option->rect.top() + 5 + pixmap.height();
+    y = option->rect.top() + 5 + image.height();
     for (int i = 9; i < 11; ++i) {
         QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
+        QImage image(imagePath);
         if (i == 9) {
-            QImage image(imagePath);
             painter->drawImage(option->rect.right() - 5 - image.width(), y, image);
             contentRect.setRight(option->rect.right() - 5 - image.width() - 1);
             y += image.height();
         } else {
-            QPixmap pixmap = QPixmap::fromImage(QImage(imagePath));
-            painter->drawTiledPixmap(QRect(option->rect.right() - 5 - pixmap.width(), y, pixmap.width(), option->rect.height()), pixmap);
+            drawTiledImage(painter, QRect(option->rect.right() - 5 - image.width(), y, image.width(), option->rect.height()), image);
         }
     }
     painter->fillRect(contentRect, option->palette.color(QPalette::Window));
@@ -207,6 +237,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
     font.setBold(true);
     painter->setFont(font);
     painter->setPen(Qt::black);
+    image = image.scaled(1, 1, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     if (qGray(image.pixel(0, 0)) < 150) {
         painter->drawText(rect.adjusted(1, 1, 1, 1), Qt::AlignCenter, text);
         painter->setPen(Qt::white);
@@ -219,7 +250,6 @@ void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewIt
                                     const QString &localPath, int viewMode) const
 {
     if (viewMode == FullPreviews) {
-#if 1
         int w = option->rect.width();
         int h = option->rect.height();
         QString cacheKey = QString(QLatin1String("deKoratorPreview-%1-%2-%3")).arg(w).arg(h).arg(localPath);
@@ -235,13 +265,14 @@ void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewIt
             pixmap = QPixmap::fromImage(image);
             QPixmapCache::insert(cacheKey, pixmap);
         }
-        painter->drawPixmap(option->rect.left(), option->rect.top(), pixmap);
-#else
-        painter->save();
+#if 0
         QColor bgColor = option->palette.color(option->state & QStyle::State_Selected ? QPalette::Highlight : QPalette::Base);
-        paintThemePreview(painter, option, localPath, themeName(localPath), bgColor);
-        painter->restore();
+        QLinearGradient gradient(option->rect.topLeft(), option->rect.bottomLeft());
+        gradient.setColorAt(0.0, bgColor.light(120));
+        gradient.setColorAt(1.0, bgColor.dark(120));
+        painter->fillRect(option->rect, gradient);
 #endif
+        painter->drawPixmap(option->rect.left(), option->rect.top(), pixmap);
     } else {
         KThemeSelector::paintThemeItem(painter, option, localPath, viewMode);
     }

@@ -111,8 +111,16 @@ void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewIt
             "rightTitle", "rightButtons", "topRightCorner",
             "topLeftFrame", "midLeftFrame",
             "topRightFrame", "midRightFrame",
-            "topLeftCorner", "topRightCorner"
+            "topLeftCorner", "topRightCorner",
+            "Min", "Max", "Close"
         };
+        QImage buttonImage[3];
+        int rightButtonsWidth = 0;
+        for (int i = 13; i < 16; ++i) {
+            QString imagePath = localPath + QLatin1String("/buttons/normal/button") + QLatin1String(tileNames[i]) + QLatin1String(".png");
+            buttonImage[i - 13] = QImage(imagePath);
+            rightButtonsWidth += buttonImage[i - 13].width();
+        }
         QColor color = option->palette.color(option->state & QStyle::State_Selected ? QPalette::Highlight : QPalette::Base);
         QRect rect = option->rect.adjusted(40, 8, -100, -32);
         QString text = option->fontMetrics.elidedText(themeName(localPath), Qt::ElideRight, rect.width());
@@ -128,8 +136,18 @@ void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewIt
         for (int i = 6; i > 3; --i) {
             QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
             QImage image(imagePath);
-            x -= image.width();
-            painter->drawImage(x, y, image);
+            if (i == 5) {
+                x -= rightButtonsWidth;
+                painter->drawTiledPixmap(QRect(x, y, rightButtonsWidth, image.height()), QPixmap::fromImage(image));
+                int bx = x;
+                for (int j = 0; j < 3; ++j) {
+                    painter->drawImage(bx, y + ((image.height() - buttonImage[j].height()) >> 1), buttonImage[j]);
+                    bx += buttonImage[j].width();
+                }
+            } else {
+                x -= image.width();
+                painter->drawImage(x, y, image);
+            }
         }
         rect.setRight(x);
         QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[3]) + QLatin1String("Bg.png");

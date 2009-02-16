@@ -1,7 +1,14 @@
+2009-02-16, christoph
+
+        * deKorator: add new theme selector with previews
+        * deKorator: improve theme detection
+
+
 2009-02-10, christoph
 
         * deKorator: add KNS support to (old) theme selector, since it will be some
             time until I get the new one working, this will allow me some early testing
+
 
 2009-02-10, christoph
 

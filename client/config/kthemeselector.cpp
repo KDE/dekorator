@@ -467,6 +467,16 @@ QStringList KThemeSelector::scanInstalledThemes()
             if (isValidTheme(localPath)) {
                 themes.append(localPath);
             }
+            if (true) {
+                QDir dir(localPath);
+                QStringList entries = dir.entryList(QDir::Dirs | QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
+                foreach (QString entry, entries) {
+                    QString localPath = dir.absoluteFilePath(entry);
+                    if (isValidTheme(localPath)) {
+                        themes.append(localPath);
+                    }
+                }
+            }
         }
     }
     return themes;
@@ -482,7 +492,7 @@ bool KThemeSelector::isValidTheme(const QString &localPath) const
 QString KThemeSelector::themeName(const QString &localPath) const
 {
     QFileInfo info(localPath);
-    return (info.fileName());
+    return (info.fileName().replace(QChar('_', 0), QChar(' ', 0)));
 }
 
 

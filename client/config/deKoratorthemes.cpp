@@ -81,14 +81,34 @@ deKoratorThemes::~deKoratorThemes()
 
 /*------------------------------------------------------------------------*/
 
+static QString themePath(const QString &localPath, const QString &dirName)
+{
+    QDir dir(localPath);
+    if (dir.exists(dirName)) {
+        return (localPath + QLatin1String("/") + dirName);
+    }
+    QString lowerName = dirName.toLower();
+    if (dir.exists(lowerName)) {
+        return (localPath + QLatin1String("/") + lowerName);
+    }
+    return QString();
+}
+
+
 bool deKoratorThemes::isValidTheme(const QString &localPath) const
 {
     QFileInfo info(localPath);
 
     if (KThemeSelector::isValidTheme(localPath) && info.isDir()) {
         QDir dir(localPath);
-        if (dir.exists() && dir.exists("deco") && dir.exists("deco/midTitleBg.png") && dir.exists("buttons")) {
-            return true;
+        if (dir.exists()) {
+            QString decoPath = themePath(localPath, QLatin1String("Deco"));
+            if (!decoPath.isEmpty() && dir.exists(decoPath + QLatin1String("/midTitleBg.png"))) {
+                QString buttonsPath = themePath(localPath, QLatin1String("Buttons"));
+                if (!buttonsPath.isEmpty()) {
+                    return true;
+                }
+            }
         }
     }
     return false;
@@ -126,11 +146,13 @@ QString deKoratorThemes::viewModeLabel(int viewMode) const
 
 static void drawTiledImage(QPainter *painter, const QRect &rect, const QImage &image)
 {
-    for (int x = rect.left(); x <= rect.right(); x += image.width()) {
-        int w = qMin(image.width(), rect.right() + 1 - x);
-        for (int y = rect.top(); y <= rect.bottom(); y += image.height()) {
-            int h = qMin(image.height(), rect.bottom() + 1 - y);
-            painter->drawImage(x, y, image, 0, 0, w, h);
+    if (!image.size().isEmpty()) {
+        for (int x = rect.left(); x <= rect.right(); x += image.width()) {
+            int w = qMin(image.width(), rect.right() + 1 - x);
+            for (int y = rect.top(); y <= rect.bottom(); y += image.height()) {
+                int h = qMin(image.height(), rect.bottom() + 1 - y);
+                painter->drawImage(x, y, image, 0, 0, w, h);
+            }
         }
     }
 }
@@ -138,18 +160,25 @@ static void drawTiledImage(QPainter *painter, const QRect &rect, const QImage &i
 
 static void paintThemePreview(QPainter *painter, const QStyleOption *option, const QString &localPath, const QString &title, QColor bgColor)
 {
+    QString decoPath = themePath(localPath, QLatin1String("Deco"));
+    QString masksPath = themePath(localPath, QLatin1String("Masks"));
+    QString buttonsPath = themePath(localPath, QLatin1String("Buttons/normal"));
+    if (buttonsPath.isEmpty()) {
+        buttonsPath = themePath(localPath, QLatin1String("Buttons"));
+    }
+
     static const char * const tileNames[] = {
         "topLeftCorner", "leftButtons", "leftTitle", "midTitle",
         "rightTitle", "rightButtons", "topRightCorner",
         "topLeftFrame", "midLeftFrame",
         "topRightFrame", "midRightFrame",
         "topLeftCorner", "topRightCorner",
-        "Min", "Max", "Close"
+        "buttonMin", "buttonMax", "buttonClose"
     };
     QImage buttonImage[3];
     int rightButtonsWidth = 0;
     for (int i = 13; i < 16; ++i) {
-        QString imagePath = localPath + QLatin1String("/buttons/normal/button") + QLatin1String(tileNames[i]) + QLatin1String(".png");
+        QString imagePath = buttonsPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String(".png");
         buttonImage[i - 13] = QImage(imagePath);
         rightButtonsWidth += buttonImage[i - 13].width();
     }
@@ -157,7 +186,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
     QString text = option->fontMetrics.elidedText(title, Qt::ElideRight, rect.width());
     int x = option->rect.left() + 5, y = option->rect.top() + 5;
     for (int i = 0; i < 3; ++i) {
-        QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
+        QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
         QImage image(imagePath);
         painter->drawImage(x, y, image);
         x += image.width();
@@ -165,7 +194,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
     rect.setLeft(x);
     x = option->rect.right() - 5;
     for (int i = 6; i > 3; --i) {
-        QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
+        QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
         QImage image(imagePath);
         if (i == 5) {
             x -= rightButtonsWidth;
@@ -181,7 +210,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
         }
     }
     rect.setRight(x);
-    QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[3]) + QLatin1String("Bg.png");
+    QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[3]) + QLatin1String("Bg.png");
     QImage image = QImage(imagePath);
     rect.setTop(y); rect.setHeight(image.height());
     drawTiledImage(painter, rect, image);
@@ -191,32 +220,40 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
     contentRect.setTop(option->rect.top() + 5 + image.height());
     contentRect.setBottom(option->rect.bottom());
     for (int i = 7; i < 9; ++i) {
-        QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
+        QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
         QImage image(imagePath);
         if (i == 7) {
             painter->drawImage(option->rect.left() + 5, y, image);
-            contentRect.setLeft(option->rect.left() + 5 + image.width());
             y += image.height();
         } else {
+            if (image.isNull()) {
+                QString imagePath = decoPath + QLatin1String("/") + QLatin1String("leftFrame") + QLatin1String("Bg.png");
+                image = QImage(imagePath);
+            }
+            contentRect.setLeft(option->rect.left() + 5 + image.width());
             drawTiledImage(painter, QRect(option->rect.left() + 5, y, image.width(), option->rect.height()), image);
         }
     }
     y = option->rect.top() + 5 + image.height();
     for (int i = 9; i < 11; ++i) {
-        QString imagePath = localPath + QLatin1String("/deco/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
+        QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
         QImage image(imagePath);
         if (i == 9) {
             painter->drawImage(option->rect.right() - 5 - image.width(), y, image);
-            contentRect.setRight(option->rect.right() - 5 - image.width() - 1);
             y += image.height();
         } else {
+            if (image.isNull()) {
+                QString imagePath = decoPath + QLatin1String("/") + QLatin1String("rightFrame") + QLatin1String("Bg.png");
+                image = QImage(imagePath);
+            }
+            contentRect.setRight(option->rect.right() - 5 - image.width() - 1);
             drawTiledImage(painter, QRect(option->rect.right() - 5 - image.width(), y, image.width(), option->rect.height()), image);
         }
     }
     painter->fillRect(contentRect, option->palette.color(QPalette::Window));
     painter->setCompositionMode(QPainter::CompositionMode_DestinationOut);
     for (int i = 11; i < 13; ++i) {
-        QString imagePath = localPath + QLatin1String("/masks/") + QLatin1String(tileNames[i]) + QLatin1String("Bitmap.png");
+        QString imagePath = masksPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bitmap.png");
         QBitmap bitmap = QBitmap::fromImage(QImage(imagePath));
         painter->setPen(bgColor);
         if (i == 11) {

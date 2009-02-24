@@ -130,7 +130,7 @@ QString deKoratorThemes::themeName(const QString &localPath) const
 
 int deKoratorThemes::viewModes() const
 {
-    return ViewModes;
+    return 0;//ViewModes;
 }
 
 
@@ -251,24 +251,25 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
         }
     }
     painter->fillRect(contentRect, option->palette.color(QPalette::Window));
-    painter->setCompositionMode(QPainter::CompositionMode_DestinationOut);
-    for (int i = 11; i < 13; ++i) {
-        QString imagePath = masksPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bitmap.png");
-        QBitmap bitmap = QBitmap::fromImage(QImage(imagePath));
-        painter->setPen(bgColor);
-        if (i == 11) {
-            painter->drawPixmap(option->rect.left() + 5, option->rect.top() + 5, bitmap);
-        } else {
-            painter->drawPixmap(option->rect.right() - 5 - bitmap.width(), option->rect.top() + 5, bitmap);
+    if (!masksPath.isEmpty()) {
+        painter->setCompositionMode(QPainter::CompositionMode_DestinationOut);
+        for (int i = 11; i < 13; ++i) {
+            QString imagePath = masksPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bitmap.png");
+            QBitmap bitmap = QBitmap::fromImage(QImage(imagePath));
+            painter->setPen(Qt::black/*bgColor*/);
+            if (i == 11) {
+                painter->drawPixmap(option->rect.left() + 5, option->rect.top() + 5, bitmap);
+            } else {
+                painter->drawPixmap(option->rect.right() - 5 - bitmap.width(), option->rect.top() + 5, bitmap);
+            }
         }
+        painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     }
-#if 0
-    QLinearGradient gradient(option->rect.bottomLeft() - QPoint(0, 15), option->rect.bottomLeft() - QPoint(0, 5));
-    gradient.setColorAt(1.0, bgColor);
-    bgColor.setAlpha(0);
-    gradient.setColorAt(0.0, bgColor);
-    painter->fillRect(option->rect.adjusted(4, 4, -4, -4), gradient);
-#endif
+    painter->setCompositionMode(QPainter::CompositionMode_DestinationOut);
+    QLinearGradient gradient(option->rect.bottomLeft() - QPoint(0, 10), option->rect.bottomLeft() - QPoint(0, 5));
+    gradient.setColorAt(0.0, QColor(255, 255, 255, 0));
+    gradient.setColorAt(1.0, QColor(255, 255, 255, 255));
+    painter->fillRect(option->rect.adjusted(4, option->rect.height() - 12, -4, -4), gradient);
     painter->setCompositionMode(QPainter::CompositionMode_SourceOver);
     QFont font = painter->font();
     font.setBold(true);
@@ -286,29 +287,23 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
 void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewItem *option,
                                     const QString &localPath, int viewMode) const
 {
-    if (viewMode == FullPreviews) {
+    if (true /*viewMode == FullPreviews*/) {
         int w = option->rect.width();
         int h = option->rect.height();
         QString cacheKey = QString(QLatin1String("deKoratorPreview-%1-%2-%3")).arg(w).arg(h).arg(localPath);
         QPixmap pixmap;
 
         if (!QPixmapCache::find(cacheKey, pixmap)) {
-            QImage image(w, h, QImage::Format_ARGB32);
-            image.fill(0);
+            QPixmap image(w, h);
+            image.fill(Qt::transparent);
             QPainter p(&image);
             QStyleOptionViewItem opt = *option;
             opt.rect = QRect(0, 0, w, h);
             paintThemePreview(&p, &opt, localPath, themeName(localPath), Qt::transparent);
-            pixmap = QPixmap::fromImage(image);
+            p.end();
+            pixmap = image;
             QPixmapCache::insert(cacheKey, pixmap);
         }
-#if 0
-        QColor bgColor = option->palette.color(option->state & QStyle::State_Selected ? QPalette::Highlight : QPalette::Base);
-        QLinearGradient gradient(option->rect.topLeft(), option->rect.bottomLeft());
-        gradient.setColorAt(0.0, bgColor.light(120));
-        gradient.setColorAt(1.0, bgColor.dark(120));
-        painter->fillRect(option->rect, gradient);
-#endif
         painter->drawPixmap(option->rect.left(), option->rect.top(), pixmap);
     } else {
         KThemeSelector::paintThemeItem(painter, option, localPath, viewMode);
@@ -319,7 +314,7 @@ void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewIt
 QSize deKoratorThemes::sizeHintThemeItem(const QStyleOptionViewItem *option,
                                         const QString &localPath, int viewMode) const
 {
-    if (viewMode == FullPreviews) {
+    if (true /*viewMode == FullPreviews*/) {
         return QSize(300, 40 + option->fontMetrics.height());
     } else {
         return KThemeSelector::sizeHintThemeItem(option, localPath, viewMode);

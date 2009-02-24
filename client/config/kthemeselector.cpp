@@ -137,6 +137,7 @@ void KThemeSelector::Private::setup(KThemeSelector *widget)
 
     m_editFilter->setClickMessage(i18n("Filter Themes"));
     m_editFilter->setClearButtonShown(true);
+    m_editFilter->setVisible(false);
 
     m_buttonConfigure->setVisible(false);
     m_buttonConfigure->setEnabled(false);
@@ -161,7 +162,7 @@ void KThemeSelector::Private::setFilter(const QString &text)
 
 void KThemeSelector::Private::filterChanged(const QString &filter)
 {
-    // TODO
+    Q_UNUSED(filter);
 }
 
 
@@ -485,6 +486,7 @@ QStringList KThemeSelector::scanInstalledThemes()
 
 bool KThemeSelector::isValidTheme(const QString &localPath) const
 {
+    Q_UNUSED(localPath);
     return true;
 }
 
@@ -492,7 +494,9 @@ bool KThemeSelector::isValidTheme(const QString &localPath) const
 QString KThemeSelector::themeName(const QString &localPath) const
 {
     QFileInfo info(localPath);
-    return (info.fileName().replace(QChar('_', 0), QChar(' ', 0)));
+    QString name = info.fileName().replace(QChar('_', 0), QChar(' ', 0));
+    name[0] = name[0].toUpper();
+    return name;
 }
 
 
@@ -524,6 +528,7 @@ int KThemeSelector::viewMode() const
 
 QString KThemeSelector::viewModeLabel(int viewMode) const
 {
+    Q_UNUSED(viewMode);
     return i18n("Themes");
 }
 
@@ -532,7 +537,6 @@ void KThemeSelector::paintThemeItem(QPainter *painter, const QStyleOptionViewIte
                                     const QString &localPath, int viewMode) const
 {
     Q_UNUSED(viewMode);
-
     painter->save();
     QRect rect = option->rect.adjusted(3, 0, -3, 0);
     QString text = option->fontMetrics.elidedText(themeName(localPath), Qt::ElideRight, rect.width());

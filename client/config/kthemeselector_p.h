@@ -27,6 +27,7 @@
 #include <KDE/KComponentData>
 #include <QtGui/QStyledItemDelegate>
 
+
 class KThemeSelectorDelegate : public QStyledItemDelegate
 {
     Q_OBJECT

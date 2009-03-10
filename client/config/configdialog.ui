@@ -547,7 +547,7 @@
        <item>
         <widget class="QCheckBox" name="useAnimChkBox" >
          <property name="text" >
-          <string>&amp;Use buttons animation</string>
+          <string>&amp;Use button animation</string>
          </property>
         </widget>
        </item>
@@ -729,7 +729,7 @@
        <item>
         <widget class="QGroupBox" name="buttonGroup9" >
          <property name="title" >
-          <string>Pressed Buttons Shift</string>
+          <string>Pressed Buttons' Shift</string>
          </property>
          <layout class="QVBoxLayout" name="_13" >
           <item>
@@ -822,7 +822,7 @@
        <item>
         <widget class="QCheckBox" name="useCusBtnClrChkBox" >
          <property name="text" >
-          <string>Use custom buttons colors</string>
+          <string>Use custom button colors</string>
          </property>
 	 <property name="checked" >
 		 <bool>true</bool>
@@ -1196,7 +1196,7 @@
        <item>
         <widget class="QLabel" name="textLabel1_2" >
          <property name="text" >
-          <string>Frames tiles path</string>
+          <string>Frame tiles path</string>
          </property>
          <property name="wordWrap" >
           <bool>false</bool>
@@ -1209,7 +1209,7 @@
        <item>
         <widget class="QLabel" name="textLabel2" >
          <property name="text" >
-          <string>Buttons tiles path</string>
+          <string>Button tiles path</string>
          </property>
          <property name="wordWrap" >
           <bool>false</bool>
@@ -1232,7 +1232,7 @@
           <bool>false</bool>
          </property>
          <property name="text" >
-          <string>Masks tiles path</string>
+          <string>Mask tiles path</string>
          </property>
          <property name="wordWrap" >
           <bool>false</bool>
@@ -1388,9 +1388,9 @@ is a guide for building such a theme.
 deKorator comes with:
     * default-theme - Used by default, illustrates some of deKorator's
       features.
-    * ugly-theme - It's purpose is to understand the way deKorator paints the
+    * ugly-theme - Its purpose is to understand the way deKorator paints the
       decorations.
-    * template-theme - this theme  is meant to be a template theme for other themes, this theme features all possible buttons.
+    * template-theme - this theme is meant to be a template theme for other themes, this theme features all possible buttons.
     * Bushido-Yellow-theme - shows how masking can be done.
 
 ****** Names ******
@@ -1409,12 +1409,12 @@ deKorator determines the 4 borders' sizes from:
 |the top bar height      		|midTitleBg's height      		|
 |the bottom border height	|midBottomFrameBg's height	|
 
-All parts that build up a specific border should be in the same width or height
-correspondingly. An example follows for a window decoration with a 10px high
+All parts that build up a specific border should have the same width or height,
+as appropriate. An example follows for a window decoration with a 10px high
 top bar, a 20px wide left border, a 30px wide right border and a 40px high
 bottom border.
 
-All tiles in the top bar should be 10 pixel high:
+All tiles in the top bar should be 10 pixels high:
     * topLeftCornerBg
     * leftButtonsBg
     * leftTitleBg
@@ -1423,17 +1423,17 @@ All tiles in the top bar should be 10 pixel high:
     * rightButtonsBg
     * topRightCornerBg
 
-All tiles in the left border should be 20 pixel wide:
+All tiles in the left border should be 20 pixels wide:
     * topLeftFrameBg
     * midLeftFrameBg
     * bottomLeftFrameBg
 
-All tiles in the right border should be 30 pixel wide:
+All tiles in the right border should be 30 pixels wide:
     * topRightFrameBg
     * midRightFrameBg
     * bottomRightFrameBg
 
-All tiles in the bottom border should be 40 pixel high:
+All tiles in the bottom border should be 40 pixels high:
     * leftBottomFrameBg
     * midBottomFrameBg
     * rightBottomFrameBg
@@ -1450,7 +1450,7 @@ The button images are separated into background and foreground ones.
 
 ***** Background *****
 The button background uses the leftButtonsBg and the rightButtonsBg tiles.
-Their height should be the same as the top bar's. The background's repeated
+Their height should be the same as the top bar's. The background is repeated
 horizontally to fit the buttons in.
 
 ***** Foreground *****
@@ -1465,7 +1465,7 @@ Masks contain only black and white. Black pixels are subtracted from the
 decoration.
 
 ****** Image format ******
-All images should be in PNG.
+All images should be in PNG format.
 
 ****** Tips and Tricks ******
 Always start up building your theme from the template-theme.

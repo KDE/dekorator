@@ -1085,6 +1085,7 @@ void DeKoratorFactory::prepareDecoWithBgCol()
     QPixmap tempPix;
     QPalette palette;
     QColor col = palette.color(QPalette::Window);
+    col.setAlpha(0);
 
 
     if ( DeKoratorFactory::colorizeActFrames_ )
@@ -2334,6 +2335,7 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
 
         QPainter painter2;
         QPixmap pix( w, TITLESIZE );
+        pix.fill(Qt::transparent);
         painter2.begin( &pix );
         {
             // topLeftCorner

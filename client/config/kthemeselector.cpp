@@ -68,7 +68,14 @@ void KThemeSelectorDelegate::paint(QPainter *painter, const QStyleOptionViewItem
 {
     painter->save();
     // paint styled background
-    QStyledItemDelegate::paint(painter, option, QModelIndex());
+    QStyle *style = QApplication::style();
+    if (option.version >= 3) {
+        const QWidget *widget = qobject_cast<const QWidget *>(((const QStyleOptionViewItemV3 *) &option)->widget);
+        if (widget) {
+            style = widget->style();
+        }
+    }
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, 0);
     QString localPath = index.data().toString();
 
     if (selector) {

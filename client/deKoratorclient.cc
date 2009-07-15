@@ -258,6 +258,43 @@ DeKoratorFactory::~DeKoratorFactory()
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// supports()
+// -----------------
+// inform kwin which features our decoration supports
+bool DeKoratorFactory::supports( KDecorationDefines::Ability ability ) const
+{
+    switch (ability)
+    {
+        // announce
+        case AbilityAnnounceButtons:
+        case AbilityAnnounceColors:
+        // buttons
+        case AbilityButtonMenu:
+        case AbilityButtonOnAllDesktops:
+        case AbilityButtonSpacer:
+        case AbilityButtonHelp:
+        case AbilityButtonMinimize:
+        case AbilityButtonMaximize:
+        case AbilityButtonClose:
+        case AbilityButtonAboveOthers:
+        case AbilityButtonBelowOthers:
+        case AbilityButtonShade:
+        case AbilityButtonResize:
+        // colors
+        case AbilityColorTitleBack:
+        case AbilityColorTitleFore:
+        case AbilityColorTitleBlend:
+        case AbilityColorFrame:
+        case AbilityColorHandle:
+        case AbilityColorButtonBack:
+        case AbilityColorButtonFore:
+            return true;
+        default:
+            return false;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // createDecoration()
 // -----------------
 // Create the decoration

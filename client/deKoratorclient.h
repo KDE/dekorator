@@ -128,7 +128,7 @@ public:
     virtual ~DeKoratorFactory();
     virtual KDecoration *createDecoration( KDecorationBridge *b );
     virtual bool reset( unsigned long changed );
-    virtual bool supports( KDecorationDefines::Ability ) const { return true; }
+    virtual bool supports( KDecorationDefines::Ability ) const;
     static void colorizePixmap( QPixmap *pix, QColor col, QString colorizeMethod );
     static bool initialized();
 	QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, buttomLeftCornerBitmap_, buttomMidBitmap_, buttomRightCornerBitmap_;

@@ -1235,7 +1235,7 @@ DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight
     //decoPixInAct_ = buttonPixInAct;
     animProgress = 0;
     hover_ = false;
-    setAttribute( Qt::WA_NoBackground, true );
+    setAttribute( Qt::WA_NoSystemBackground, true );
     setFixedSize( buttonWidth_, BUTTONSHEIGHT );
     setCursor( Qt::ArrowCursor );
     setObjectName( QString::fromAscii(name) );
@@ -1666,7 +1666,7 @@ void DeKoratorClient::init()
     createMainWidget();
     widget() ->installEventFilter( this );
 
-    widget() ->setAttribute( Qt::WA_NoBackground, true );
+    widget() ->setAttribute( Qt::WA_NoSystemBackground, true );
 
     // layouts
     delete mainLayout_;

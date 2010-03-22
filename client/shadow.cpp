@@ -47,11 +47,11 @@ ShadowEngine::~ShadowEngine()
 {
 }
 
-QImage ShadowEngine::makeShadow(const QPixmap& textPixmap, const QColor &bgColor)
+QImage ShadowEngine::makeShadow(const QImage& textImage, const QColor &bgColor)
 {
   // create a new image for for the shaddow
-  int w = textPixmap.width();
-  int h = textPixmap.height();
+  int w = textImage.width();
+  int h = textImage.height();
 
   QImage result(w, h, QImage::Format_ARGB32);
 
@@ -62,18 +62,13 @@ QImage ShadowEngine::makeShadow(const QPixmap& textPixmap, const QColor &bgColor
 
   double alphaShadow;
 
-  /*
-   *	This is the source pixmap
-   */
-  QImage img = textPixmap.toImage();
-
   result.fill(0); // transparent
 
   for (int i = thickness_; i < w - thickness_; i++)
   {
     for (int j = thickness_; j < h - thickness_; j++)
     {
-        alphaShadow = decay(img, i, j);
+        alphaShadow = decay(textImage, i, j);
         alphaShadow = (alphaShadow > 180.0) ? 180.0 : alphaShadow;
       // update the shadow's i,j pixel.
       result.setPixel(i,j, qRgba(bgRed, bgGreen , bgBlue, (int) alphaShadow));
@@ -82,7 +77,7 @@ QImage ShadowEngine::makeShadow(const QPixmap& textPixmap, const QColor &bgColor
   return result;
 }
 
-double ShadowEngine::decay(QImage& source, int i, int j)
+double ShadowEngine::decay(const QImage &source, int i, int j) const
 {
   // create a new image for the shadow
   int w = source.width();

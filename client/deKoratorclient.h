@@ -119,6 +119,12 @@ enum buttonState {
     buttonStateCount
 };
 
+enum WindowActivationState {
+    WindowActive = 0,
+    WindowInactive,
+    WindowActivationStateCount
+};
+
 // DeKoratorFactory /////////////////////////////////////////////////////////////
 
 class DeKoratorFactory: public KDecorationFactory
@@ -129,7 +135,7 @@ public:
     virtual KDecoration *createDecoration( KDecorationBridge *b );
     virtual bool reset( unsigned long changed );
     virtual bool supports( KDecorationDefines::Ability ) const;
-    static void colorizePixmap( QPixmap *pix, QColor col, QString colorizeMethod );
+    static QImage colorizedImage( const QImage &image, QColor color, QString colorizeMethod );
     static bool initialized();
 	QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, buttomLeftCornerBitmap_, buttomMidBitmap_, buttomRightCornerBitmap_;
 
@@ -138,7 +144,6 @@ private:
     void loadPixmaps();
     void colorizeDecoPixmaps( bool isActive );
     void colorizeButtonsPixmaps( bool isActive );
-    void initPixmaps();
     void chooseRightPixmaps();
     void determineSizes();
     void prepareDecoWithBgCol();
@@ -202,7 +207,7 @@ private:
     void mousePressEvent( QMouseEvent *e );
     void mouseReleaseEvent( QMouseEvent *e );
     void paintEvent( QPaintEvent *e );
-    QImage* chooseRightHoverEffect( QImage *img, QString res );
+    QImage chooseRightHoverEffect( const QImage &img, QString res );
 
 private:
     bool isLeft_;
@@ -215,7 +220,7 @@ private:
     bool hover_;
     QTimer *animTmr;
     uint animProgress;
-    QPixmap *btnPixAct_, *btnPixInAct_;
+    //QPixmap *btnPixAct_, *btnPixInAct_;
     buttonTypeAll btnType_;
 int s;
 };
@@ -294,7 +299,7 @@ private:
     QHBoxLayout *midLayout_;
     QSpacerItem *leftTitleBarSpacer_, *titleBarSpacer_, *rightTitleBarSpacer_, *leftSpacer_, *rightSpacer_, *bottomSpacer_;
     bool closing_;
-    QPixmap *captionBufferPix_;
+//    QPixmap *captionBufferPix_;
     bool captionBufferDirty_;
     QImage activeShadowImg_, inActiveShadowImg_;
 	QRegion mask_;

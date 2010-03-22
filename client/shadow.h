@@ -44,9 +44,9 @@ class ShadowEngine
         ~ShadowEngine();
         void setThickness(int thickness) { thickness_ = thickness; }
         void setMultiplicationFactor(double factor) { multiplicationFactor_ = factor; }
-        QImage makeShadow(const QPixmap& textPixmap, const QColor &bgColor);
+        QImage makeShadow(const QImage& textImage, const QColor &bgColor);
     private:
-        double decay(QImage& source, int x, int y);
+        double decay(const QImage &source, int x, int y) const;
 
         int thickness_;
         double multiplicationFactor_;

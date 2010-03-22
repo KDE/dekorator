@@ -1,5 +1,4 @@
 - improve decoration code
-    - replace QPixmap* with QPixmap
     - less QPixmap <-> QImage conversions
 - improve theme file detection
     - should allow multiple themes in a .tar

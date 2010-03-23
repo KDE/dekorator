@@ -522,6 +522,18 @@ void DeKoratorFactory::loadPixmaps()
         decoImage[ i ][ orig ].load( decoPixDir + '/' + decoPixName[i] + "Bg.png" );
     }
 
+    // 0.1 compatibility
+    if ( decoImage[ midLeftFrame ][ orig ].isNull() )
+        decoImage[ midLeftFrame ][ orig ].load( decoPixDir + "/leftFrameBg.png" );
+    if ( decoImage[ midRightFrame ][ orig ].isNull() )
+        decoImage[ midRightFrame ][ orig ].load( decoPixDir + "/rightFrameBg.png" );
+    if ( decoImage[ midBottomFrame ][ orig ].isNull() )
+    {
+        decoImage[ leftBottomFrame ][ orig ].load( decoPixDir + "/buttomLeftCornerBg.png" );
+        decoImage[ midBottomFrame ][ orig ].load( decoPixDir + "/buttomFrameBg.png" );
+        decoImage[ rightBottomFrame ][ orig ].load( decoPixDir + "/buttomRightCornerBg.png" );
+    }
+
     // buttons
     static const char * const buttonStateName[] =
     {
@@ -539,6 +551,16 @@ void DeKoratorFactory::loadPixmaps()
         {
             buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[i] + ".png" );
         }
+
+        // 0.1 compatibility
+        if ( buttonImage[ i ][ regular][ normal ].isNull() )
+        {
+            buttonImage[ i ][ regular ][ normal ].load( btnPixDir + "/button" + buttonGlyphName[i] + ".png" );
+            for ( int j = hover; j < buttonStateCount; ++j )
+            {
+                buttonImage[ i ][ j ][ normal ] = buttonImage[ i ][ regular ][ normal ];
+            }
+        }
     }
 
     //masks
@@ -549,7 +571,7 @@ void DeKoratorFactory::loadPixmaps()
     bottomMidBitmap_ = QBitmap( masksPixDir + "/bottomMidBitmap.png" );
     bottomRightCornerBitmap_ = QBitmap( masksPixDir + "/bottomRightCornerBitmap.png" );
 
-    //compatibility masks
+    // 0.2 compatibility
     if ( bottomLeftCornerBitmap_.isNull() )
         bottomLeftCornerBitmap_ = QBitmap( masksPixDir + "/buttomLeftCornerBitmap.png" );
     if ( bottomMidBitmap_.isNull() )

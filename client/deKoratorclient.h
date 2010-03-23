@@ -193,7 +193,7 @@ class DeKoratorButton : public QAbstractButton
 {
     Q_OBJECT
 public:
-    DeKoratorButton( bool isLeft, const QSize &buttonSize, DeKoratorClient *parent = 0, const char *name = 0,
+    DeKoratorButton( bool isLeft, DeKoratorClient *parent = 0, const char *name = 0,
                      const QString &tip = NULL, ButtonType type = ButtonHelp, buttonTypeAll btnType = restore );
     ~DeKoratorButton();
 

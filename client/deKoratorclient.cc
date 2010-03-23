@@ -803,13 +803,15 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 // DeKoratorButton()
 // ---------------
 // Constructor
-DeKoratorButton::DeKoratorButton( bool isLeft, const QSize &buttonSize, DeKoratorClient * parent, const char * name,
+DeKoratorButton::DeKoratorButton( bool isLeft, DeKoratorClient * parent, const char * name,
                                   const QString & tip, ButtonType type, buttonTypeAll btnType )
-        : QAbstractButton( parent->widget() ), isLeft_( isLeft ), buttonWidth_( buttonSize.width() ), client_( parent ), type_( type ), lastmouse_( Qt::NoButton ), decoPixHeight_( buttonSize.height() )
+        : QAbstractButton( parent->widget() ), isLeft_( isLeft ), buttonWidth_( buttonSize[type].width() ), client_( parent ), type_( type ), lastmouse_( Qt::NoButton ), decoPixHeight_( buttonSize[type].height() )
 {
     animProgress = 0;
     hover_ = false;
     setAttribute( Qt::WA_NoSystemBackground, true );
+    if (type == ButtonMenu)
+        buttonWidth_ = qMax( 16, buttonWidth_ );
     setFixedSize( buttonWidth_, BUTTONSHEIGHT );
     setCursor( Qt::ArrowCursor );
     setObjectName( QString::fromAscii(name) );
@@ -1245,7 +1247,9 @@ void DeKoratorClient::init()
     midLayout_->addItem( leftSpacer_ );
     if ( isPreview() )
     {
-        QWidget *previewLabel = new QLabel( "<center><b>" + i18n( "deKorator 0.5.0 preview" ) + "</b></center>", widget() );
+        QWidget *previewLabel = new QLabel( "<p align=\"center\"><b>" + i18n( "deKorator")
+            + "</b> - " + i18n("Themable window decorator for KDE" ) + "</p><p align=\"center\">"
+            + i18n("Click Configure button to manage themes") + "</p>", widget() );
         previewLabel->setAutoFillBackground( true );
         midLayout_->addWidget( previewLabel );
     }
@@ -1288,12 +1292,8 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 // Menu button
                 if ( !button[ ButtonMenu ] )
                 {
-                    QSize size = buttonSize[ ButtonMenu];
-                    if (size.width() < 16)
-                        size.setWidth(16);
-
                     button[ ButtonMenu ] =
-                        new DeKoratorButton( isLeft, size, this, "menu", i18n( "Menu" ), ButtonMenu, menu );
+                        new DeKoratorButton( isLeft, this, "menu", i18n( "Menu" ), ButtonMenu, menu );
                     connect( button[ ButtonMenu ], SIGNAL( pressed() ),
                              this, SLOT( menuButtonPressed() ) );
                     connect( button[ ButtonMenu ], SIGNAL( released() ), this, SLOT( menuButtonReleased() ) );
@@ -1316,7 +1316,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                         btnType = sticky;
                     }
                     button[ ButtonSticky ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonSticky ], this, "sticky", d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ), ButtonSticky, btnType );
+                        new DeKoratorButton( isLeft, this, "sticky", d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ), ButtonSticky, btnType );
                     connect( button[ ButtonSticky ], SIGNAL( clicked() ),
                              this, SLOT( toggleOnAllDesktops() ) );
                     layout->addWidget( button[ ButtonSticky ] );
@@ -1328,7 +1328,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 if ( ( !button[ ButtonHelp ] ) && providesContextHelp() )
                 {
                     button[ ButtonHelp ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonHelp ], this, "help-contents", i18n( "Help" ),
+                        new DeKoratorButton( isLeft, this, "help-contents", i18n( "Help" ),
                                              ButtonHelp, help );
                     connect( button[ ButtonHelp ], SIGNAL( clicked() ),
                              this, SLOT( showContextHelp() ) );
@@ -1341,7 +1341,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 if ( ( !button[ ButtonMin ] ) && isMinimizable() )
                 {
                     button[ ButtonMin ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonMin ], this, "iconify", i18n( "Minimize" ), ButtonMin, min );
+                        new DeKoratorButton( isLeft, this, "iconify", i18n( "Minimize" ), ButtonMin, min );
                     connect( button[ ButtonMin ], SIGNAL( clicked() ),
                              this, SLOT( minimize() ) );
                     layout->addWidget( button[ ButtonMin ] );
@@ -1362,7 +1362,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                         btnType = max;
                     }
                     button[ ButtonMax ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonMax], this, "maximize", m ? i18n( "Restore" ) : i18n( "Maximize" ),
+                        new DeKoratorButton( isLeft, this, "maximize", m ? i18n( "Restore" ) : i18n( "Maximize" ),
                                              ButtonMax, btnType );
                     connect( button[ ButtonMax ], SIGNAL( clicked() ),
                              this, SLOT( maxButtonPressed() ) );
@@ -1375,7 +1375,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 if ( ( !button[ ButtonClose ] ) && isCloseable() )
                 {
                     button[ ButtonClose ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonClose ], this, "close", i18n( "Close" ),
+                        new DeKoratorButton( isLeft, this, "close", i18n( "Close" ),
                                              ButtonClose, close );
                     connect( button[ ButtonClose ], SIGNAL( clicked() ),
                              this, SLOT( closeWindow() ) );
@@ -1397,7 +1397,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                         btnType = above;
                     }
                     button[ ButtonAbove ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonAbove ], this, "above",
+                        new DeKoratorButton( isLeft, this, "above",
                                              i18n( "Keep Above Others" ), ButtonAbove, btnType );
                     connect( button[ ButtonAbove ], SIGNAL( clicked() ),
                              this, SLOT( aboveButtonPressed() ) );
@@ -1419,7 +1419,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                         btnType = below;
                     }
                     button[ ButtonBelow ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonBelow ], this, "below",
+                        new DeKoratorButton( isLeft, this, "below",
                                              i18n( "Keep Below Others" ), ButtonBelow, btnType );
                     connect( button[ ButtonBelow ], SIGNAL( clicked() ),
                              this, SLOT( belowButtonPressed() ) );
@@ -1441,7 +1441,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                         btnType = shade;
                     }
                     button[ ButtonShade ] =
-                        new DeKoratorButton( isLeft, buttonSize[ ButtonShade ], this, "shade", s ? i18n( "Unshade" ) : i18n( "Shade" ),
+                        new DeKoratorButton( isLeft, this, "shade", s ? i18n( "Unshade" ) : i18n( "Shade" ),
                                              ButtonShade, btnType );
                     connect( button[ ButtonShade ], SIGNAL( clicked() ),
                              this, SLOT( shadeButtonPressed() ) );

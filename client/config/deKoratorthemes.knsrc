@@ -2,3 +2,9 @@
 ProvidersUrl=http://download.kde.org/khotnewstuff/dekorator-providers.xml
 Uncompress=always
 TargetDir=deKorator/themes
+
+[KNewStuff3]
+ProvidersUrl=http://download.kde.org/ocs/providers.xml
+Categories=Window Decoration deKorator
+Uncompress=always
+TargetDir=deKorator/themes

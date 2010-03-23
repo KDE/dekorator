@@ -47,7 +47,7 @@
 #include <KDE/KIO/Job>
 #include <KDE/KIO/NetAccess>
 
-#include <KDE/KNS/Engine>
+#include <KDE/KNS3/DownloadDialog>
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -244,10 +244,10 @@ void KThemeSelector::Private::removeClicked()
 
 void KThemeSelector::Private::getNewClicked()
 {
-    KNS::Engine engine(m_parent);
+    KNS3::DownloadDialog dialog(m_configFileKNS, m_parent);
 
-    if (engine.init(m_configFileKNS)) {
-        KNS::Entry::List entries = engine.downloadDialogModal(m_parent);
+    if (dialog.exec()) {
+        KNS3::Entry::List entries = dialog.changedEntries();
         if (entries.size() > 0) {
             m_parent->rescanThemes();
         }

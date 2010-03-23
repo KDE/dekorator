@@ -66,7 +66,7 @@ static QColor STYLEBGCOL;
 // frames
 static int TITLESIZE = 0;
 static int LEFTFRAMESIZE = 0;
-static int BUTTOMFRAMESIZE = 0;
+static int BOTTOMFRAMESIZE = 0;
 static int RIGHTFRAMESIZE = 0;
 
 // deco
@@ -86,25 +86,16 @@ static int RIGHTBOTTOMFRAMEWIDTH;
 
 static int BUTTONSHEIGHT = 0;
 
-static int BTNHELPEWIDTH = 0;
-static int BTNMAXWIDTH = 0;
-static int BTNCLOSEWIDTH = 0;
-static int BTNMINWIDTH = 0;
-static int BTNSTICKYWIDTH = 0;
-static int BTNABOVEWIDTH = 0;
-static int BTNBELOWWIDTH = 0;
-static int BTNSHADEWIDTH = 0;
-static int BTNMENUWIDTH = 0;
+static QSize buttonSize[ButtonTypeCount];
 
-static int BTNHELPEHEIGHT = 0;
-static int BTNMAXHEIGHT = 0;
-static int BTNCLOSEHEIGHT = 0;
-static int BTNMINHEIGHT = 0;
-static int BTNSTICKYHEIGHT = 0;
-static int BTNABOVEHEIGHT = 0;
-static int BTNBELOWHEIGHT = 0;
-static int BTNSHADEHEIGHT = 0;
-static int BTNMENUHEIGHT = 0;
+static const char * const buttonGlyphName[] =
+{
+    "Restore", "Help", "Max", "Min", "Close",
+    "Sticky", "StickyDown", "Above", "AboveDown",
+    "Below", "BelowDown", "Shade", "ShadeDown",
+    "Menu", "TabClose"
+};
+
 
 // masks
 static int TOPLEFTMASKWIDTH = 0;
@@ -161,11 +152,8 @@ static const uint ANIMATIONSTEPS = 100;
 static bool USEMASKS = false;
 
 // pix arrays
-static QImage DECOARR[ decoCount ][ pixTypeCount ];
-static QPixmap DECOPIXARR[ decoCount ][ WindowActivationStateCount ];
-
-static QImage BUTTONSARR[ buttonTypeAllCount ][ buttonStateCount ][ pixTypeCount ];
-static QPixmap BUTTONPIXARR[ buttonTypeAllCount ][ buttonStateCount ][ WindowActivationStateCount ];
+static QPixmap decoPixmap[ decoCount ][ WindowActivationStateCount ];
+static QImage buttonStateImage[ buttonTypeAllCount ][ buttonStateCount ][ WindowActivationStateCount ];
 
 //////////////////////////////////////////////////////////////////////////////
 // DeKoratorFactory Class                                                     //
@@ -204,20 +192,6 @@ DeKoratorFactory::DeKoratorFactory()
     initialized_ = true;
 
     loadPixmaps();
-
-    bool isActive = false;
-    if ( colorizeInActFrames_ )
-        colorizeDecoPixmaps( isActive );
-    if ( colorizeInActButtons_ )
-        colorizeButtonsPixmaps( isActive );
-
-    isActive = true;
-    if ( colorizeActFrames_ )
-        colorizeDecoPixmaps( isActive );
-    if ( colorizeActButtons_ )
-        colorizeButtonsPixmaps( isActive );
-
-    prepareDecoWithBgCol();
 
     chooseRightPixmaps();
 }
@@ -297,44 +271,7 @@ bool DeKoratorFactory::reset( unsigned long changed )
         {
             loadPixmaps();
 
-            //             bool isActive = false;
-            //             if ( colorizeInActFrames_ )
-            //                 colorizeDecoPixmaps( isActive );
-            //             if ( colorizeInActButtons_ )
-            //                 colorizeButtonsPixmaps( isActive );
-            //
-            //             isActive = true;
-            //             if ( colorizeActFrames_ )
-            //                 colorizeDecoPixmaps( isActive );
-            //             if ( colorizeActButtons_ )
-            //                 colorizeButtonsPixmaps( isActive );
-            //
-            //             prepareDecoWithBgCol();
-            //
-            //             chooseRightPixmaps();
-            //
-            //             return true;
-        }
-
-        //if ( DeKoratorFactory::needInit_ )
-        {
-            bool isActive = false;
-            if ( colorizeInActFrames_ )
-                colorizeDecoPixmaps( isActive );
-            if ( colorizeInActButtons_ )
-                colorizeButtonsPixmaps( isActive );
-
-            isActive = true;
-            if ( colorizeActFrames_ )
-                colorizeDecoPixmaps( isActive );
-            if ( colorizeActButtons_ )
-                colorizeButtonsPixmaps( isActive );
-
-            prepareDecoWithBgCol();
-
             chooseRightPixmaps();
-
-            //return true;
         }
         return true;
     }
@@ -468,21 +405,8 @@ bool DeKoratorFactory::readConfig()
     for ( int i = 0 ; i < buttonTypeAllCount ; ++i )
     {
         colArr[ i ] = DeKoratorFactory::cusBtnCol_[ i ];
+        DeKoratorFactory::cusBtnCol_[ i ] = config.readEntry( QLatin1String( buttonGlyphName[ i ] ) + "ButtonColor", col );
     }
-    DeKoratorFactory::cusBtnCol_[ restore ] = config.readEntry( "RestoreButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ help ] = config.readEntry( "HelpButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ max ] = config.readEntry( "MaxButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ min ] = config.readEntry( "MinButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ close ] = config.readEntry( "CloseButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ sticky ] = config.readEntry( "StickyButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ stickydown ] = config.readEntry( "StickyDownButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ above ] = config.readEntry( "AboveButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ abovedown ] = config.readEntry( "AboveDownButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ below ] = config.readEntry( "BelowButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ belowdown ] = config.readEntry( "BelowDownButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ shade ] = config.readEntry( "ShadeButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ shadedown ] = config.readEntry( "ShadeDownButtonColor", col );
-    DeKoratorFactory::cusBtnCol_[ menu ] = config.readEntry( "MenuButtonColor", col );
 
     bool cusColChanged = false;
     for ( int i = 0 ; i < buttonTypeAllCount ; ++i )
@@ -585,98 +509,55 @@ void DeKoratorFactory::loadPixmaps()
     QString masksPixDir = DeKoratorFactory::masksPath_;
 
     // deco
-    // top bar from left to right
-    DECOARR[ topLeftCorner ][ orig ].load( decoPixDir + "/topLeftCornerBg.png" );
-    DECOARR[ leftButtons ][ orig ].load( decoPixDir + "/leftButtonsBg.png" );
-    DECOARR[ leftTitle ][ orig ].load( decoPixDir + "/leftTitleBg.png" );
-    DECOARR[ midTitle ][ orig ].load( decoPixDir + "/midTitleBg.png" );
-    DECOARR[ rightTitle ][ orig ].load( decoPixDir + "/rightTitleBg.png" );
-    DECOARR[ rightButtons ][ orig ].load( decoPixDir + "/rightButtonsBg.png" );
-    DECOARR[ topRightCorner ][ orig ].load( decoPixDir + "/topRightCornerBg.png" );
-    // left frame from top to buttom
-    DECOARR[ topLeftFrame ][ orig ].load( decoPixDir + "/topLeftFrameBg.png" );
-    DECOARR[ midLeftFrame ][ orig ].load( decoPixDir + "/midLeftFrameBg.png" );
-    DECOARR[ buttomLeftFrame ][ orig ].load( decoPixDir + "/bottomLeftFrameBg.png" );
-    // buttom frame from left to right
-    DECOARR[ leftButtomFrame ][ orig ].load( decoPixDir + "/leftBottomFrameBg.png" );
-    DECOARR[ midButtomFrame ][ orig ].load( decoPixDir + "/midBottomFrameBg.png" );
-    DECOARR[ rightButtomFrame ][ orig ].load( decoPixDir + "/rightBottomFrameBg.png" );
-    // right frame from top to buttom
-    DECOARR[ topRightFrame ][ orig ].load( decoPixDir + "/topRightFrameBg.png" );
-    DECOARR[ midRightFrame ][ orig ].load( decoPixDir + "/midRightFrameBg.png" );
-    DECOARR[ buttomRightFrame ][ orig ].load( decoPixDir + "/bottomRightFrameBg.png" );
+    static const char * const decoPixName[] =
+    {
+        "topLeftCorner", "leftButtons", "leftTitle", "midTitle", "rightTitle", "rightButtons", "topRightCorner",
+        "topLeftFrame", "midLeftFrame", "bottomLeftFrame",
+        "leftBottomFrame", "midBottomFrame", "rightBottomFrame",
+        "topRightFrame", "midRightFrame", "bottomRightFrame"
+    };
 
+    for ( int i = 0; i < decoCount; ++i )
+    {
+        decoImage[ i ][ orig ].load( decoPixDir + '/' + decoPixName[i] + "Bg.png" );
+    }
 
     // buttons
-    BUTTONSARR[ restore ][ regular ][ normal ].load( btnPixDir + "/normal/buttonRestore.png" );
-    BUTTONSARR[ restore ][ press ][ normal ].load( btnPixDir + "/press/buttonRestorePress.png" );
-    BUTTONSARR[ restore ][ hover ][ normal ].load( btnPixDir + "/hover/buttonRestoreHover.png" );
+    static const char * const buttonStateName[] =
+    {
+        "", "Hover", "Press"
+    };
 
-    BUTTONSARR[ help ][ regular ][ normal ].load( btnPixDir + "/normal/buttonHelp.png" );
-    BUTTONSARR[ help ][ press ][ normal ].load( btnPixDir + "/press/buttonHelpPress.png" );
-    BUTTONSARR[ help ][ hover ][ normal ].load( btnPixDir + "/hover/buttonHelpHover.png" );
+    static const char * const buttonStatePath[] =
+    {
+        "/normal/button", "/hover/button", "/press/button"
+    };
 
-    BUTTONSARR[ max ][ regular ][ normal ].load( btnPixDir + "/normal/buttonMax.png" );
-    BUTTONSARR[ max ][ press ][ normal ].load( btnPixDir + "/press/buttonMaxPress.png" );
-    BUTTONSARR[ max ][ hover ][ normal ].load( btnPixDir + "/hover/buttonMaxHover.png" );
-
-    BUTTONSARR[ min ][ regular ][ normal ].load( btnPixDir + "/normal/buttonMin.png" );
-    BUTTONSARR[ min ][ press ][ normal ].load( btnPixDir + "/press/buttonMinPress.png" );
-    BUTTONSARR[ min ][ hover ][ normal ].load( btnPixDir + "/hover/buttonMinHover.png" );
-
-    BUTTONSARR[ close ][ regular ][ normal ].load( btnPixDir + "/normal/buttonClose.png" );
-    BUTTONSARR[ close ][ press ][ normal ].load( btnPixDir + "/press/buttonClosePress.png" );
-    BUTTONSARR[ close ][ hover ][ normal ].load( btnPixDir + "/hover/buttonCloseHover.png" );
-
-    BUTTONSARR[ sticky ][ regular ][ normal ].load( btnPixDir + "/normal/buttonSticky.png" );
-    BUTTONSARR[ sticky ][ press ][ normal ].load( btnPixDir + "/press/buttonStickyDownPress.png" );
-    BUTTONSARR[ sticky ][ hover ][ normal ].load( btnPixDir + "/hover/buttonStickyHover.png" );
-
-    BUTTONSARR[ stickydown ][ regular ][ normal ].load( btnPixDir + "/normal/buttonStickyDown.png" );
-    BUTTONSARR[ stickydown ][ press ][ normal ].load( btnPixDir + "/press/buttonStickyDownPress.png" );
-    BUTTONSARR[ stickydown ][ hover ][ normal ].load( btnPixDir + "/hover/buttonStickyDownHover.png" );
-
-    BUTTONSARR[ above ][ regular ][ normal ].load( btnPixDir + "/normal/buttonAbove.png" );
-    BUTTONSARR[ above ][ press ][ normal ].load( btnPixDir + "/press/buttonAbovePress.png" );
-    BUTTONSARR[ above ][ hover ][ normal ].load( btnPixDir + "/hover/buttonAboveHover.png" );
-
-    BUTTONSARR[ abovedown ][ regular ][ normal ].load( btnPixDir + "/normal/buttonAboveDown.png" );
-    BUTTONSARR[ abovedown ][ press ][ normal ].load( btnPixDir + "/press/buttonAboveDownPress.png" );
-    BUTTONSARR[ abovedown ][ hover ][ normal ].load( btnPixDir + "/hover/buttonAboveDownHover.png" );
-
-    BUTTONSARR[ below ][ regular ][ normal ].load( btnPixDir + "/normal/buttonBelow.png" );
-    BUTTONSARR[ below ][ press ][ normal ].load( btnPixDir + "/press/buttonBelowPress.png" );
-    BUTTONSARR[ below ][ hover ][ normal ].load( btnPixDir + "/hover/buttonBelowHover.png" );
-
-    BUTTONSARR[ belowdown ][ regular ][ normal ].load( btnPixDir + "/normal/buttonBelowDown.png" );
-    BUTTONSARR[ belowdown ][ press ][ normal ].load( btnPixDir + "/press/buttonBelowDownPress.png" );
-    BUTTONSARR[ belowdown ][ hover ][ normal ].load( btnPixDir + "/hover/buttonBelowDownHover.png" );
-
-    BUTTONSARR[ shade ][ regular ][ normal ].load( btnPixDir + "/normal/buttonShade.png" );
-    BUTTONSARR[ shade ][ press ][ normal ].load( btnPixDir + "/press/buttonShadePress.png" );
-    BUTTONSARR[ shade ][ hover ][ normal ].load( btnPixDir + "/hover/buttonShadeHover.png" );
-
-    BUTTONSARR[ shadedown ][ regular ][ normal ].load( btnPixDir + "/normal/buttonShadeDown.png" );
-    BUTTONSARR[ shadedown ][ press ][ normal ].load( btnPixDir + "/press/buttonShadeDownPress.png" );
-    BUTTONSARR[ shadedown ][ hover ][ normal ].load( btnPixDir + "/hover/buttonShadeDownHover.png" );
-
-    BUTTONSARR[ menu ][ regular ][ normal ].load( btnPixDir + "/normal/buttonMenu.png" );
-    BUTTONSARR[ menu ][ press ][ normal ].load( btnPixDir + "/press/buttonMenuPress.png" );
-    BUTTONSARR[ menu ][ hover ][ normal ].load( btnPixDir + "/hover/buttonMenuHover.png" );
-
+    for ( int i = 0; i < buttonTypeAllCount; ++i )
+    {
+        for ( int j = 0; j < buttonStateCount; ++j )
+        {
+            buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[i] + ".png" );
+        }
+    }
 
     //masks
     topLeftCornerBitmap_ = QBitmap( masksPixDir + "/topLeftCornerBitmap.png" );
     topMidBitmap_ = QBitmap( masksPixDir + "/topMidBitmap.png" );
     topRightCornerBitmap_ = QBitmap( masksPixDir + "/topRightCornerBitmap.png" );
-    buttomLeftCornerBitmap_ = QBitmap( masksPixDir + "/buttomLeftCornerBitmap.png" );
-    buttomMidBitmap_ = QBitmap( masksPixDir + "/buttomMidBitmap.png" );
-    buttomRightCornerBitmap_ = QBitmap( masksPixDir + "/buttomRightCornerBitmap.png" );
+    bottomLeftCornerBitmap_ = QBitmap( masksPixDir + "/bottomLeftCornerBitmap.png" );
+    bottomMidBitmap_ = QBitmap( masksPixDir + "/bottomMidBitmap.png" );
+    bottomRightCornerBitmap_ = QBitmap( masksPixDir + "/bottomRightCornerBitmap.png" );
+
+    //compatibility masks
+    if ( bottomLeftCornerBitmap_.isNull() )
+        bottomLeftCornerBitmap_ = QBitmap( masksPixDir + "/buttomLeftCornerBitmap.png" );
+    if ( bottomMidBitmap_.isNull() )
+        bottomMidBitmap_ = QBitmap( masksPixDir + "/buttomMidBitmap.png" );
+    if ( bottomRightCornerBitmap_.isNull() )
+        bottomRightCornerBitmap_ = QBitmap( masksPixDir + "/buttomRightCornerBitmap.png" );
 
     determineSizes();
-
-    //prepareDecoWithBgCol();
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -685,60 +566,51 @@ void DeKoratorFactory::loadPixmaps()
 //
 void DeKoratorFactory::determineSizes()
 {
-    //MARGIN = midButtomFrameBg_.height();
+    //MARGIN = midBottomFrameBg_.height();
 
     // frames
-    TITLESIZE = DECOARR[ midTitle ][ orig ].height();
-    LEFTFRAMESIZE = DECOARR[ midLeftFrame ][ orig ].width();
-    BUTTOMFRAMESIZE = DECOARR[ midButtomFrame ][ orig ].height();
-    RIGHTFRAMESIZE = DECOARR[ midRightFrame ][ orig ].width();
+    TITLESIZE = decoImage[ midTitle ][ orig ].height();
+    LEFTFRAMESIZE = decoImage[ midLeftFrame ][ orig ].width();
+    BOTTOMFRAMESIZE = decoImage[ midBottomFrame ][ orig ].height();
+    RIGHTFRAMESIZE = decoImage[ midRightFrame ][ orig ].width();
 
-    TOPLEFTCORNERWIDTH = DECOARR[ topLeftCorner ][ orig ].width();
-    TOPRIGHTCORNERWIDTH = DECOARR[ topRightCorner ][ orig ].width();
-    LEFTTITLEWIDTH = DECOARR[ leftTitle ][ orig ].width();
-    RIGHTTITLEWIDTH = DECOARR[ rightTitle ][ orig ].width();
-    TOPLEFTFRAMEHEIGHT = DECOARR[ topLeftFrame ][ orig ].height();
-    BOTTOMLEFTFRAMEHEIGHT = DECOARR[ buttomLeftFrame ][ orig ].height();
-    TOPRIGHTFRAMEHEIGHT = DECOARR[ topRightFrame ][ orig ].height();
-    BOTTOMRIGHTFRAMEHEIGHT = DECOARR[ buttomRightFrame ][ orig ].height();
-    LEFTBOTTOMFRAMEWIDTH = DECOARR[ leftButtomFrame ][ orig ].width();
-    RIGHTBOTTOMFRAMEWIDTH = DECOARR[ rightButtomFrame ][ orig ].width();
+    TOPLEFTCORNERWIDTH = decoImage[ topLeftCorner ][ orig ].width();
+    TOPRIGHTCORNERWIDTH = decoImage[ topRightCorner ][ orig ].width();
+    LEFTTITLEWIDTH = decoImage[ leftTitle ][ orig ].width();
+    RIGHTTITLEWIDTH = decoImage[ rightTitle ][ orig ].width();
+    TOPLEFTFRAMEHEIGHT = decoImage[ topLeftFrame ][ orig ].height();
+    BOTTOMLEFTFRAMEHEIGHT = decoImage[ bottomLeftFrame ][ orig ].height();
+    TOPRIGHTFRAMEHEIGHT = decoImage[ topRightFrame ][ orig ].height();
+    BOTTOMRIGHTFRAMEHEIGHT = decoImage[ bottomRightFrame ][ orig ].height();
+    LEFTBOTTOMFRAMEWIDTH = decoImage[ leftBottomFrame ][ orig ].width();
+    RIGHTBOTTOMFRAMEWIDTH = decoImage[ rightBottomFrame ][ orig ].width();
 
 
     // buttons
     BUTTONSHEIGHT = TITLESIZE;
 
-    BTNHELPEWIDTH = BUTTONSARR[ help ][ regular ][ normal ].width();
-    BTNMAXWIDTH = BUTTONSARR[ max ][ regular ][ normal ].width();
-    BTNCLOSEWIDTH = BUTTONSARR[ close ][ regular ][ normal ].width();
-    BTNMINWIDTH = BUTTONSARR[ min ][ regular ][ normal ].width();
-    BTNSTICKYWIDTH = BUTTONSARR[ sticky ][ regular ][ normal ].width();
-    BTNABOVEWIDTH = BUTTONSARR[ above ][ regular ][ normal ].width();
-    BTNBELOWWIDTH = BUTTONSARR[ below ][ regular ][ normal ].width();
-    BTNSHADEWIDTH = BUTTONSARR[ shade ][ regular ][ normal ].width();
-    BTNMENUWIDTH = BUTTONSARR[ menu ][ regular ][ normal ].width();
-
-    BTNHELPEHEIGHT = BUTTONSARR[ help ][ regular ][ normal ].height();
-    BTNMAXHEIGHT = BUTTONSARR[ max ][ regular ][ normal ].height();
-    BTNCLOSEHEIGHT = BUTTONSARR[ close ][ regular ][ normal ].height();
-    BTNMINHEIGHT = BUTTONSARR[ min ][ regular ][ normal ].height();
-    BTNSTICKYHEIGHT = BUTTONSARR[ sticky ][ regular ][ normal ].height();
-    BTNABOVEHEIGHT = BUTTONSARR[ above ][ regular ][ normal ].height();
-    BTNBELOWHEIGHT = BUTTONSARR[ below ][ regular ][ normal ].height();
-    BTNSHADEHEIGHT = BUTTONSARR[ shade ][ regular ][ normal ].height();
-    BTNMENUHEIGHT = BUTTONSARR[ menu ][ regular ][ normal ].height();
+    buttonSize[ ButtonHelp ] = buttonImage[ help ][ regular ][ normal ].size();
+    buttonSize[ ButtonMax ] = buttonImage[ max ][ regular ][ normal ].size();
+    buttonSize[ ButtonMin ] = buttonImage[ min ][ regular ][ normal ].size();
+    buttonSize[ ButtonClose ] = buttonImage[ close ][ regular ][ normal ].size();
+    buttonSize[ ButtonMenu ] = buttonImage[ menu ][ regular ][ normal ].size();
+    buttonSize[ ButtonSticky ] = buttonImage[ sticky ][ regular ][ normal ].size();
+    buttonSize[ ButtonAbove ] = buttonImage[ above ][ regular ][ normal ].size();
+    buttonSize[ ButtonBelow ] = buttonImage[ below ][ regular ][ normal ].size();
+    buttonSize[ ButtonShade ] = buttonImage[ shade ][ regular ][ normal ].size();
+    buttonSize[ ButtonTabClose ] = buttonImage[ tabClose ][ regular ][ normal ].size();
 
     // masks
     TOPLEFTMASKWIDTH = topLeftCornerBitmap_.width();
     TOPMIDMASKWIDTH = topMidBitmap_.width();
     TOPRIGHTMASKWIDTH = topRightCornerBitmap_.width();
-    BOTTOMLEFTMASKWIDTH = buttomLeftCornerBitmap_.width();
-    BOTTOMMIDMASKWIDTH = buttomMidBitmap_.width();
-    BOTTOMRIGHTMASKWIDTH = buttomRightCornerBitmap_.width();
+    BOTTOMLEFTMASKWIDTH = bottomLeftCornerBitmap_.width();
+    BOTTOMMIDMASKWIDTH = bottomMidBitmap_.width();
+    BOTTOMRIGHTMASKWIDTH = bottomRightCornerBitmap_.width();
 
-    BOTTOMLEFTMASKHEIGHT = buttomLeftCornerBitmap_.height();
-    BOTTOMMIDMASKHEIGHT = buttomMidBitmap_.height();
-    BOTTOMRIGHTMASKHEIGHT = buttomRightCornerBitmap_.height();
+    BOTTOMLEFTMASKHEIGHT = bottomLeftCornerBitmap_.height();
+    BOTTOMMIDMASKHEIGHT = bottomMidBitmap_.height();
+    BOTTOMRIGHTMASKHEIGHT = bottomRightCornerBitmap_.height();
 
 }
 
@@ -749,26 +621,12 @@ void DeKoratorFactory::determineSizes()
 //
 void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 {
-    int i;
     QColor col = options() ->palette( KDecoration::ColorTitleBar, isActive ).background().color();
 
-    if ( isActive )
+    for ( int i = 0; i < decoCount; ++i )
     {
-        for ( i = 0; i < decoCount; ++i )
-        {
-            DECOARR[ i ][ actCol ] = colorizedImage( DECOARR[ i ][ orig ], col, DECOCOLORIZE );
-        }
+        decoImage[ i ][ isActive ? actCol : inActCol ] = colorizedImage( decoImage[ i ][ orig ], col, DECOCOLORIZE );
     }
-    else
-    {
-        for ( i = 0; i < decoCount; ++i )
-        {
-            DECOARR[ i ][ inActCol ] = colorizedImage( DECOARR[ i ][ orig ], col, DECOCOLORIZE );
-        }
-
-    }
-
-    prepareDecoWithBgCol();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -777,53 +635,15 @@ void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 //
 void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
 {
-    int i, j;
     QColor col = options() ->palette( KDecoration::ColorButtonBg, isActive ).background().color();
 
-    if ( isActive )
+    bool customColors = useCustomButtonsColors_ && ( isActive ? customColorsActiveButtons_ : customColorsInActiveButtons_ );
+
+    for ( int i = 0; i < buttonTypeAllCount; ++i )
     {
-        if ( useCustomButtonsColors_ && customColorsActiveButtons_ )
+        for ( int j = 0; j < buttonStateCount; ++j )
         {
-            for ( i = 0; i < buttonTypeAllCount; ++i )
-            {
-                for ( j = 0; j < buttonStateCount; ++j )
-                {
-                    BUTTONSARR[ i ][ j ][ actCol ] = colorizedImage( BUTTONSARR[ i ][ j ][ normal ], cusBtnCol_[ i ], BUTTONSCOLORIZE );
-                }
-            }
-        }
-        else
-        {
-            for ( i = 0; i < buttonTypeAllCount; ++i )
-            {
-                for ( j = 0; j < buttonStateCount; ++j )
-                {
-                    BUTTONSARR[ i ][ j ][ actCol ] = colorizedImage( BUTTONSARR[ i ][ j ][ normal ], col, BUTTONSCOLORIZE );
-                }
-            }
-        }
-    }
-    else
-    {
-        if ( ( useCustomButtonsColors_ && customColorsInActiveButtons_ ) )
-        {
-            for ( i = 0; i < buttonTypeAllCount; ++i )
-            {
-                for ( j = 0; j < buttonStateCount; ++j )
-                {
-                    BUTTONSARR[ i ][ j ][ inActCol ] = colorizedImage( BUTTONSARR[ i ][ j ][ normal ], cusBtnCol_[ i ], BUTTONSCOLORIZE );
-                }
-            }
-        }
-        else
-        {
-            for ( i = 0; i < buttonTypeAllCount; ++i )
-            {
-                for ( j = 0; j < buttonStateCount; ++j )
-                {
-                    BUTTONSARR[ i ][ j ][ inActCol ] = colorizedImage( BUTTONSARR[ i ][ j ][ normal ], col, BUTTONSCOLORIZE );
-                }
-            }
+            buttonImage[ i ][ j ][ isActive ? actCol : inActCol ] = colorizedImage( buttonImage[ i ][ j ][ normal ], customColors ? cusBtnCol_[ i ] : col, BUTTONSCOLORIZE );
         }
     }
 }
@@ -838,7 +658,6 @@ QImage DeKoratorFactory::colorizedImage( const QImage &image, QColor c, QString 
     if ( colorizeMethod == "Liquid Method" )
     {
         QImage img = image;
-        //KIconEffect::toGray( img, 1.0 );
 
         if ( img.depth() != 32 )
             img = img.convertToFormat( QImage::Format_ARGB32 );
@@ -856,11 +675,6 @@ QImage DeKoratorFactory::colorizedImage( const QImage &image, QColor c, QString 
         for ( current = 0; current < total; ++current )
         {
             alpha = qAlpha( data[ current ] );
-
-            //         qWarning( "--------------------------" );
-            //         qWarning( "red - %d", qRed( data[ current ] ) );
-            //         qWarning( "green - %d", qRed( data[ current ] ) );
-            //         qWarning( "blue - %d", qRed( data[ current ] ) );
 
             delta = 255 - qGray( data[ current ] );
 
@@ -893,74 +707,32 @@ QImage DeKoratorFactory::colorizedImage( const QImage &image, QColor c, QString 
     else if ( colorizeMethod == "Hue Adjustment" )
     {
         QImage img = image;
-        //KIconEffect::toGray( img, 1.0 );
 
         if ( img.depth() != 32 )
             img = img.convertToFormat( QImage::Format_ARGB32 );
 
-        //         QImage *dest;
-        //         *dest = img;
         QImage dest( img.width(), img.height(), QImage::Format_ARGB32 );
         unsigned int *data = ( unsigned int * ) img.bits();
         unsigned int *destData = ( unsigned int* ) dest.bits();
         int total = img.width() * img.height();
         int current;
-//        int delta;
         int destR, destG, destB, alpha;
-//        int srcR = c.red();
-//        int srcG = c.green();
-//        int srcB = c.blue();
         int h, s, v, ch;
-//        int *r, *g, *b, *a;
         QColor col ;
-//        float srcPercent, destPercent;
 
         for ( current = 0; current < total; ++current )
         {
-            //             int qRed ( data[ current ] );
-            //             int qGreen ( data[ current ] );
-            //             int qBlue ( data[ current ] );
-            //             alpha = qAlpha( destData[ current ] );
-            //
-            //             //destData[ current ] = data[ current ];
-            //
-            //             QColor col = destData[ current ];
-            //             col.getHsv( h, s, v );
-            //             //*h += 50;
-            //
-            //             col.setHsv( 50, *s, *v );
-            //
-            //             col.getRgb( r, g, b );
-
             col.setRgb( data[ current ] );
-            //col = Qt::red;
             c.getHsv( &h, &s, &v );
             ch = h;
             col.getHsv( &h, &s, &v );
-            //             s = 0;
-            //v += 100;
             col.setHsv( ch, s, v );
             destR = col.red();
             destG = col.green();
             destB = col.blue();
             alpha = qAlpha( data[ current ] );
 
-
-            //             if ( destR < 0 )
-            //                 destR = 0;
-            //             if ( destG < 0 )
-            //                 destG = 0;
-            //             if ( destB < 0 )
-            //                 destB = 0;
-            //             if ( destR > 255 )
-            //                 destR = 255;
-            //             if ( destG > 255 )
-            //                 destG = 255;
-            //             if ( destB > 255 )
-            //                 destB = 255;
-
             destData[ current ] = qRgba( destR, destG, destB, alpha );
-            //destData[ current ] = data[ current ];
         }
         return dest;
     }
@@ -974,82 +746,34 @@ void DeKoratorFactory::chooseRightPixmaps()
 {
     int i, j;
 
-    if ( DeKoratorFactory::colorizeActFrames_ )
-    {
-        for ( i = 0; i < decoCount; ++i )
-        {
-            DECOPIXARR[ i ][ WindowActive ] = QPixmap::fromImage( DECOARR[ i ][ actCol ] );
-        }
-    }
-    else
-    {
-        for ( i = 0; i < decoCount; ++i )
-        {
-            DECOPIXARR[ i ][ WindowActive ] = QPixmap::fromImage( DECOARR[ i ][ normal ] );
-        }
-    }
+    bool isActive = false;
+    if ( colorizeInActFrames_ )
+        colorizeDecoPixmaps( isActive );
+    if ( colorizeInActButtons_ )
+        colorizeButtonsPixmaps( isActive );
 
-    if ( DeKoratorFactory::colorizeInActFrames_ )
+    isActive = true;
+    if ( colorizeActFrames_ )
+        colorizeDecoPixmaps( isActive );
+    if ( colorizeActButtons_ )
+        colorizeButtonsPixmaps( isActive );
+
+    prepareDecoWithBgCol();
+
+    for ( i = 0; i < decoCount; ++i )
     {
-        for ( i = 0; i < decoCount; ++i )
-        {
-            DECOPIXARR[ i ][ WindowInactive ] = QPixmap::fromImage( DECOARR[ i ][ inActCol ] );
-        }
-    }
-    else
-    {
-        for ( i = 0; i < decoCount; ++i )
-        {
-            DECOPIXARR[ i ][ WindowInactive ] = QPixmap::fromImage( DECOARR[ i ][ normal ] );
-        }
+        decoPixmap[ i ][ WindowActive ] = QPixmap::fromImage( decoImage[ i ][ DeKoratorFactory::colorizeActFrames_ ? actCol : normal ] );
+        decoPixmap[ i ][ WindowInactive ] = QPixmap::fromImage( decoImage[ i ][ DeKoratorFactory::colorizeInActFrames_ ? inActCol : normal ] );
     }
 
-
-
-    if ( DeKoratorFactory::colorizeActButtons_ )
+    for ( i = 0; i < buttonTypeAllCount; ++i )
     {
-
-        for ( i = 0; i < buttonTypeAllCount; ++i )
+        for ( j = 0; j < buttonStateCount; ++j )
         {
-            for ( j = 0; j < buttonStateCount; ++j )
-            {
-                BUTTONPIXARR[ i ][ j ][ WindowActive ] = QPixmap::fromImage( BUTTONSARR[ i ][ j ][ actCol ] );
-            }
+            buttonStateImage[ i ][ j ][ WindowActive ] = buttonImage[ i ][ j ][ DeKoratorFactory::colorizeActButtons_ ? actCol : normal ];
+            buttonStateImage[ i ][ j ][ WindowInactive ] = buttonImage[ i ][ j ][ DeKoratorFactory::colorizeInActButtons_ ? inActCol : normal ];
         }
     }
-    else
-    {
-        for ( i = 0; i < buttonTypeAllCount; ++i )
-        {
-            for ( j = 0; j < buttonStateCount; ++j )
-            {
-                BUTTONPIXARR[ i ][ j ][ WindowActive ] = QPixmap::fromImage( BUTTONSARR[ i ][ j ][ normal ] );
-            }
-        }
-    }
-
-
-    if ( DeKoratorFactory::colorizeInActButtons_ )
-    {
-        for ( i = 0; i < buttonTypeAllCount; ++i )
-        {
-            for ( j = 0; j < buttonStateCount; ++j )
-            {
-                BUTTONPIXARR[ i ][ j ][ WindowInactive ] = QPixmap::fromImage( BUTTONSARR[ i ][ j ][ inActCol ] );
-            }
-        }
-    }
-    else
-    {
-        for ( i = 0; i < buttonTypeAllCount; ++i )
-        {
-            for ( j = 0; j < buttonStateCount; ++j )
-            {
-                BUTTONPIXARR[ i ][ j ][ WindowInactive ] = QPixmap::fromImage( BUTTONSARR[ i ][ j ][ normal ] );
-            }
-        }
-    }
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1059,36 +783,11 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 {
     int i;
 
-    if ( DeKoratorFactory::colorizeActFrames_ )
+    for ( i = 0 ; i < decoCount ; ++i )
     {
-        for ( i = 0 ; i < decoCount ; ++i )
-        {
-            DECOARR[ i ][ actCol ] = DECOARR[ i ][ actCol ];
-        }
+        decoImage[ i ][ actCol ] = decoImage[ i ][ DeKoratorFactory::colorizeActFrames_ ? actCol : orig ];
+        decoImage[ i ][ inActCol ] = decoImage[ i ][ DeKoratorFactory::colorizeInActFrames_ ? inActCol : orig ];
     }
-    else
-    {
-        for ( i = 0 ; i < decoCount ; ++i )
-        {
-            DECOARR[ i ][ normal ] = DECOARR[ i ][ orig ];
-        }
-    }
-
-    if ( DeKoratorFactory::colorizeInActFrames_ )
-    {
-        for ( i = 0 ; i < decoCount ; ++i )
-        {
-            DECOARR[ i ][ inActCol ] = DECOARR[ i ][ inActCol ];
-        }
-    }
-    else
-    {
-        for ( i = 0 ; i < decoCount ; ++i )
-        {
-            DECOARR[ i ][ normal ] = DECOARR[ i ][ orig ];
-        }
-    }
-
 }
 
 
@@ -1104,11 +803,10 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 // DeKoratorButton()
 // ---------------
 // Constructor
-DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight, DeKoratorClient * parent, const char * name,
+DeKoratorButton::DeKoratorButton( bool isLeft, const QSize &buttonSize, DeKoratorClient * parent, const char * name,
                                   const QString & tip, ButtonType type, buttonTypeAll btnType )
-        : QAbstractButton( parent->widget() ), isLeft_( isLeft ), buttonWidth_( buttonWidth ), client_( parent ), type_( type ), lastmouse_( Qt::NoButton ), decoPixHeight_( buttonHeight )
+        : QAbstractButton( parent->widget() ), isLeft_( isLeft ), buttonWidth_( buttonSize.width() ), client_( parent ), type_( type ), lastmouse_( Qt::NoButton ), decoPixHeight_( buttonSize.height() )
 {
-    //decoPixInAct_ = buttonPixInAct;
     animProgress = 0;
     hover_ = false;
     setAttribute( Qt::WA_NoSystemBackground, true );
@@ -1116,8 +814,6 @@ DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight
     setCursor( Qt::ArrowCursor );
     setObjectName( QString::fromAscii(name) );
 
-
-    //if ( buttonPix )
     setPixmap( btnType );
     setToolTip( tip );
     animTmr = new QTimer( this );
@@ -1131,7 +827,6 @@ DeKoratorButton::DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight
 // destructor
 DeKoratorButton::~DeKoratorButton()
 {
-    //if ( deco_ ) delete deco_;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1141,27 +836,8 @@ DeKoratorButton::~DeKoratorButton()
 // Set the button decoration
 void DeKoratorButton::setPixmap( buttonTypeAll btnType )
 {
-    //   decoPix_ = buttonPix;
-    //   decoPixPress_ = buttonPixPress;
-    //   decoPixHover_ = buttonPixHover;
-    //   decoPixInAct_ = buttonPixInAct;
-
-    //   btnPixAct_ = btnPixAct;
-    //   btnPixInAct_ = btnPixInAct;
     btnType_ = btnType;
-
-
-    //     btnPixAct_ = btnPixAct;
-    //     btnPixInAct_ = btnPixInAct;
-
-    //decoPix_->setMask(*deco_);
-    //   }
-    //   else
-    //   {
-    //     deco_ = new QBitmap(DECOSIZE, DECOSIZE, bitmap, true);
-    //     deco_->setMask(*deco_);
-    //   }
-    repaint();
+    update();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1259,14 +935,14 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
     int dx = 0, dy = 0;
     bool act = client_->isActive();
     WindowActivationState waState = act ? WindowActive : WindowInactive;
-    QImage buttonImgBak;
+    QImage image;
     QPainter painter( this );
 
     // fill background
     if ( isLeft_ )
-        painter.drawTiledPixmap( rect(), DECOPIXARR[ leftButtons ][ waState ] );
+        painter.drawTiledPixmap( rect(), decoPixmap[ leftButtons ][ waState ] );
     else
-        painter.drawTiledPixmap( rect(), DECOPIXARR[ rightButtons ][ waState ] );
+        painter.drawTiledPixmap( rect(), decoPixmap[ rightButtons ][ waState ] );
 
     // apply app icon effects
     if ( type_ == ButtonMenu && !USEMENUEIMAGE )
@@ -1274,35 +950,21 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
         dy = ( height() - 16 ) / 2;
 
         QPixmap appIconPix = client_->icon().pixmap( 16, QIcon::Normal );
-        buttonImgBak = appIconPix.toImage();
+        image = appIconPix.toImage();
 
         if ( !IGNOREAPPICNCOL )
         {
-            if ( act )
-            {
-                if ( client_->decoFactory_->useCustomButtonsColors_ && client_->decoFactory_->customColorsActiveButtons_ )
-                {
-                    buttonImgBak = DeKoratorFactory::colorizedImage( buttonImgBak, client_->decoFactory_->cusBtnCol_[ menu ], BUTTONSCOLORIZE );
-                }
-                else if ( client_->decoFactory_->colorizeActButtons_ )
-                {
-                    QColor col = client_->decoFactory_->options() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
+            DeKoratorFactory *factory = client_->decoFactory_;
 
-                    buttonImgBak = DeKoratorFactory::colorizedImage( buttonImgBak, col, BUTTONSCOLORIZE );
-                }
+            if ( factory->useCustomButtonsColors_ && ( act ? factory->customColorsActiveButtons_ : factory->customColorsInActiveButtons_ ) )
+            {
+                image = DeKoratorFactory::colorizedImage( image, factory->cusBtnCol_[ menu ], BUTTONSCOLORIZE );
             }
-            else
+            else if ( act ? factory->colorizeActButtons_ : factory->colorizeInActButtons_ )
             {
-                if ( client_->decoFactory_->useCustomButtonsColors_ && client_->decoFactory_->customColorsInActiveButtons_ )
-                {
-                    buttonImgBak = DeKoratorFactory::colorizedImage( buttonImgBak, client_->decoFactory_->cusBtnCol_[ menu ], BUTTONSCOLORIZE );
-                }
-                else if ( client_->decoFactory_->colorizeInActButtons_ )
-                {
-                    QColor col = client_->decoFactory_->options() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
+                QColor col = factory->options() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
 
-                    buttonImgBak = DeKoratorFactory::colorizedImage( buttonImgBak, col, BUTTONSCOLORIZE );
-                }
+                image = DeKoratorFactory::colorizedImage( image, col, BUTTONSCOLORIZE );
             }
         }
 
@@ -1310,43 +972,32 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
     else
     {
         dy = ( BUTTONSHEIGHT - decoPixHeight_ ) / 2;
+
+        image = buttonStateImage[ btnType_ ][ isDown() ? press : hover_ ? hover : regular ][ waState ];
     }
 
 
     // down
     if ( isDown() )
     {
-        if ( !( type_ == ButtonMenu && !USEMENUEIMAGE ) )
-        {
-            buttonImgBak = BUTTONPIXARR[ btnType_ ][ press ][ waState ].toImage();
-        }
         dx += BTNSHIFTX;
         dy += BTNSHIFTY;
 
-        buttonImgBak = chooseRightHoverEffect( buttonImgBak, BUTTONHOVERTYPE );
+        image = chooseRightHoverEffect( image, BUTTONHOVERTYPE );
     }
     // hover
     else if ( hover_ )
     {
-        if ( !( type_ == ButtonMenu && !USEMENUEIMAGE ) )
-        {
-            buttonImgBak = BUTTONPIXARR[ btnType_ ][ hover ][ waState ].toImage();
-        }
-        buttonImgBak = chooseRightHoverEffect( buttonImgBak, USEANIMATION ? ANIMATIONTYPE : BUTTONHOVERTYPE );
+        image = chooseRightHoverEffect( image, USEANIMATION ? ANIMATIONTYPE : BUTTONHOVERTYPE );
     }
     // regular
     else
     {
-        if ( !( type_ == ButtonMenu && !USEMENUEIMAGE ) )
-        {
-            buttonImgBak = BUTTONPIXARR[ btnType_ ][ regular ][ waState ].toImage();
-        }
-
         if ( USEANIMATION && animProgress > 0 )
-            buttonImgBak = chooseRightHoverEffect( buttonImgBak, ANIMATIONTYPE );
+            image = chooseRightHoverEffect( image, ANIMATIONTYPE );
     }
 
-    painter.drawImage( dx, dy, buttonImgBak );
+    painter.drawImage( dx, dy, image );
 
 
     if ( client_->isShade() && !SHOWBTMBORDER )
@@ -1473,9 +1124,6 @@ void DeKoratorButton::animate()
         if ( animProgress > 0 )
             animTmr->start( INTERVAL );
     }
-    //qWarning( "STEPS: %d", STEPS );
-    //qWarning( "animProgress: %d", animProgress );
-    //qWarning( "INTERVAL: %d", INTERVAL );
     repaint();
 }
 
@@ -1551,25 +1199,6 @@ void DeKoratorClient::init()
     delete leftSpacer_;
     delete rightSpacer_;
     delete bottomSpacer_;
-    /*  topLeftCornerBg[ normal ] ->load( decoPixDir + "/topLeftCornerBg.png" );
-            leftButtonsBg[ normal ] ->load( decoPixDir + "/leftButtonsBg.png" );
-            leftTitleBg[ normal ] ->load( decoPixDir + "/leftTitleBg.png" );
-            midTitleBg[ normal ] ->load( decoPixDir + "/midTitleBg.png" );
-            rightTitleBg[ normal ] ->load( decoPixDir + "/rightTitleBg.png" );
-            rightButtonsBg[ normal ] ->load( decoPixDir + "/rightButtonsBg.png" );
-            topRightCornerBg[ normal ] ->load( decoPixDir + "/topRightCornerBg.png" );
-            // left frame from top to buttom
-            topLeftFrameBg[ normal ] ->load( decoPixDir + "/topLeftFrameBg.png" );
-            midLeftFrameBg[ normal ] ->load( decoPixDir + "/midLeftFrameBg.png" );
-            buttomLeftFrameBg[ normal ] ->load( decoPixDir + "/bottomLeftFrameBg.png" );
-            // buttom frame from left to right
-            leftButtomFrameBg[ normal ] ->load( decoPixDir + "/leftBottomFrameBg.png" );
-            midButtomFrameBg[ normal ] ->load( decoPixDir + "/midBottomFrameBg.png" );
-            rightButtomFrameBg[ normal ] ->load( decoPixDir + "/rightBottomFrameBg.png" );
-            // right frame from top to buttom
-            topRightFrameBg[ normal ] ->load( decoPixDir + "/topRightFrameBg.png" );
-            midRightFrameBg[ normal ] ->load( decoPixDir + "/midRightFrameBg.png" );
-            buttomRightFrameBg[ normal ] ->load( decoPixDir + "/bottomRightFrameBg.png" );*/
 
     // layouts
     mainLayout_ = new QVBoxLayout( widget() );
@@ -1595,7 +1224,7 @@ void DeKoratorClient::init()
                                    QSizePolicy::Fixed, QSizePolicy::Expanding );
     rightSpacer_ = new QSpacerItem( RIGHTFRAMESIZE, 1,
                                     QSizePolicy::Fixed, QSizePolicy::Expanding );
-    bottomSpacer_ = new QSpacerItem( 1, ( !isSetShade() || SHOWBTMBORDER ) ? BUTTOMFRAMESIZE : 0,
+    bottomSpacer_ = new QSpacerItem( 1, ( !isSetShade() || SHOWBTMBORDER ) ? BOTTOMFRAMESIZE : 0,
                                      QSizePolicy::Expanding, QSizePolicy::Fixed );
 
 
@@ -1616,7 +1245,9 @@ void DeKoratorClient::init()
     midLayout_->addItem( leftSpacer_ );
     if ( isPreview() )
     {
-        midLayout_->addWidget( new QLabel( "<center><b>" + i18n( "deKorator 0.5.0 preview" ) + "</b></center>", widget() ) );
+        QWidget *previewLabel = new QLabel( "<center><b>" + i18n( "deKorator 0.5.0 preview" ) + "</b></center>", widget() );
+        previewLabel->setAutoFillBackground( true );
+        midLayout_->addWidget( previewLabel );
     }
     else
     {
@@ -1644,8 +1275,6 @@ void DeKoratorClient::init()
 // Add buttons to title layout
 void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool isLeft )
 {
-    //const unsigned char * bitmap;
-//    QPixmap * pix1, *pix2, *pix3, *pix4;
     QString tip;
     buttonTypeAll btnType;
 
@@ -1659,8 +1288,12 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 // Menu button
                 if ( !button[ ButtonMenu ] )
                 {
+                    QSize size = buttonSize[ ButtonMenu];
+                    if (size.width() < 16)
+                        size.setWidth(16);
+
                     button[ ButtonMenu ] =
-                        new DeKoratorButton( isLeft, ( BTNMENUWIDTH < 16 ) ? 16 : BTNMENUWIDTH, BTNMENUHEIGHT, this, "menu", i18n( "Menu" ), ButtonMenu, menu );
+                        new DeKoratorButton( isLeft, size, this, "menu", i18n( "Menu" ), ButtonMenu, menu );
                     connect( button[ ButtonMenu ], SIGNAL( pressed() ),
                              this, SLOT( menuButtonPressed() ) );
                     connect( button[ ButtonMenu ], SIGNAL( released() ), this, SLOT( menuButtonReleased() ) );
@@ -1680,16 +1313,10 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                     }
                     else
                     {
-                        //             pix1 = &( decoFactory_->buttonStickyPix_ );
-                        //             pix2 = &( decoFactory_->buttonStickyPressPix_ );
-                        //             pix3 = &( decoFactory_->buttonStickyHoverPix_ );
-                        //             pix4 = &( decoFactory_->buttonStickyDownPixInAct_ );
-
-
                         btnType = sticky;
                     }
                     button[ ButtonSticky ] =
-                        new DeKoratorButton( isLeft, BTNSTICKYWIDTH, BTNSTICKYHEIGHT, this, "sticky", d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ), ButtonSticky, btnType );
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonSticky ], this, "sticky", d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ), ButtonSticky, btnType );
                     connect( button[ ButtonSticky ], SIGNAL( clicked() ),
                              this, SLOT( toggleOnAllDesktops() ) );
                     layout->addWidget( button[ ButtonSticky ] );
@@ -1701,7 +1328,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 if ( ( !button[ ButtonHelp ] ) && providesContextHelp() )
                 {
                     button[ ButtonHelp ] =
-                        new DeKoratorButton( isLeft, BTNHELPEWIDTH, BTNHELPEHEIGHT, this, "help-contents", i18n( "Help" ),
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonHelp ], this, "help-contents", i18n( "Help" ),
                                              ButtonHelp, help );
                     connect( button[ ButtonHelp ], SIGNAL( clicked() ),
                              this, SLOT( showContextHelp() ) );
@@ -1714,7 +1341,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 if ( ( !button[ ButtonMin ] ) && isMinimizable() )
                 {
                     button[ ButtonMin ] =
-                        new DeKoratorButton( isLeft, BTNMINWIDTH, BTNMINHEIGHT, this, "iconify", i18n( "Minimize" ), ButtonMin, min );
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonMin ], this, "iconify", i18n( "Minimize" ), ButtonMin, min );
                     connect( button[ ButtonMin ], SIGNAL( clicked() ),
                              this, SLOT( minimize() ) );
                     layout->addWidget( button[ ButtonMin ] );
@@ -1728,26 +1355,14 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                     bool m = ( maximizeMode() == MaximizeFull );
                     if ( m )
                     {
-                        //            pix1 = &( decoFactory_->buttonRestorePix_ );
-                        //             pix2 = &( decoFactory_->buttonRestorePressPix_ );
-                        //             pix3 = &( decoFactory_->buttonRestoreHoverPix_ );
-                        //             pix4 = &( decoFactory_->buttonRestorePixInAct_ );
-
-
                         btnType = restore;
                     }
                     else
                     {
-                        //             pix1 = &( decoFactory_->buttonMaxPix_ );
-                        //             pix2 = &( decoFactory_->buttonMaxPressPix_ );
-                        //             pix3 = &( decoFactory_->buttonMaxHoverPix_ );
-                        //             pix4 = &( decoFactory_->buttonMaxPixInAct_ );
-
-
                         btnType = max;
                     }
                     button[ ButtonMax ] =
-                        new DeKoratorButton( isLeft, BTNMAXWIDTH, BTNMAXHEIGHT, this, "maximize", m ? i18n( "Restore" ) : i18n( "Maximize" ),
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonMax], this, "maximize", m ? i18n( "Restore" ) : i18n( "Maximize" ),
                                              ButtonMax, btnType );
                     connect( button[ ButtonMax ], SIGNAL( clicked() ),
                              this, SLOT( maxButtonPressed() ) );
@@ -1760,7 +1375,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                 if ( ( !button[ ButtonClose ] ) && isCloseable() )
                 {
                     button[ ButtonClose ] =
-                        new DeKoratorButton( isLeft, BTNCLOSEWIDTH, BTNCLOSEHEIGHT, this, "close", i18n( "Close" ),
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonClose ], this, "close", i18n( "Close" ),
                                              ButtonClose, close );
                     connect( button[ ButtonClose ], SIGNAL( clicked() ),
                              this, SLOT( closeWindow() ) );
@@ -1781,9 +1396,8 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                     {
                         btnType = above;
                     }
-                    //           pix1 = &( decoFactory_->buttonAbovePix_ );
                     button[ ButtonAbove ] =
-                        new DeKoratorButton( isLeft, BTNABOVEWIDTH, BTNABOVEHEIGHT, this, "above",
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonAbove ], this, "above",
                                              i18n( "Keep Above Others" ), ButtonAbove, btnType );
                     connect( button[ ButtonAbove ], SIGNAL( clicked() ),
                              this, SLOT( aboveButtonPressed() ) );
@@ -1804,9 +1418,8 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                     {
                         btnType = below;
                     }
-                    //          pix1 = &( decoFactory_->buttonBelowPix_ );
                     button[ ButtonBelow ] =
-                        new DeKoratorButton( isLeft, BTNBELOWWIDTH, BTNBELOWHEIGHT, this, "below",
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonBelow ], this, "below",
                                              i18n( "Keep Below Others" ), ButtonBelow, btnType );
                     connect( button[ ButtonBelow ], SIGNAL( clicked() ),
                              this, SLOT( belowButtonPressed() ) );
@@ -1828,7 +1441,7 @@ void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s, bool i
                         btnType = shade;
                     }
                     button[ ButtonShade ] =
-                        new DeKoratorButton( isLeft, BTNSHADEWIDTH, BTNSHADEHEIGHT, this, "shade", s ? i18n( "Unshade" ) : i18n( "Shade" ),
+                        new DeKoratorButton( isLeft, buttonSize[ ButtonShade ], this, "shade", s ? i18n( "Unshade" ) : i18n( "Shade" ),
                                              ButtonShade, btnType );
                     connect( button[ ButtonShade ], SIGNAL( clicked() ),
                              this, SLOT( shadeButtonPressed() ) );
@@ -2017,12 +1630,12 @@ void DeKoratorClient::borders( int & l, int & r, int & t, int & b ) const
     //     if ( SHOWBTMBORDER )
     //b = 10;
     //     else
-    //         b = isShade() ? 0 : BUTTOMFRAMESIZE;
-    //b = SHOWBTMBORDER ? BUTTOMFRAMESIZE : isShade() ? 1 : BUTTOMFRAMESIZE;
+    //         b = isShade() ? 0 : BOTTOMFRAMESIZE;
+    //b = SHOWBTMBORDER ? BOTTOMFRAMESIZE : isShade() ? 1 : BOTTOMFRAMESIZE;
     if ( !isShade() || SHOWBTMBORDER )
     {
-        b = BUTTOMFRAMESIZE;
-        bottomSpacer_->changeSize( 1, BUTTOMFRAMESIZE, QSizePolicy::Expanding, QSizePolicy::Fixed );
+        b = BOTTOMFRAMESIZE;
+        bottomSpacer_->changeSize( 1, BOTTOMFRAMESIZE, QSizePolicy::Expanding, QSizePolicy::Fixed );
     }
     else
     {
@@ -2077,7 +1690,7 @@ KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) con
         else
             pos = PositionTop;
     }
-    else if ( point.y() >= ( height() - BUTTOMFRAMESIZE ) )
+    else if ( point.y() >= ( height() - BOTTOMFRAMESIZE ) )
     {
         // inside handle
         if ( point.x() <= LEFTFRAMESIZE )
@@ -2092,7 +1705,7 @@ KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) con
         // on left frame
         if ( point.y() <= TITLESIZE )
             pos = PositionTopLeft;
-        else if ( point.y() >= ( height() - BUTTOMFRAMESIZE ) )
+        else if ( point.y() >= ( height() - BOTTOMFRAMESIZE ) )
             pos = PositionBottomLeft;
         else
             pos = PositionLeft;
@@ -2102,7 +1715,7 @@ KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) con
         // on right frame
         if ( point.y() <= TITLESIZE )
             pos = PositionTopRight;
-        else if ( point.y() >= ( height() - BUTTOMFRAMESIZE ) )
+        else if ( point.y() >= ( height() - BOTTOMFRAMESIZE ) )
             pos = PositionBottomRight;
         else
             pos = PositionRight;
@@ -2113,36 +1726,6 @@ KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) con
         pos = PositionCenter;
     }
     return pos;
-
-    //     const int corner = 24;
-    //     Position pos;
-    //
-    //     if (point.y() <= MARGIN) {
-    //         // inside top frame
-    //         if (point.x() <= corner)                 pos = PositionTopLeft;
-    //         else if (point.x() >= (width()-corner))  pos = PositionTopRight;
-    //         else                                     pos = PositionTop;
-    //     } else if (point.y() >= (height()-MARGIN*2)) {
-    //         // inside handle
-    //         if (point.x() <= corner)                 pos = PositionBottomLeft;
-    //         else if (point.x() >= (width()-corner))  pos = PositionBottomRight;
-    //         else                                     pos = PositionBottom;
-    //     } else if (point.x() <= MARGIN) {
-    //         // on left frame
-    //         if (point.y() <= corner)                 pos = PositionTopLeft;
-    //         else if (point.y() >= (height()-corner)) pos = PositionBottomLeft;
-    //         else                                     pos = PositionLeft;
-    //     } else if (point.x() >= width()-MARGIN) {
-    //         // on right frame
-    //         if (point.y() <= corner)                 pos = PositionTopRight;
-    //         else if (point.y() >= (height()-corner)) pos = PositionBottomRight;
-    //         else                                     pos = PositionRight;
-    //     } else {
-    //         // inside the frame
-    //         pos = PositionCenter;
-    //     }
-    //     return pos;
-
 }
 
 
@@ -2252,35 +1835,25 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
             // topLeftCorner
 
             rect.setRect( 0, 0, TOPLEFTCORNERWIDTH, TITLESIZE );
-            painter2.drawTiledPixmap( rect, DECOPIXARR[ topLeftCorner ][ waState ] );
-
-            //         rect.setRect( 0, 0, TOPLEFTCORNERWIDTH, TITLESIZE );
-            //         painter2.drawTiledPixmap( rect, isActive() ? decoFactory_->topLeftCornerBg_ : decoFactory_->topLeftCornerBgInAct_ );
+            painter2.drawTiledPixmap( rect, decoPixmap[ topLeftCorner ][ waState ] );
 
             // Space under the left button group
             painter2.drawTiledPixmap( leftTitleR.right() + 1, titleR.top(),
-                                      ( titleR.left() - 1 ) - leftTitleR.right(), titleR.height(), DECOPIXARR[ leftButtons ][ waState ] );
+                                      ( titleR.left() - 1 ) - leftTitleR.right(), titleR.height(), decoPixmap[ leftButtons ][ waState ] );
 
             if ( tw > 0 )
             {
-                //qWarning("%d",titleR.width());
-
                 //leftTitleR
                 rect.setRect( tx, 0, qMin( LEFTTITLEWIDTH, tw ), TITLESIZE );
 
-                painter2.drawTiledPixmap( rect, DECOPIXARR[ leftTitle ][ waState ] );
-
-                //             rect.setRect( tx, 0, qMin( LEFTTITLEWIDTH, tw ), TITLESIZE );
-                //             painter2.drawTiledPixmap( rect, isActive() ? decoFactory_->leftTitleBg_ : decoFactory_->leftTitleBgInAct_ );
+                painter2.drawTiledPixmap( rect, decoPixmap[ leftTitle ][ waState ] );
 
                 //midTitle
                 if ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH )
                 {
                     rect.setRect( tx + LEFTTITLEWIDTH, 0, tw - ( RIGHTTITLEWIDTH + LEFTTITLEWIDTH ), th );
 
-                    painter2.drawTiledPixmap( rect, DECOPIXARR[ midTitle ][ waState ] );
-
-                    //                 painter2.drawTiledPixmap( rect, isActive() ? decoFactory_->midTitleBg_ : decoFactory_->midTitleBgInAct_ );
+                    painter2.drawTiledPixmap( rect, decoPixmap[ midTitle ][ waState ] );
                 }
 
                 //rightTitleR
@@ -2288,23 +1861,20 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
                 {
                     rect.setRect( qMax( tx + tw - RIGHTTITLEWIDTH, tx + LEFTTITLEWIDTH ), 0, qMin( RIGHTTITLEWIDTH, tw - LEFTTITLEWIDTH ), th );
 
-                    painter2.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), DECOPIXARR[ rightTitle ][ waState ], ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH ) ? 0 : LEFTTITLEWIDTH - ( tw - RIGHTTITLEWIDTH ), 0 );
-
-                    //                 painter2.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), isActive() ? decoFactory_->rightTitleBg_ : decoFactory_->rightTitleBgInAct_, ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH ) ? 0 : LEFTTITLEWIDTH - ( tw - RIGHTTITLEWIDTH ), 0 );
+                    painter2.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ rightTitle ][ waState ], ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH ) ? 0 : LEFTTITLEWIDTH - ( tw - RIGHTTITLEWIDTH ), 0 );
                 }
             }
 
             // Space under the right button group
             painter2.drawTiledPixmap( titleR.right() + 1, titleR.top(),
-                                      ( rightTitleR.left() - 1 ) - titleR.right(), titleR.height(), DECOPIXARR[ rightButtons ][ waState ] );
+                                      ( rightTitleR.left() - 1 ) - titleR.right(), titleR.height(), decoPixmap[ rightButtons ][ waState ] );
 
 
             //topRightCorner
             rect.setRect( widget() ->width() - TOPRIGHTCORNERWIDTH, 0, TOPRIGHTCORNERWIDTH, TITLESIZE );
 
-            painter2.drawTiledPixmap( rect, DECOPIXARR[ topRightCorner ][ waState ] );
+            painter2.drawTiledPixmap( rect, decoPixmap[ topRightCorner ][ waState ] );
 
-            // painter2.drawTiledPixmap( rect, isActive() ? decoFactory_->topRightCornerBg_ : decoFactory_->topRightCornerBgInAct_ );
 
 
             QString c( caption() );
@@ -2355,34 +1925,30 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
         if ( ! isShade() || SHOWBTMBORDER )
         {
 
-            if ( h - TITLESIZE - BUTTOMFRAMESIZE > 0 )
+            if ( h - TITLESIZE - BOTTOMFRAMESIZE > 0 )
             {
-                int leftRightFramesHeight = h - TITLESIZE - BUTTOMFRAMESIZE ;
+                int leftRightFramesHeight = h - TITLESIZE - BOTTOMFRAMESIZE ;
 
                 //left frame
                 //top
                 rect.setRect( 0, TITLESIZE , LEFTFRAMESIZE, qMin( TOPLEFTFRAMEHEIGHT, leftRightFramesHeight ) );
 
-                painter.drawTiledPixmap( rect, DECOPIXARR[ topLeftFrame ][ waState ] );
+                painter.drawTiledPixmap( rect, decoPixmap[ topLeftFrame ][ waState ] );
 
                 // mid
                 if ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT + BOTTOMLEFTFRAMEHEIGHT )
                 {
                     rect.setRect( 0, TITLESIZE + TOPLEFTFRAMEHEIGHT , LEFTFRAMESIZE, leftRightFramesHeight - TOPLEFTFRAMEHEIGHT - BOTTOMLEFTFRAMEHEIGHT );
 
-                    painter.drawTiledPixmap( rect, DECOPIXARR[ midLeftFrame ][ waState ] );
-
-                    //                 painter.drawTiledPixmap( rect, isActive() ? decoFactory_->midLeftFrameBg_ : decoFactory_->midLeftFrameBgInAct_ );
+                    painter.drawTiledPixmap( rect, decoPixmap[ midLeftFrame ][ waState ] );
                 }
 
-                // buttom
+                // bottom
                 if ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT )
                 {
-                    rect.setRect( 0, qMax( h - BUTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT, TITLESIZE + TOPLEFTFRAMEHEIGHT ) , LEFTFRAMESIZE, qMin( BOTTOMLEFTFRAMEHEIGHT, leftRightFramesHeight - TOPLEFTFRAMEHEIGHT ) );
+                    rect.setRect( 0, qMax( h - BOTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT, TITLESIZE + TOPLEFTFRAMEHEIGHT ) , LEFTFRAMESIZE, qMin( BOTTOMLEFTFRAMEHEIGHT, leftRightFramesHeight - TOPLEFTFRAMEHEIGHT ) );
 
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), DECOPIXARR[ buttomLeftFrame ][ waState ], 0, ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT + BOTTOMLEFTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPLEFTFRAMEHEIGHT - ( h - BUTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT ) );
-
-                    //                 painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), isActive() ? decoFactory_->buttomLeftFrameBg_ : decoFactory_->buttomLeftFrameBgInAct_, 0, ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT + BOTTOMLEFTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPLEFTFRAMEHEIGHT - ( h - BUTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT ) );
+                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ bottomLeftFrame ][ waState ], 0, ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT + BOTTOMLEFTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPLEFTFRAMEHEIGHT - ( h - BOTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT ) );
                 }
 
 
@@ -2390,57 +1956,47 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
                 // top
                 rect.setRect( w - RIGHTFRAMESIZE, TITLESIZE , RIGHTFRAMESIZE, qMin( TOPRIGHTFRAMEHEIGHT, leftRightFramesHeight ) );
 
-                painter.drawTiledPixmap( rect, DECOPIXARR[ topRightFrame ][ waState ] );
-
-                //             painter.drawTiledPixmap( rect, isActive() ? decoFactory_->topRightFrameBg_ : decoFactory_->topRightFrameBgInAct_ );
+                painter.drawTiledPixmap( rect, decoPixmap[ topRightFrame ][ waState ] );
 
                 // mid
                 if ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT + BOTTOMRIGHTFRAMEHEIGHT )
                 {
                     rect.setRect( w - RIGHTFRAMESIZE, TITLESIZE + TOPRIGHTFRAMEHEIGHT, RIGHTFRAMESIZE, leftRightFramesHeight - TOPRIGHTFRAMEHEIGHT - BOTTOMRIGHTFRAMEHEIGHT );
 
-                    painter.drawTiledPixmap( rect, DECOPIXARR[ midRightFrame ][ waState ] );
-
-                    //                 painter.drawTiledPixmap( rect, isActive() ? decoFactory_->midRightFrameBg_ : decoFactory_->rightFrameBgInAct_ );
+                    painter.drawTiledPixmap( rect, decoPixmap[ midRightFrame ][ waState ] );
                 }
 
                 // bottom
                 if ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT )
                 {
-                    rect.setRect( w - RIGHTFRAMESIZE, qMax( h - BUTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT, TITLESIZE + TOPRIGHTFRAMEHEIGHT ) , RIGHTFRAMESIZE, qMin( BOTTOMRIGHTFRAMEHEIGHT, leftRightFramesHeight - TOPRIGHTFRAMEHEIGHT ) );
+                    rect.setRect( w - RIGHTFRAMESIZE, qMax( h - BOTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT, TITLESIZE + TOPRIGHTFRAMEHEIGHT ) , RIGHTFRAMESIZE, qMin( BOTTOMRIGHTFRAMEHEIGHT, leftRightFramesHeight - TOPRIGHTFRAMEHEIGHT ) );
 
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), DECOPIXARR[ buttomRightFrame ][ waState ], 0, ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT + BOTTOMRIGHTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPRIGHTFRAMEHEIGHT - ( h - BUTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT ) );
-
-                    //                 painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), isActive() ? decoFactory_->buttomRightFrameBg_ : decoFactory_->buttomRightFrameBgInAct_, 0, ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT + BOTTOMRIGHTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPRIGHTFRAMEHEIGHT - ( h - BUTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT ) );
+                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ bottomRightFrame ][ waState ], 0, ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT + BOTTOMRIGHTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPRIGHTFRAMEHEIGHT - ( h - BOTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT ) );
                 }
             }
 
 
-            // buttom frame
+            // bottom frame
             if ( w > 0 )
             {            // left
-                rect.setRect( 0 , h - BUTTOMFRAMESIZE, qMin( LEFTBOTTOMFRAMEWIDTH, w ) , BUTTOMFRAMESIZE );
+                rect.setRect( 0 , h - BOTTOMFRAMESIZE, qMin( LEFTBOTTOMFRAMEWIDTH, w ) , BOTTOMFRAMESIZE );
 
-                painter.drawTiledPixmap( rect, DECOPIXARR[ leftButtomFrame ][ waState ] );
+                painter.drawTiledPixmap( rect, decoPixmap[ leftBottomFrame ][ waState ] );
 
                 // mid
                 if ( w > LEFTBOTTOMFRAMEWIDTH + RIGHTBOTTOMFRAMEWIDTH )
                 {
-                    rect.setRect( LEFTBOTTOMFRAMEWIDTH , h - BUTTOMFRAMESIZE, w - LEFTBOTTOMFRAMEWIDTH - RIGHTBOTTOMFRAMEWIDTH, BUTTOMFRAMESIZE );
+                    rect.setRect( LEFTBOTTOMFRAMEWIDTH , h - BOTTOMFRAMESIZE, w - LEFTBOTTOMFRAMEWIDTH - RIGHTBOTTOMFRAMEWIDTH, BOTTOMFRAMESIZE );
 
-                    painter.drawTiledPixmap( rect, DECOPIXARR[ midButtomFrame ][ waState ] );
-
-                    //                 painter.drawTiledPixmap( rect, isActive() ? decoFactory_->midButtomFrameBg_ : decoFactory_->midButtomFrameBgInAct_ );
+                    painter.drawTiledPixmap( rect, decoPixmap[ midBottomFrame ][ waState ] );
                 }
 
                 // right
                 if ( w > LEFTBOTTOMFRAMEWIDTH )
                 {
-                    rect.setRect( qMax( w - RIGHTBOTTOMFRAMEWIDTH, LEFTBOTTOMFRAMEWIDTH ) , h - BUTTOMFRAMESIZE, qMin( RIGHTBOTTOMFRAMEWIDTH, w - LEFTBOTTOMFRAMEWIDTH ) , BUTTOMFRAMESIZE );
+                    rect.setRect( qMax( w - RIGHTBOTTOMFRAMEWIDTH, LEFTBOTTOMFRAMEWIDTH ) , h - BOTTOMFRAMESIZE, qMin( RIGHTBOTTOMFRAMEWIDTH, w - LEFTBOTTOMFRAMEWIDTH ) , BOTTOMFRAMESIZE );
 
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), DECOPIXARR[ rightButtomFrame ][ waState ], ( w > LEFTBOTTOMFRAMEWIDTH + RIGHTBOTTOMFRAMEWIDTH ) ? 0 : LEFTBOTTOMFRAMEWIDTH - ( w - RIGHTBOTTOMFRAMEWIDTH ), 0 );
-
-                    //                 painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), isActive() ? decoFactory_->rightButtomFrameBg_ : decoFactory_->rightButtomFrameBgInAct_, ( w > LEFTBOTTOMFRAMEWIDTH + RIGHTBOTTOMFRAMEWIDTH ) ? 0 : LEFTBOTTOMFRAMEWIDTH - ( w - RIGHTBOTTOMFRAMEWIDTH ), 0 );
+                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ rightBottomFrame ][ waState ], ( w > LEFTBOTTOMFRAMEWIDTH + RIGHTBOTTOMFRAMEWIDTH ) ? 0 : LEFTBOTTOMFRAMEWIDTH - ( w - RIGHTBOTTOMFRAMEWIDTH ), 0 );
                 }
             }
         }
@@ -2503,7 +2059,6 @@ void DeKoratorClient::resizeEvent( QResizeEvent *e )
 
         if ( oldSize_ != e->size() )
         {
-            //qWarning("QResizeEvent");
             sizeChanged = true;
         }
         else
@@ -2511,14 +2066,6 @@ void DeKoratorClient::resizeEvent( QResizeEvent *e )
 
         oldSize_ = e->size();
 
-        // 		if(e->type() == QEvent::Resize)
-        // 		{
-        //
-        // 			//oldSize((QResizeEvent*)e)->size());
-        // 			qWarning( "resizeEvent" );
-        // 		}
-
-        //        maskDirty_ = true;
         doShape();
     }
 }
@@ -2588,16 +2135,6 @@ void DeKoratorClient::belowButtonPressed()
 // Menu button was pressed (popup the menu)
 void DeKoratorClient::menuButtonPressed()
 {
-    //     if ( button[ ButtonMenu ] )
-    //     {
-    //         QPoint p( button[ ButtonMenu ] ->rect().bottomLeft().x(),
-    //                   button[ ButtonMenu ] ->rect().bottomLeft().y() );
-    //         KDecorationFactory* f = factory();
-    //         showWindowMenu( button[ ButtonMenu ] ->mapToGlobal( p ) );
-    //         if ( !f->exists( this ) ) return ; // decoration was destroyed
-    //         button[ ButtonMenu ] ->setDown( false );
-    //     }
-
     static QTime * t = NULL;
     static DeKoratorClient* lastClient = NULL;
     if ( t == NULL )
@@ -2641,8 +2178,6 @@ void DeKoratorClient::doShape()
 
     if ( sizeChanged )
     {
-        //qWarning("doShape");
-
         // top left
         QRegion mtr;
         QRegion m = QRegion( decoFactory_->topLeftCornerBitmap_ );
@@ -2683,8 +2218,8 @@ void DeKoratorClient::doShape()
 
         if ( !isShade() || SHOWBTMBORDER )
         {
-            //buttom left
-            m = QRegion( decoFactory_->buttomLeftCornerBitmap_ );
+            //bottom left
+            m = QRegion( decoFactory_->bottomLeftCornerBitmap_ );
             m.translate( 0, h - BOTTOMLEFTMASKHEIGHT );
             mask -= QRegion( m );
 
@@ -2694,7 +2229,7 @@ void DeKoratorClient::doShape()
                 int pos = BOTTOMLEFTMASKWIDTH;
                 int rep = ( w - BOTTOMLEFTMASKWIDTH - BOTTOMRIGHTMASKWIDTH ) / BOTTOMMIDMASKWIDTH;
                 int hm = h - BOTTOMMIDMASKHEIGHT;
-                m = QRegion( decoFactory_->buttomMidBitmap_ );
+                m = QRegion( decoFactory_->bottomMidBitmap_ );
                 QRegion mBak = m;
 
                 for ( int i = 0 ; i < rep ; ++i )
@@ -2713,8 +2248,8 @@ void DeKoratorClient::doShape()
                 mask -= m;
             }
 
-            //buttom right
-            m = QRegion( decoFactory_->buttomRightCornerBitmap_ );
+            //bottom right
+            m = QRegion( decoFactory_->bottomRightCornerBitmap_ );
             m.translate( width() - BOTTOMRIGHTMASKWIDTH, h - BOTTOMRIGHTMASKHEIGHT );
             mask -= QRegion( m );
         }

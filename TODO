@@ -1,5 +1,4 @@
 - improve decoration code
-    - less QPixmap <-> QImage conversions
 - improve theme file detection
     - should allow multiple themes in a .tar
     - less strict file names
@@ -15,4 +14,6 @@
     - add "Get New Themes ..." (GHNS / DX2) button
 - new decoration features
     - add option to vertically shift title text
+    - add option to use borderless maximized windows
+    - support window grouping
 - your ideas (mailto: christoph (a) maxiom.de)

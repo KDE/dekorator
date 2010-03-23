@@ -63,13 +63,13 @@ enum decoType {
     topRightCorner,
     topLeftFrame,
     midLeftFrame,
-    buttomLeftFrame,
-    leftButtomFrame,
-    midButtomFrame,
-    rightButtomFrame,
+    bottomLeftFrame,
+    leftBottomFrame,
+    midBottomFrame,
+    rightBottomFrame,
     topRightFrame,
     midRightFrame,
-    buttomRightFrame,
+    bottomRightFrame,
     decoCount
 };
 
@@ -88,6 +88,7 @@ enum buttonTypeAll {
     shade,
     shadedown,
     menu,
+    tabClose,
     buttonTypeAllCount
 };
 
@@ -101,6 +102,7 @@ enum ButtonType {
     ButtonAbove,
     ButtonBelow,
     ButtonShade,
+    ButtonTabClose,
     ButtonTypeCount
 };
 
@@ -137,7 +139,7 @@ public:
     virtual bool supports( KDecorationDefines::Ability ) const;
     static QImage colorizedImage( const QImage &image, QColor color, QString colorizeMethod );
     static bool initialized();
-	QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, buttomLeftCornerBitmap_, buttomMidBitmap_, buttomRightCornerBitmap_;
+    QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, bottomLeftCornerBitmap_, bottomMidBitmap_, bottomRightCornerBitmap_;
 
 private:
     bool readConfig();
@@ -153,7 +155,7 @@ private:
     static bool colorizeActFrames_;
     static bool colorizeInActFrames_;
     static bool needInit_;
-	static bool needReload_;
+    static bool needReload_;
     static QString framesPath_;
     static QString buttonsPath_;
     static QString masksPath_;
@@ -165,6 +167,8 @@ public:
     static bool colorizeActButtons_;
     static bool colorizeInActButtons_;
     static QColor cusBtnCol_[ buttonTypeAllCount ];
+    QImage decoImage[ decoCount ][ pixTypeCount ];
+    QImage buttonImage[ buttonTypeAllCount ][ buttonStateCount ][ pixTypeCount ];
 };
 
 inline bool DeKoratorFactory::initialized()
@@ -189,7 +193,7 @@ class DeKoratorButton : public QAbstractButton
 {
     Q_OBJECT
 public:
-    DeKoratorButton( bool isLeft, int buttonWidth, int buttonHeight, DeKoratorClient *parent = 0, const char *name = 0,
+    DeKoratorButton( bool isLeft, const QSize &buttonSize, DeKoratorClient *parent = 0, const char *name = 0,
                      const QString &tip = NULL, ButtonType type = ButtonHelp, buttonTypeAll btnType = restore );
     ~DeKoratorButton();
 
@@ -214,15 +218,13 @@ private:
     int buttonWidth_;
     DeKoratorClient *client_;
     ButtonType type_;
-    //QPixmap *decoPix_, *decoPixPress_, *decoPixHover_, *decoPixInAct_;
     Qt::MouseButton lastmouse_;
-	int decoPixHeight_;
+    int decoPixHeight_;
     bool hover_;
     QTimer *animTmr;
     uint animProgress;
-    //QPixmap *btnPixAct_, *btnPixInAct_;
     buttonTypeAll btnType_;
-int s;
+    int s;
 };
 
 inline Qt::MouseButton DeKoratorButton::lastMousePress() const
@@ -274,8 +276,8 @@ private:
 
     bool eventFilter( QObject *obj, QEvent *e );
     void mouseDoubleClickEvent( QMouseEvent *e );
-	void wheelEvent( QWheelEvent *e );
-	void paintEvent( QPaintEvent *e );
+    void wheelEvent( QWheelEvent *e );
+    void paintEvent( QPaintEvent *e );
     void resizeEvent( QResizeEvent * );
     void showEvent( QShowEvent * );
     void doShape();
@@ -299,12 +301,11 @@ private:
     QHBoxLayout *midLayout_;
     QSpacerItem *leftTitleBarSpacer_, *titleBarSpacer_, *rightTitleBarSpacer_, *leftSpacer_, *rightSpacer_, *bottomSpacer_;
     bool closing_;
-//    QPixmap *captionBufferPix_;
     bool captionBufferDirty_;
     QImage activeShadowImg_, inActiveShadowImg_;
-	QRegion mask_;
-	bool sizeChanged;
-	QSize oldSize_;
+    QRegion mask_;
+    bool sizeChanged;
+    QSize oldSize_;
 public:
     DeKoratorFactory *decoFactory_;
 };

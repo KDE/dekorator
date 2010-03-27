@@ -549,7 +549,7 @@ void DeKoratorFactory::loadPixmaps()
     {
         for ( int j = 0; j < buttonStateCount; ++j )
         {
-            buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[i] + ".png" );
+            buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[j] + ".png" );
         }
 
         // 0.1 compatibility

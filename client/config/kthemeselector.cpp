@@ -177,7 +177,10 @@ void KThemeSelector::Private::setViewMode(int viewMode)
 {
     if (viewMode != m_viewMode) {
         m_viewMode = viewMode;
+        QString selected = m_selected;
+        setSelected(QString());
         m_view->reset();
+        setSelected(selected);
         if (!m_selected.isEmpty()) {
             QList<QListWidgetItem *> items = m_view->findItems(m_selected, Qt::MatchExactly);
             if (!items.isEmpty()) {
@@ -421,7 +424,6 @@ void KThemeSelector::rescanThemes()
         if (!oldThemes.contains(theme)) {
             d->m_view->addItem(theme);
             emit themeInstalled(theme);
-            d->setSelected(theme);
         }
     }
     foreach (const QString &theme, oldThemes) {
@@ -431,6 +433,11 @@ void KThemeSelector::rescanThemes()
                 d->m_view->takeItem(d->m_view->row(items.at(0)));
                 emit themeRemoved(theme);
             }
+        }
+    }
+    if (d->m_selected.isEmpty()) {
+        if (!newThemes.isEmpty()) {
+            d->setSelected(newThemes.at(0));
         }
     }
 }

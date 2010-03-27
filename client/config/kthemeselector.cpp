@@ -336,8 +336,8 @@ void KThemeSelector::setConfigureAllowed(bool allowed)
 {
     if (allowed != !d->m_buttonConfigure->isHidden()) {
         d->m_buttonConfigure->setVisible(allowed);
-        if (allowed && !d->m_selected.isEmpty()) {
-            d->m_buttonConfigure->setEnabled(hasProperty(d->m_selected, Configurable));
+        if (allowed) {
+            d->m_buttonConfigure->setEnabled(!d->m_selected.isEmpty() && hasProperty(d->m_selected, Configurable));
         }
     }
 }
@@ -367,8 +367,8 @@ void KThemeSelector::setRemoveAllowed(bool allowed)
 {
     if (allowed != !d->m_buttonRemove->isHidden()) {
         d->m_buttonRemove->setVisible(allowed);
-        if (allowed && !d->m_selected.isEmpty()) {
-            d->m_buttonRemove->setEnabled(hasProperty(d->m_selected, Removable));
+        if (allowed) {
+            d->m_buttonRemove->setEnabled(!d->m_selected.isEmpty() && hasProperty(d->m_selected, Removable));
         }
     }
 }

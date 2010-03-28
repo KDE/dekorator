@@ -806,8 +806,8 @@ void DeKoratorFactory::chooseRightPixmaps()
 
     for ( i = 0; i < decoCount; ++i )
     {
-        decoPixmap[ i ][ WindowActive ] = QPixmap::fromImage( decoImage[ i ][ DeKoratorFactory::colorizeActFrames_ ? actCol : normal ] );
-        decoPixmap[ i ][ WindowInactive ] = QPixmap::fromImage( decoImage[ i ][ DeKoratorFactory::colorizeInActFrames_ ? inActCol : normal ] );
+        decoPixmap[ i ][ WindowActive ] = QPixmap::fromImage( decoImage[ i ][ actCol ] );
+        decoPixmap[ i ][ WindowInactive ] = QPixmap::fromImage( decoImage[ i ][ inActCol ] );
     }
 
     for ( i = 0; i < buttonTypeAllCount; ++i )

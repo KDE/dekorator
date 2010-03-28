@@ -33,8 +33,8 @@ class deKoratorThemes : public KThemeSelector
 
     public:
         enum ViewMode {
-            NamesOnly,
             FullPreviews,
+            NamesOnly,
             // number of view modes
             ViewModes
         };

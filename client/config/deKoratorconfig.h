@@ -40,6 +40,7 @@
 
 class KConfig;
 class IconThemesConfig;
+class deKoratorThemes;
 class QListWidgetItem;
 
 
@@ -77,6 +78,7 @@ protected slots:
 private:
     KConfig *config_;
     IconThemesConfig *themes_;
+    deKoratorThemes *m_themes;
     ConfigDialog *dialog_;
 };
 

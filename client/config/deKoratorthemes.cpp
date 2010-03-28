@@ -67,8 +67,8 @@ deKoratorThemes::deKoratorThemes(QWidget *parent)
     componentData = new KComponentData(aboutData);
     setup(*componentData);
     setConfigFileKNS("deKoratorthemes.knsrc");
-    setCreateAllowed(true);
-    setConfigureAllowed(true);
+    setCreateAllowed(false);
+    setConfigureAllowed(false);
 }
 
 
@@ -130,7 +130,7 @@ QString deKoratorThemes::themeName(const QString &localPath) const
 
 int deKoratorThemes::viewModes() const
 {
-    return 0;//ViewModes;
+    return 1;//ViewModes;
 }
 
 
@@ -182,8 +182,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
         buttonImage[i - 13] = QImage(imagePath);
         rightButtonsWidth += buttonImage[i - 13].width();
     }
-    QRect rect = option->rect.adjusted(40, 8, -100, -32);
-    QString text = option->fontMetrics.elidedText(title, Qt::ElideRight, rect.width());
+    QRect rect, titleRect;
     int x = option->rect.left() + 5, y = option->rect.top() + 5;
     for (int i = 0; i < 3; ++i) {
         QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
@@ -191,18 +190,19 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
         painter->drawImage(x, y, image);
         if (i == 1) {
             x += qMin(16, image.width());
-            rect.setLeft(x);
+            titleRect.setLeft(x);
         } else {
             x += image.width();
         }
     }
+    rect.setLeft(x);
     x = option->rect.right() - 5;
     for (int i = 6; i > 3; --i) {
         QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String("Bg.png");
         QImage image(imagePath);
         if (i == 5) {
             x -= rightButtonsWidth;
-            rect.setRight(x);
+            titleRect.setRight(x);
             drawTiledImage(painter, QRect(x, y, rightButtonsWidth, image.height()), image);
             int bx = x;
             for (int j = 0; j < 3; ++j) {
@@ -214,9 +214,11 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
             painter->drawImage(x, y, image);
         }
     }
+    rect.setRight(x);
     QString imagePath = decoPath + QLatin1String("/") + QLatin1String(tileNames[3]) + QLatin1String("Bg.png");
     QImage image = QImage(imagePath);
     rect.setTop(y); rect.setHeight(image.height());
+    titleRect.setTop(y); titleRect.setHeight(image.height());
     drawTiledImage(painter, rect, image);
     y = option->rect.top() + 5 + image.height();
     painter->setClipRect(option->rect.adjusted(0, 0, 0, -5));
@@ -280,18 +282,19 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
     painter->setFont(font);
     painter->setPen(Qt::black);
     image = image.scaled(1, 1, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    QString text = option->fontMetrics.elidedText(title, Qt::ElideRight, titleRect.width());
     if (qGray(image.pixel(0, 0)) < 150) {
-        painter->drawText(rect.adjusted(1, 1, 1, 1), Qt::AlignCenter, text);
+        painter->drawText(titleRect.adjusted(1, 1, 1, 1), Qt::AlignCenter, text);
         painter->setPen(Qt::white);
     }
-    painter->drawText(rect, Qt::AlignCenter, text);
+    painter->drawText(titleRect, Qt::AlignCenter, text);
 }
 
 
 void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewItem *option,
                                     const QString &localPath, int viewMode) const
 {
-    if (true /*viewMode == FullPreviews*/) {
+    if (viewMode == FullPreviews) {
         int w = option->rect.width();
         int h = option->rect.height();
         QString cacheKey = QString(QLatin1String("deKoratorPreview-%1-%2-%3")).arg(w).arg(h).arg(localPath);
@@ -318,7 +321,7 @@ void deKoratorThemes::paintThemeItem(QPainter *painter, const QStyleOptionViewIt
 QSize deKoratorThemes::sizeHintThemeItem(const QStyleOptionViewItem *option,
                                         const QString &localPath, int viewMode) const
 {
-    if (true /*viewMode == FullPreviews*/) {
+    if (viewMode == FullPreviews) {
         return QSize(300, 40 + option->fontMetrics.height());
     } else {
         return KThemeSelector::sizeHintThemeItem(option, localPath, viewMode);

@@ -34,6 +34,9 @@
 
 #include "deKoratorconfig.h"
 
+#include <KDE/KConfigGroup>
+#include <KDE/KLocale>
+
 #include "themes.h"
 #include "deKoratorthemes.h"
 
@@ -57,9 +60,12 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
 
     themes_ = new IconThemesConfig( dialog_, dialog_->themesKlstView /*, dialog_->removeThemBtn*/ );
 //dialog_->setWindowFlags(Qt::Window);
-    deKoratorThemes *themeSelector = new deKoratorThemes(dialog_);
-    themeSelector->layout()->setMargin(-1);
-    dialog_->tabWidget2->insertTab(0, themeSelector, "Themes");
+    m_themes = new deKoratorThemes(dialog_);
+    m_themes->layout()->setMargin(-1);
+    dialog_->tabWidget2->insertTab(0, m_themes, i18n("Themes"));
+    dialog_->tabWidget2->removeTab(7);
+    dialog_->tabWidget2->removeTab(6);
+    dialog_->tabWidget2->removeTab(5);
     dialog_->tabWidget2->setCurrentIndex(0);
     dialog_->show();
 
@@ -77,6 +83,7 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
 	connect( dialog_->ignoreAppIcnCol, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->dblClkCloseChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->showBtmBorderChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
+    connect( dialog_->showMaximizedBordersChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->useShdtextChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->activeShdtextXSpinBox, SIGNAL( valueChanged( int ) ), SIGNAL( changed() ) );
     connect( dialog_->activeShdtextYSpinBox, SIGNAL( valueChanged( int ) ), SIGNAL( changed() ) );
@@ -134,7 +141,7 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     dialog_->framesPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
     connect( dialog_->buttonsPathKurl, SIGNAL( textChanged( const QString& ) ), SIGNAL( changed() ) );
     dialog_->buttonsPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
-    connect( dialog_->useMasks_Chkbox, SIGNAL( clicked() ), SIGNAL( changed() ) );
+    connect( dialog_->ignoreMasksChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->masksPathKurl, SIGNAL( textChanged( const QString& ) ), SIGNAL( changed() ) );
     dialog_->masksPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
 
@@ -180,6 +187,7 @@ void DeKoratorConfig::load( const KConfigGroup & )
 	dialog_->ignoreAppIcnCol->setChecked( config_->readEntry( "IgnoreAppIconCol", false ) );
     dialog_->dblClkCloseChkBox->setChecked( config_->readEntry( "DblClkClose", false ) );
     dialog_->showBtmBorderChkBox->setChecked( config_->readEntry( "ShowBtmBorder", false ) );
+    dialog_->showMaximizedBordersChkBox->setChecked( config_->readEntry( "ShowMaximizedBorders", false ) );
     QColor color = QColor( 150, 150, 150 );
     dialog_->useShdtextChkBox->setChecked( config_->readEntry( "UseShdtext", false ) );
     dialog_->activeShdtextXSpinBox->setValue( config_->readEntry( "ActiveShdtextX", 0 ) );
@@ -238,10 +246,29 @@ void DeKoratorConfig::load( const KConfigGroup & )
     // path's
     KConfigGroup groupPaths(conf, "PATHS" ); config_ = &groupPaths;
 
+    QString themePath = config_->readEntry( "FramesPath", "" );
+    if ( themePath.endsWith( QLatin1String( "/deco" ) ) || themePath.endsWith( QLatin1String( "/Deco") ) ) {
+        themePath.chop( 5 );
+        m_themes->setSelectedTheme( themePath );
+    }
+
     dialog_->framesPathKurl->setUrl( config_->readEntry( "FramesPath", "" ) );
     dialog_->buttonsPathKurl->setUrl( config_->readEntry( "ButtonsPath", "" ) );
-    dialog_->useMasks_Chkbox->setChecked( config_->readEntry( "UseMasks", false ) );
+    dialog_->ignoreMasksChkBox->setChecked( !config_->readEntry( "UseMasks", true ) );
     dialog_->masksPathKurl->setUrl( config_->readEntry( "MasksPath", "" ) );
+}
+
+static QString themePath(const QString &localPath, const QString &dirName)
+{
+    QDir dir(localPath);
+    if (dir.exists(dirName)) {
+        return (localPath + QLatin1String("/") + dirName);
+    }
+    QString lowerName = dirName.toLower();
+    if (dir.exists(lowerName)) {
+        return (localPath + QLatin1String("/") + lowerName);
+    }
+    return QString();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -269,6 +296,7 @@ void DeKoratorConfig::save( KConfigGroup & )
 	config_->writeEntry( "IgnoreAppIconCol", dialog_->ignoreAppIcnCol->isChecked() );
     config_->writeEntry( "DblClkClose", dialog_->dblClkCloseChkBox->isChecked() );
     config_->writeEntry( "ShowBtmBorder", dialog_->showBtmBorderChkBox->isChecked() );
+    config_->writeEntry( "ShowMaximizedBorders", dialog_->showMaximizedBordersChkBox->isChecked() );
     config_->writeEntry( "UseShdtext", dialog_->useShdtextChkBox->isChecked() );
     config_->writeEntry( "ActiveShdtextX", dialog_->activeShdtextXSpinBox->value() );
     config_->writeEntry( "ActiveShdtextY", dialog_->activeShdtextYSpinBox->value() );
@@ -324,12 +352,23 @@ void DeKoratorConfig::save( KConfigGroup & )
 
     // path's
     KConfigGroup groupPaths(conf, "PATHS" ); config_ = &groupPaths;
-
+#if 0
     config_->writeEntry( "FramesPath", dialog_->framesPathKurl->url().path() );
     config_->writeEntry( "ButtonsPath", dialog_->buttonsPathKurl->url().path() );
     config_->writeEntry( "UseMasks", dialog_->useMasks_Chkbox->isChecked() );
     config_->writeEntry( "MasksPath", dialog_->masksPathKurl->url().path() );
+#else
+    QString path = m_themes->selectedTheme();
 
+    if ( path.isEmpty() ) {
+        // TODO no theme selected
+    } else {
+        config_->writeEntry( "FramesPath", themePath( path, "Deco" ) );
+        config_->writeEntry( "ButtonsPath", themePath( path, "Buttons" ) );
+        config_->writeEntry( "MasksPath", themePath( path, "Masks" ) );
+        config_->writeEntry( "UseMasks", !dialog_->ignoreMasksChkBox->isChecked() );
+    }
+#endif
     config_->sync();
 }
 
@@ -349,6 +388,7 @@ void DeKoratorConfig::defaults()
 	dialog_->ignoreAppIcnCol->setChecked( false );
     dialog_->dblClkCloseChkBox->setChecked( false );
     dialog_->showBtmBorderChkBox->setChecked( false );
+    dialog_->showMaximizedBordersChkBox->setChecked( false );
     dialog_->useShdtextChkBox->setChecked( false );
     dialog_->activeShdtextXSpinBox->setValue( 0 );
     dialog_->activeShdtextYSpinBox->setValue( 0 );
@@ -401,7 +441,7 @@ void DeKoratorConfig::defaults()
     // path's
     dialog_->framesPathKurl->setUrl( KUrl() );
     dialog_->buttonsPathKurl->setUrl( KUrl() );
-    dialog_->useMasks_Chkbox->setChecked( KConfigGroup(config_, "PATHS").readEntry( "UseMasks", false ) );
+    dialog_->ignoreMasksChkBox->setChecked( false );
     dialog_->masksPathKurl->setUrl( KUrl() );
 }
 

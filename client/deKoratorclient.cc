@@ -116,6 +116,7 @@ static bool USEMENUEIMAGE = false;
 static bool IGNOREAPPICNCOL = false;
 static bool DBLCLKCLOSE = false;
 static bool SHOWBTMBORDER = false;
+static bool showMaximizedBorders = false;
 static bool USESHDTEXT = false;
 static int ACTIVESHDTEXTX = 0;
 static int ACTIVESHDTEXTY = 0;
@@ -319,6 +320,9 @@ bool DeKoratorFactory::readConfig()
     bool oldShowBtmBorder = SHOWBTMBORDER;
     SHOWBTMBORDER = config.readEntry( "ShowBtmBorder", false );
 
+    bool oldShowMaximizedBorders = showMaximizedBorders;
+    showMaximizedBorders = config.readEntry( "ShowMaximizedBorders", false );
+
     bool oldUseShdtext = USESHDTEXT;
     USESHDTEXT = config.readEntry( "UseShdtext", false );
 
@@ -447,6 +451,7 @@ bool DeKoratorFactory::readConfig()
             oldUseMenuImage == USEMENUEIMAGE &&
             oldIgnoreAppIcnCol == IGNOREAPPICNCOL &&
             oldShowBtmBorder == SHOWBTMBORDER &&
+            oldShowMaximizedBorders == showMaximizedBorders &&
             oldUseShdtext == USESHDTEXT &&
             oldActiveShdtextX == ACTIVESHDTEXTX &&
             oldActiveShdtextY == ACTIVESHDTEXTY &&
@@ -1268,6 +1273,14 @@ void DeKoratorClient::init()
     bottomSpacer_ = new QSpacerItem( 1, ( !isSetShade() || SHOWBTMBORDER ) ? BOTTOMFRAMESIZE : 0,
                                      QSizePolicy::Expanding, QSizePolicy::Fixed );
 
+    if (maximizeMode() == MaximizeFull && !showMaximizedBorders )
+    {
+        leftTitleBarSpacer_->changeSize( 0, TITLESIZE, QSizePolicy::Fixed, QSizePolicy::Fixed );
+        rightTitleBarSpacer_->changeSize( 0, TITLESIZE, QSizePolicy::Fixed, QSizePolicy::Fixed );
+        leftSpacer_->changeSize( 0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding );
+        rightSpacer_->changeSize( 0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding );
+        bottomSpacer_->changeSize( 0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed );
+    }
 
     // setup layout
 
@@ -1663,15 +1676,25 @@ void DeKoratorClient::keepBelowChange( bool b )
 // Get the size of the borders
 void DeKoratorClient::borders( int & l, int & r, int & t, int & b ) const
 {
-    l = LEFTFRAMESIZE;
-    r = RIGHTFRAMESIZE;
+    bool maximized = maximizeMode() == MaximizeFull && !showMaximizedBorders;
+
+    if ( maximized )
+    {
+        l = 0;
+        r = 0;
+    }
+    else
+    {
+        l = LEFTFRAMESIZE;
+        r = RIGHTFRAMESIZE;
+    }
     t = TITLESIZE ;
     //     if ( SHOWBTMBORDER )
     //b = 10;
     //     else
     //         b = isShade() ? 0 : BOTTOMFRAMESIZE;
     //b = SHOWBTMBORDER ? BOTTOMFRAMESIZE : isShade() ? 1 : BOTTOMFRAMESIZE;
-    if ( !isShade() || SHOWBTMBORDER )
+    if ( !maximized && (!isShade() || SHOWBTMBORDER ) )
     {
         b = BOTTOMFRAMESIZE;
         bottomSpacer_->changeSize( 1, BOTTOMFRAMESIZE, QSizePolicy::Expanding, QSizePolicy::Fixed );
@@ -1690,6 +1713,24 @@ void DeKoratorClient::borders( int & l, int & r, int & t, int & b ) const
 // Called to resize the window
 void DeKoratorClient::resize( const QSize & size )
 {
+    if (maximizeMode() == MaximizeFull && !showMaximizedBorders )
+    {
+        leftTitleBarSpacer_->changeSize( 0, TITLESIZE, QSizePolicy::Fixed, QSizePolicy::Fixed );
+        rightTitleBarSpacer_->changeSize( 0, TITLESIZE, QSizePolicy::Fixed, QSizePolicy::Fixed );
+        leftSpacer_->changeSize( 0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding );
+        rightSpacer_->changeSize( 0, 0, QSizePolicy::Fixed, QSizePolicy::Expanding );
+        bottomSpacer_->changeSize( 0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed );
+    }
+    else
+    {
+        leftTitleBarSpacer_->changeSize( TOPLEFTCORNERWIDTH, TITLESIZE, QSizePolicy::Fixed, QSizePolicy::Fixed );
+        rightTitleBarSpacer_->changeSize( TOPRIGHTCORNERWIDTH, TITLESIZE, QSizePolicy::Fixed, QSizePolicy::Fixed );
+        leftSpacer_->changeSize( LEFTFRAMESIZE, 1, QSizePolicy::Fixed, QSizePolicy::Expanding );
+        rightSpacer_->changeSize( LEFTFRAMESIZE, 1, QSizePolicy::Fixed, QSizePolicy::Expanding );
+        bottomSpacer_->changeSize( 1, BOTTOMFRAMESIZE, QSizePolicy::Expanding, QSizePolicy::Fixed );
+    }
+    widget() ->layout() ->invalidate();
+    widget() ->layout() ->activate();
     widget() ->resize( size );
 }
 
@@ -2214,6 +2255,12 @@ void DeKoratorClient::doShape()
     int w = width();
     int h = height();
     QRegion mask( 0, 0, w, h );
+
+    if (maximizeMode() == MaximizeFull && !showMaximizedBorders )
+    {
+        setMask( mask );
+        return;
+    }
 
     if ( sizeChanged )
     {

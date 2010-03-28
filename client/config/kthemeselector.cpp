@@ -122,7 +122,7 @@ void KThemeSelector::Private::setup(KThemeSelector *widget)
     setupUi((QWidget *) widget);
 
     int modes = widget->viewModes();
-    if (modes > 0) {
+    if (modes > 1) {
         for (int i = 0; i < modes; ++i) {
             m_viewModeChooser->addItem(widget->viewModeLabel(i));
         }
@@ -141,6 +141,7 @@ void KThemeSelector::Private::setup(KThemeSelector *widget)
 
     m_view->setUniformItemSizes(true);
     m_view->setItemDelegate(m_delegate);
+    m_view->setMinimumWidth(330);
 
     m_editFilter->setClickMessage(i18n("Filter Themes"));
     m_editFilter->setClearButtonShown(true);
@@ -181,12 +182,6 @@ void KThemeSelector::Private::setViewMode(int viewMode)
         setSelected(QString());
         m_view->reset();
         setSelected(selected);
-        if (!m_selected.isEmpty()) {
-            QList<QListWidgetItem *> items = m_view->findItems(m_selected, Qt::MatchExactly);
-            if (!items.isEmpty()) {
-                m_view->scrollToItem(items.at(0));
-            }
-        }
     }
 }
 
@@ -267,6 +262,7 @@ void KThemeSelector::Private::setSelected(const QString &localPath)
         QList<QListWidgetItem *> items = m_view->findItems(localPath, Qt::MatchExactly);
         if (!items.isEmpty()) {
             m_view->setCurrentItem(items.at(0), QItemSelectionModel::SelectCurrent);
+            m_view->scrollToItem(items.at(0));
         } else {
             m_view->clearSelection();
         }

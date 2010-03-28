@@ -271,9 +271,8 @@ bool DeKoratorFactory::reset( unsigned long changed )
         if ( DeKoratorFactory::needReload_ )
         {
             loadPixmaps();
-
-            chooseRightPixmaps();
         }
+        chooseRightPixmaps();
         return true;
     }
     else

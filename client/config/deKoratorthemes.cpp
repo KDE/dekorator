@@ -37,6 +37,7 @@
 
 #include <KDE/KAboutData>
 #include <KDE/KComponentData>
+#include <KDE/KConfigGroup>
 #include <KDE/KLocale>
 
 #include <QtCore/QFileInfo>
@@ -68,12 +69,17 @@ deKoratorThemes::deKoratorThemes(QWidget *parent)
     setup(*componentData);
     setConfigFileKNS("deKoratorthemes.knsrc");
     setCreateAllowed(false);
-    setConfigureAllowed(false);
+    KConfig config("deKoratorrc");
+    KConfigGroup group(&config, "General");
+    restoreState(group.readEntry("ThemeSelectorState", QByteArray()));
 }
 
 
 deKoratorThemes::~deKoratorThemes()
 {
+    KConfig config("deKoratorrc");
+    KConfigGroup group(&config, "General");
+    group.writeEntry("ThemeSelectorState", saveState());
     delete componentData;
     delete aboutData;
 }
@@ -130,7 +136,7 @@ QString deKoratorThemes::themeName(const QString &localPath) const
 
 int deKoratorThemes::viewModes() const
 {
-    return 1;//ViewModes;
+    return ViewModes;
 }
 
 

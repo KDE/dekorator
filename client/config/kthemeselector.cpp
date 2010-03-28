@@ -178,6 +178,7 @@ void KThemeSelector::Private::setViewMode(int viewMode)
 {
     if (viewMode != m_viewMode) {
         m_viewMode = viewMode;
+        m_viewModeChooser->setCurrentIndex(viewMode);
         QString selected = m_selected;
         setSelected(QString());
         m_view->reset();
@@ -366,6 +367,7 @@ void KThemeSelector::setRemoveAllowed(bool allowed)
 {
     if (allowed != !d->m_buttonRemove->isHidden()) {
         d->m_buttonRemove->setVisible(allowed);
+        d->m_buttonInstall->setVisible(allowed);
         if (allowed) {
             d->m_buttonRemove->setEnabled(!d->m_selected.isEmpty() && hasProperty(d->m_selected, Removable));
         }
@@ -399,11 +401,13 @@ QByteArray KThemeSelector::saveState() const
 
 void KThemeSelector::restoreState(const QByteArray &state)
 {
-    int version = state.at(0);
+    if (!state.isEmpty()) {
+        int version = state.at(0);
 
-    if (version == 1) {
-        d->setViewMode(state.at(1));
-        d->setFilter(QString::fromUtf8(state.mid(2)));
+        if (version == 1) {
+            d->setViewMode(state.at(1));
+            d->setFilter(QString::fromUtf8(state.mid(2)));
+        }
     }
 }
 

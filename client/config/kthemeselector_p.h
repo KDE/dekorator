@@ -76,6 +76,7 @@ class KThemeSelector::Private : public QObject, public Ui::KThemeSelectorWidgets
         void setup(KThemeSelector *widget);
         void setFilter(const QString &text);
         void setSelected(const QString &localPath);
+        void postInstallFiles(const QStringList &files);
 };
 
 #endif

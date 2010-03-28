@@ -47,7 +47,13 @@
 #include <KDE/KIO/Job>
 #include <KDE/KIO/NetAccess>
 
+#include <kdeversion.h>
+
+#if KDE_IS_VERSION(4, 4, 0)
 #include <KDE/KNS3/DownloadDialog>
+#else
+#include <KDE/KNS/Engine>
+#endif
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -241,8 +247,24 @@ void KThemeSelector::Private::removeClicked()
 }
 
 
+void KThemeSelector::Private::postInstallFiles(const QStringList &files)
+{
+    foreach (const QString &file, files) {
+        if (file.endsWith(QLatin1String(".tar.bz2"), Qt::CaseInsensitive)
+            || file.endsWith(QLatin1String(".tar.gz"), Qt::CaseInsensitive)
+            || file.endsWith(QLatin1String(".tar.xz"), Qt::CaseInsensitive)) {
+            QString installed = m_parent->installTheme(file);
+            if (!installed.isEmpty()) {
+                setSelected(installed);
+            }
+        }
+    }
+}
+
+
 void KThemeSelector::Private::getNewClicked()
 {
+#if KDE_IS_VERSION(4, 4, 0)
     KNS3::DownloadDialog dialog(m_configFileKNS, m_parent);
 
     if (dialog.exec()) {
@@ -251,22 +273,27 @@ void KThemeSelector::Private::getNewClicked()
             KNS3::Entry::List entries = dialog.installedEntries();
             if (entries.size() > 0) {
                 foreach (const KNS3::Entry &entry, entries) {
-                    QStringList files = entry.installedFiles();
-                    foreach (const QString &file, files) {
-                        if (file.endsWith(QLatin1String(".tar.bz2"), Qt::CaseInsensitive)
-                            || file.endsWith(QLatin1String(".tar.gz"), Qt::CaseInsensitive)
-                            || file.endsWith(QLatin1String(".tar.xz"), Qt::CaseInsensitive)) {
-                            QString installed = m_parent->installTheme(file);
-                            if (!installed.isEmpty()) {
-                                setSelected(installed);
-                            }
-                        }
-                    }
+                    postInstallFiles(entry.installedFiles());
                 }
             }
             m_parent->rescanThemes();
         }
     }
+#else
+    KNS::Engine engine(m_parent);
+
+    if (engine.init(m_configFileKNS)) {
+        KNS::Entry::List entries = engine.downloadDialogModal(m_parent);
+        if (entries.size() > 0) {
+            foreach (KNS::Entry *entry, entries) {
+                if (entry->status() == KNS::Entry::Installed) {
+                    postInstallFiles(entry->installedFiles());
+                }
+            }
+            m_parent->rescanThemes();
+        }
+    }
+#endif
 }
 
 

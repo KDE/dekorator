@@ -56,6 +56,8 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QPushButton>
 
+#include "deKoratorthemes.h"
+
 
 //////////////////////////////////////////////////////////////////////////////
 // IconThemesConfig()
@@ -153,15 +155,13 @@ void IconThemesConfig::getNewThemes()
 
 void IconThemesConfig::installNewTheme()
 {
+}
 
-    KUrl themeURL = KUrlRequesterDialog::getUrl( QString(), parent_,
-                    i18n( "Drag or Type Theme URL" ) );
-
-    if ( themeURL.url().isEmpty() )
-        return ;
-
+QString deKoratorThemes::installTheme(const KUrl &themeURL)
+{
     // themeTmpFile contains the name of the downloaded file
     QString themeTmpFile;
+    QWidget *parent_ = this;
 
     if ( !KIO::NetAccess::download( themeURL, themeTmpFile, parent_ ) )
     {
@@ -172,7 +172,7 @@ void IconThemesConfig::installNewTheme()
             sorryText = i18n( "Unable to download deKorator theme archive;\n"
                     "please check that address %1 is correct.", themeURL.prettyUrl() );
         KMessageBox::sorry( parent_, sorryText );
-        return ;
+        return QString();
     }
 
     //
@@ -183,7 +183,7 @@ void IconThemesConfig::installNewTheme()
         KMessageBox::error( parent_, invalidArch );
 
         KIO::NetAccess::removeTempFile( themeTmpFile );
-        return ;
+        return QString();
     }
 
     if ( !installThemes( themesNames, themeTmpFile ) )
@@ -198,12 +198,10 @@ void IconThemesConfig::installNewTheme()
 
     KIO::NetAccess::removeTempFile( themeTmpFile );
 
-    loadThemes();
+    rescanThemes();
 
-    QString cur = themesNames.at( 0 );
-
-    QListWidgetItem *item = iconThemeItem( cur );
-    themesView_->setCurrentItem( item );
+    QString localThemesDir = KStandardDirs::locateLocal("data", "deKorator/themes/");
+    return localThemesDir + themesNames.at( 0 );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -211,7 +209,7 @@ void IconThemesConfig::installNewTheme()
 // ----------
 //
 
-bool IconThemesConfig::installThemes( const QStringList &themes, const QString &archiveName )
+bool deKoratorThemes::installThemes( const QStringList &themes, const QString &archiveName )
 {
     bool everythingOk = true;
     QString localThemesDir = KStandardDirs::locateLocal("data", "deKorator/themes/");
@@ -220,7 +218,7 @@ bool IconThemesConfig::installThemes( const QStringList &themes, const QString &
         return false;
     }
     //
-    KProgressDialog progressDiag( parent_);//, "themeinstallprogress",
+    KProgressDialog progressDiag( this );//, "themeinstallprogress",
                                 /*  i18n( "Installing icon themes" ),
                                   QString::null,
                                   true );*/
@@ -269,7 +267,7 @@ bool IconThemesConfig::installThemes( const QStringList &themes, const QString &
 // ----------
 //
 
-QStringList IconThemesConfig::findThemeDirs( const QString &archiveName )
+QStringList deKoratorThemes::findThemeDirs( const QString &archiveName )
 {
     QStringList foundThemes;
 

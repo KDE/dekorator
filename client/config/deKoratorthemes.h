@@ -43,6 +43,9 @@ class deKoratorThemes : public KThemeSelector
         explicit deKoratorThemes(QWidget *parent = 0);
         ~deKoratorThemes();
 
+    public:
+        QString installTheme(const KUrl &themeUrl);
+
     protected:
         virtual bool isValidTheme(const QString &localPath) const;
         virtual QString themeName(const QString &localPath) const;
@@ -53,6 +56,10 @@ class deKoratorThemes : public KThemeSelector
                                     const QString &localPath, int viewMode) const;
         virtual QSize sizeHintThemeItem(const QStyleOptionViewItem *option,
                                         const QString &localPath, int viewMode) const;
+
+    private:
+        bool installThemes(const QStringList &themes, const QString &archiveName);
+        QStringList findThemeDirs(const QString &archiveName);
 
     private:
         KAboutData *aboutData;

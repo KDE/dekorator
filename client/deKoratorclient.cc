@@ -519,6 +519,7 @@ void DeKoratorFactory::loadPixmaps()
 
     for ( int i = 0; i < decoCount; ++i )
     {
+        decoImage[ i ][ orig ] = QImage();
         decoImage[ i ][ orig ].load( decoPixDir + '/' + decoPixName[i] + "Bg.png" );
     }
 
@@ -549,6 +550,7 @@ void DeKoratorFactory::loadPixmaps()
     {
         for ( int j = 0; j < buttonStateCount; ++j )
         {
+            buttonImage[ i ][ j ][ normal ] = QImage();
             buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[j] + ".png" );
         }
 
@@ -556,6 +558,21 @@ void DeKoratorFactory::loadPixmaps()
         if ( buttonImage[ i ][ regular][ normal ].isNull() )
         {
             buttonImage[ i ][ regular ][ normal ].load( btnPixDir + "/button" + buttonGlyphName[i] + ".png" );
+            if (buttonImage[ i ][ regular ][ normal ].isNull() )
+            {
+                if (i == 0)
+                {
+                    for ( int j = 0; j < buttonStateCount; ++j )
+                    {
+                        buttonImage[ i ][ j ][ normal ] = QImage();
+                        buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[2] + buttonStateName[j] + ".png" );
+                    }
+                    if ( buttonImage[ i ][ regular][ normal ].isNull() )
+                    {
+                        buttonImage[ i ][ regular ][ normal ].load( btnPixDir + "/button" + buttonGlyphName[2] + ".png" );
+                    }
+                }
+            }
             for ( int j = hover; j < buttonStateCount; ++j )
             {
                 buttonImage[ i ][ j ][ normal ] = buttonImage[ i ][ regular ][ normal ];
@@ -1271,7 +1288,7 @@ void DeKoratorClient::init()
     {
         QWidget *previewLabel = new QLabel( "<p align=\"center\"><b>" + i18n( "deKorator")
             + "</b> - " + i18n("Themable window decorator for KDE" ) + "</p><p align=\"center\">"
-            + i18n("Click Configure button to manage themes") + "</p>", widget() );
+            + i18n("Click Configure icon to manage themes") + "</p>", widget() );
         previewLabel->setAutoFillBackground( true );
         midLayout_->addWidget( previewLabel );
     }

@@ -248,6 +248,22 @@ void KThemeSelector::Private::getNewClicked()
     if (dialog.exec()) {
         KNS3::Entry::List entries = dialog.changedEntries();
         if (entries.size() > 0) {
+            KNS3::Entry::List entries = dialog.installedEntries();
+            if (entries.size() > 0) {
+                foreach (const KNS3::Entry &entry, entries) {
+                    QStringList files = entry.installedFiles();
+                    foreach (const QString &file, files) {
+                        if (file.endsWith(QLatin1String(".tar.bz2"), Qt::CaseInsensitive)
+                            || file.endsWith(QLatin1String(".tar.gz"), Qt::CaseInsensitive)
+                            || file.endsWith(QLatin1String(".tar.xz"), Qt::CaseInsensitive)) {
+                            QString installed = m_parent->installTheme(file);
+                            if (!installed.isEmpty()) {
+                                setSelected(installed);
+                            }
+                        }
+                    }
+                }
+            }
             m_parent->rescanThemes();
         }
     }

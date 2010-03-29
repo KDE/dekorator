@@ -1875,6 +1875,62 @@ void DeKoratorClient::wheelEvent( QWheelEvent *e )
 }
 
 
+void drawHorizontalTiled(QPainter *p, const QRect &rect,
+                         const QPixmap &left, const QPixmap &mid, const QPixmap &right)
+{
+    if (rect.isEmpty()) {
+        return;
+    }
+    int leftSize = left.width();
+    int rightSize = right.width();
+    int sum = leftSize + mid.width() + rightSize;
+    if (mid.width() > 0) {
+        if (rect.width() >= sum) {
+            p->drawTiledPixmap(QRect(rect.left() + leftSize, rect.top(), rect.width() - leftSize - rightSize, rect.height()), mid);
+        } else {
+            leftSize = leftSize * rect.width() / sum;
+            rightSize = rightSize * rect.width() / sum;
+            p->drawPixmap(QRect(rect.left() + leftSize, rect.top(), rect.width() - leftSize - rightSize, rect.height()), mid);
+        }
+    } else {
+        if (sum <= 0) {
+            return;
+        }
+        leftSize = leftSize * rect.width() / sum;
+        rightSize = rect.width() - leftSize;
+    }
+    if (leftSize > 0) p->drawPixmap(QRect(rect.left(), rect.top(), leftSize, rect.height()), left);
+    if (rightSize > 0) p->drawPixmap(QRect(rect.left() + rect.width() - rightSize, rect.top(), rightSize, rect.height()), right);
+}
+
+void drawVerticalTiled(QPainter *p, const QRect &rect,
+                       const QPixmap &top, const QPixmap &mid, const QPixmap &bottom)
+{
+    if (rect.isEmpty()) {
+        return;
+    }
+    int topSize = top.height();
+    int bottomSize = bottom.height();
+    int sum = topSize + mid.height() + bottomSize;
+    if (mid.height() > 0) {
+        if (rect.height() >= sum) {
+            p->drawTiledPixmap(QRect(rect.left(), rect.top() + topSize, rect.width(), rect.height() - topSize - bottomSize), mid);
+        } else {
+            topSize = topSize * rect.height() / sum;
+            bottomSize = bottomSize * rect.height() / sum;
+            p->drawPixmap(QRect(rect.left(), rect.top() + topSize, rect.width(), rect.height() - topSize - bottomSize), mid);
+        }
+    } else {
+        if (sum <= 0) {
+            return;
+        }
+        topSize = topSize * rect.height() / sum;
+        bottomSize = rect.height() - topSize;
+    }
+    if (topSize > 0) p->drawPixmap(QRect(rect.left(), rect.top(), rect.width(), topSize), top);
+    if (bottomSize > 0) p->drawPixmap(QRect(rect.left(), rect.top() + rect.height() - bottomSize, rect.width(), bottomSize), bottom);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // paintEvent()
 // ------------
@@ -1912,29 +1968,10 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
             painter.drawTiledPixmap( leftTitleR.right() + 1, titleR.top(),
                                       ( titleR.left() - 1 ) - leftTitleR.right(), titleR.height(), decoPixmap[ leftButtons ][ waState ] );
 
-            if ( tw > 0 )
-            {
-                //leftTitleR
-                rect.setRect( tx, 0, qMin( LEFTTITLEWIDTH, tw ), TITLESIZE );
-
-                painter.drawTiledPixmap( rect, decoPixmap[ leftTitle ][ waState ] );
-
-                //midTitle
-                if ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH )
-                {
-                    rect.setRect( tx + LEFTTITLEWIDTH, 0, tw - ( RIGHTTITLEWIDTH + LEFTTITLEWIDTH ), th );
-
-                    painter.drawTiledPixmap( rect, decoPixmap[ midTitle ][ waState ] );
-                }
-
-                //rightTitleR
-                if ( tw > LEFTTITLEWIDTH )
-                {
-                    rect.setRect( qMax( tx + tw - RIGHTTITLEWIDTH, tx + LEFTTITLEWIDTH ), 0, qMin( RIGHTTITLEWIDTH, tw - LEFTTITLEWIDTH ), th );
-
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ rightTitle ][ waState ], ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH ) ? 0 : LEFTTITLEWIDTH - ( tw - RIGHTTITLEWIDTH ), 0 );
-                }
-            }
+            drawHorizontalTiled( &painter, QRect( tx, 0, tw, TITLESIZE ),
+                decoPixmap[ leftTitle ][ waState ],
+                decoPixmap[ midTitle ][ waState ],
+                decoPixmap[ rightTitle ][ waState ] );
 
             // Space under the right button group
             painter.drawTiledPixmap( titleR.right() + 1, titleR.top(),
@@ -2001,75 +2038,23 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
                 int leftRightFramesHeight = h - TITLESIZE - BOTTOMFRAMESIZE ;
 
                 //left frame
-                //top
-                rect.setRect( 0, TITLESIZE , LEFTFRAMESIZE, qMin( TOPLEFTFRAMEHEIGHT, leftRightFramesHeight ) );
-
-                painter.drawTiledPixmap( rect, decoPixmap[ topLeftFrame ][ waState ] );
-
-                // mid
-                if ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT + BOTTOMLEFTFRAMEHEIGHT )
-                {
-                    rect.setRect( 0, TITLESIZE + TOPLEFTFRAMEHEIGHT , LEFTFRAMESIZE, leftRightFramesHeight - TOPLEFTFRAMEHEIGHT - BOTTOMLEFTFRAMEHEIGHT );
-
-                    painter.drawTiledPixmap( rect, decoPixmap[ midLeftFrame ][ waState ] );
-                }
-
-                // bottom
-                if ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT )
-                {
-                    rect.setRect( 0, qMax( h - BOTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT, TITLESIZE + TOPLEFTFRAMEHEIGHT ) , LEFTFRAMESIZE, qMin( BOTTOMLEFTFRAMEHEIGHT, leftRightFramesHeight - TOPLEFTFRAMEHEIGHT ) );
-
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ bottomLeftFrame ][ waState ], 0, ( leftRightFramesHeight > TOPLEFTFRAMEHEIGHT + BOTTOMLEFTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPLEFTFRAMEHEIGHT - ( h - BOTTOMFRAMESIZE - BOTTOMLEFTFRAMEHEIGHT ) );
-                }
-
+                drawVerticalTiled( &painter, QRect(0, TITLESIZE, LEFTFRAMESIZE, leftRightFramesHeight ),
+                    decoPixmap[ topLeftFrame ][ waState ],
+                    decoPixmap[ midLeftFrame ][ waState ],
+                    decoPixmap[ bottomLeftFrame ][ waState ] );
 
                 //rightFrame
-                // top
-                rect.setRect( w - RIGHTFRAMESIZE, TITLESIZE , RIGHTFRAMESIZE, qMin( TOPRIGHTFRAMEHEIGHT, leftRightFramesHeight ) );
-
-                painter.drawTiledPixmap( rect, decoPixmap[ topRightFrame ][ waState ] );
-
-                // mid
-                if ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT + BOTTOMRIGHTFRAMEHEIGHT )
-                {
-                    rect.setRect( w - RIGHTFRAMESIZE, TITLESIZE + TOPRIGHTFRAMEHEIGHT, RIGHTFRAMESIZE, leftRightFramesHeight - TOPRIGHTFRAMEHEIGHT - BOTTOMRIGHTFRAMEHEIGHT );
-
-                    painter.drawTiledPixmap( rect, decoPixmap[ midRightFrame ][ waState ] );
-                }
-
-                // bottom
-                if ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT )
-                {
-                    rect.setRect( w - RIGHTFRAMESIZE, qMax( h - BOTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT, TITLESIZE + TOPRIGHTFRAMEHEIGHT ) , RIGHTFRAMESIZE, qMin( BOTTOMRIGHTFRAMEHEIGHT, leftRightFramesHeight - TOPRIGHTFRAMEHEIGHT ) );
-
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ bottomRightFrame ][ waState ], 0, ( leftRightFramesHeight > TOPRIGHTFRAMEHEIGHT + BOTTOMRIGHTFRAMEHEIGHT ) ? 0 : TITLESIZE + TOPRIGHTFRAMEHEIGHT - ( h - BOTTOMFRAMESIZE - BOTTOMRIGHTFRAMEHEIGHT ) );
-                }
+                drawVerticalTiled( &painter, QRect( w - RIGHTFRAMESIZE, TITLESIZE, RIGHTFRAMESIZE, leftRightFramesHeight ),
+                    decoPixmap[ topRightFrame ][ waState ],
+                    decoPixmap[ midRightFrame ][ waState ],
+                    decoPixmap[ bottomRightFrame ][ waState ] );
             }
-
 
             // bottom frame
-            if ( w > 0 )
-            {            // left
-                rect.setRect( 0 , h - BOTTOMFRAMESIZE, qMin( LEFTBOTTOMFRAMEWIDTH, w ) , BOTTOMFRAMESIZE );
-
-                painter.drawTiledPixmap( rect, decoPixmap[ leftBottomFrame ][ waState ] );
-
-                // mid
-                if ( w > LEFTBOTTOMFRAMEWIDTH + RIGHTBOTTOMFRAMEWIDTH )
-                {
-                    rect.setRect( LEFTBOTTOMFRAMEWIDTH , h - BOTTOMFRAMESIZE, w - LEFTBOTTOMFRAMEWIDTH - RIGHTBOTTOMFRAMEWIDTH, BOTTOMFRAMESIZE );
-
-                    painter.drawTiledPixmap( rect, decoPixmap[ midBottomFrame ][ waState ] );
-                }
-
-                // right
-                if ( w > LEFTBOTTOMFRAMEWIDTH )
-                {
-                    rect.setRect( qMax( w - RIGHTBOTTOMFRAMEWIDTH, LEFTBOTTOMFRAMEWIDTH ) , h - BOTTOMFRAMESIZE, qMin( RIGHTBOTTOMFRAMEWIDTH, w - LEFTBOTTOMFRAMEWIDTH ) , BOTTOMFRAMESIZE );
-
-                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ rightBottomFrame ][ waState ], ( w > LEFTBOTTOMFRAMEWIDTH + RIGHTBOTTOMFRAMEWIDTH ) ? 0 : LEFTBOTTOMFRAMEWIDTH - ( w - RIGHTBOTTOMFRAMEWIDTH ), 0 );
-                }
-            }
+            drawHorizontalTiled( &painter, QRect( 0, h - BOTTOMFRAMESIZE, w, BOTTOMFRAMESIZE ),
+                decoPixmap[ leftBottomFrame ][ waState ],
+                decoPixmap[ midBottomFrame ][ waState ],
+                decoPixmap[ rightBottomFrame ][ waState ] );
         }
         else
         {

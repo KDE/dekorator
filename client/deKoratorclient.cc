@@ -112,6 +112,7 @@ static int BOTTOMRIGHTMASKHEIGHT = 0;
 // config
 // misc
 static Qt::Alignment TITLEALIGN = Qt::AlignHCenter;
+static bool changeCursorOverButtons = false;
 static bool USEMENUEIMAGE = false;
 static bool IGNOREAPPICNCOL = false;
 static bool DBLCLKCLOSE = false;
@@ -307,6 +308,9 @@ bool DeKoratorFactory::readConfig()
     else if ( value == "AlignRight" )
         TITLEALIGN = Qt::AlignRight;
 
+    bool oldChangeCursorOverButtons = changeCursorOverButtons;
+    changeCursorOverButtons = config.readEntry( "ChangeCursorOverButtons", false );
+
     bool oldUseMenuImage = USEMENUEIMAGE;
     USEMENUEIMAGE = config.readEntry( "UseMenuImage", false );
 
@@ -447,6 +451,7 @@ bool DeKoratorFactory::readConfig()
 
 
     if ( oldalign == TITLEALIGN &&
+            oldChangeCursorOverButtons == changeCursorOverButtons &&
             oldUseMenuImage == USEMENUEIMAGE &&
             oldIgnoreAppIcnCol == IGNOREAPPICNCOL &&
             oldShowBtmBorder == SHOWBTMBORDER &&
@@ -920,7 +925,8 @@ void DeKoratorButton::enterEvent( QEvent * e )
     QAbstractButton::enterEvent( e );
     s = STEPS;
     hover_ = true;
-    setCursor( Qt::PointingHandCursor );
+    if ( changeCursorOverButtons )
+        setCursor( Qt::PointingHandCursor );
 
     if ( USEANIMATION )
         animate();
@@ -939,7 +945,8 @@ void DeKoratorButton::leaveEvent( QEvent * e )
     QAbstractButton::leaveEvent( e );
     //STEPS = s;
     hover_ = false;
-    unsetCursor ();
+    if ( changeCursorOverButtons )
+        unsetCursor ();
 
     if ( USEANIMATION )
         animate();

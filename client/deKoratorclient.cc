@@ -909,7 +909,7 @@ void DeKoratorButton::enterEvent( QEvent * e )
     if ( USEANIMATION )
         animate();
     else
-        repaint();
+        update();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -928,7 +928,7 @@ void DeKoratorButton::leaveEvent( QEvent * e )
     if ( USEANIMATION )
         animate();
     else
-        repaint();
+        update();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -982,12 +982,6 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
     WindowActivationState waState = act ? WindowActive : WindowInactive;
     QImage image;
     QPainter painter( this );
-
-    // fill background
-    if ( isLeft_ )
-        painter.drawTiledPixmap( rect(), decoPixmap[ leftButtons ][ waState ] );
-    else
-        painter.drawTiledPixmap( rect(), decoPixmap[ rightButtons ][ waState ] );
 
     // apply app icon effects
     if ( type_ == ButtonMenu && !USEMENUEIMAGE )
@@ -1169,7 +1163,7 @@ void DeKoratorButton::animate()
         if ( animProgress > 0 )
             animTmr->start( INTERVAL );
     }
-    repaint();
+    update();
 }
 
 
@@ -1321,7 +1315,6 @@ void DeKoratorClient::init()
 
     captionBufferDirty_ = true;
     //maskDirty_ = true;
-    widget() ->update( titleBarSpacer_->geometry() );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1517,7 +1510,7 @@ void DeKoratorClient::activeChange()
     for ( int n = 0; n < ButtonTypeCount; ++n )
         if ( button[ n ] )
             button[ n ] ->reset();
-    widget() ->repaint();
+    widget() ->update();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1527,7 +1520,7 @@ void DeKoratorClient::activeChange()
 void DeKoratorClient::captionChange()
 {
     captionBufferDirty_ = true;
-    widget() ->repaint( titleBarSpacer_->geometry() );
+    widget() ->update( titleBarSpacer_->geometry() );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1563,7 +1556,7 @@ void DeKoratorClient::iconChange()
     if ( !USEMENUEIMAGE && button[ ButtonMenu ] )
     {
         //button[ ButtonMenu ] ->setPixmap( 0 );
-        button[ ButtonMenu ] ->repaint();
+        button[ ButtonMenu ] ->update();
     }
 }
 
@@ -1618,11 +1611,11 @@ void DeKoratorClient::shadeChange()
     for ( int n = 0; n < ButtonTypeCount; ++n )
         if ( button[ n ] )
             button[ n ] ->reset();
-    widget() ->repaint();
 
     //mainlayout_->setRowSpacing( 3, isSetShade() ? 0 : MARGIN );
-    //     if ( DeKoratorFactory::useMasks_ )
-    //         doShape();
+    sizeChanged = true;
+    if ( USEMASKS )
+        doShape();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1906,18 +1899,17 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
         titleR.getRect( &tx, &ty, &tw, &th );
         QRect rect;
 
-        QPainter painter2;
-        QPixmap pix( w, TITLESIZE );
-        pix.fill(Qt::transparent);
-        painter2.begin( &pix );
         {
             // topLeftCorner
 
-            rect.setRect( 0, 0, TOPLEFTCORNERWIDTH, TITLESIZE );
-            painter2.drawTiledPixmap( rect, decoPixmap[ topLeftCorner ][ waState ] );
+            if ( leftTitleR.width() > 0 )
+            {
+                rect.setRect( 0, 0, TOPLEFTCORNERWIDTH, TITLESIZE );
+                painter.drawPixmap( rect, decoPixmap[ topLeftCorner ][ waState ] );
+            }
 
             // Space under the left button group
-            painter2.drawTiledPixmap( leftTitleR.right() + 1, titleR.top(),
+            painter.drawTiledPixmap( leftTitleR.right() + 1, titleR.top(),
                                       ( titleR.left() - 1 ) - leftTitleR.right(), titleR.height(), decoPixmap[ leftButtons ][ waState ] );
 
             if ( tw > 0 )
@@ -1925,14 +1917,14 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
                 //leftTitleR
                 rect.setRect( tx, 0, qMin( LEFTTITLEWIDTH, tw ), TITLESIZE );
 
-                painter2.drawTiledPixmap( rect, decoPixmap[ leftTitle ][ waState ] );
+                painter.drawTiledPixmap( rect, decoPixmap[ leftTitle ][ waState ] );
 
                 //midTitle
                 if ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH )
                 {
                     rect.setRect( tx + LEFTTITLEWIDTH, 0, tw - ( RIGHTTITLEWIDTH + LEFTTITLEWIDTH ), th );
 
-                    painter2.drawTiledPixmap( rect, decoPixmap[ midTitle ][ waState ] );
+                    painter.drawTiledPixmap( rect, decoPixmap[ midTitle ][ waState ] );
                 }
 
                 //rightTitleR
@@ -1940,19 +1932,21 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
                 {
                     rect.setRect( qMax( tx + tw - RIGHTTITLEWIDTH, tx + LEFTTITLEWIDTH ), 0, qMin( RIGHTTITLEWIDTH, tw - LEFTTITLEWIDTH ), th );
 
-                    painter2.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ rightTitle ][ waState ], ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH ) ? 0 : LEFTTITLEWIDTH - ( tw - RIGHTTITLEWIDTH ), 0 );
+                    painter.drawTiledPixmap( rect.x(), rect.y(), rect.width(), rect.height(), decoPixmap[ rightTitle ][ waState ], ( tw > LEFTTITLEWIDTH + RIGHTTITLEWIDTH ) ? 0 : LEFTTITLEWIDTH - ( tw - RIGHTTITLEWIDTH ), 0 );
                 }
             }
 
             // Space under the right button group
-            painter2.drawTiledPixmap( titleR.right() + 1, titleR.top(),
+            painter.drawTiledPixmap( titleR.right() + 1, titleR.top(),
                                       ( rightTitleR.left() - 1 ) - titleR.right(), titleR.height(), decoPixmap[ rightButtons ][ waState ] );
 
 
             //topRightCorner
-            rect.setRect( widget() ->width() - TOPRIGHTCORNERWIDTH, 0, TOPRIGHTCORNERWIDTH, TITLESIZE );
-
-            painter2.drawTiledPixmap( rect, decoPixmap[ topRightCorner ][ waState ] );
+            if ( rightTitleR.width() > 0 )
+            {
+                rect.setRect( widget() ->width() - TOPRIGHTCORNERWIDTH, 0, TOPRIGHTCORNERWIDTH, TITLESIZE );
+                painter.drawPixmap( rect, decoPixmap[ topRightCorner ][ waState ] );
+            }
 
 
 
@@ -1982,22 +1976,20 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
                     dy = ( TITLESIZE / 2 ) - ( captionHeight / 2 ) + ( isActive() ? ACTIVESHDTEXTY : INACTIVESHDTEXTY ) ;
                 }
 
-                painter2.drawImage( dx, dy, isActive() ? activeShadowImg_ : inActiveShadowImg_, 0, 0, isActive() ? qMin( activeShadowImg_.width(), titleR.width() ) : qMin( inActiveShadowImg_.width(), titleR.width() ), isActive() ? activeShadowImg_.height() : inActiveShadowImg_.height() );
+                painter.drawImage( dx, dy, isActive() ? activeShadowImg_ : inActiveShadowImg_, 0, 0, isActive() ? qMin( activeShadowImg_.width(), titleR.width() ) : qMin( inActiveShadowImg_.width(), titleR.width() ), isActive() ? activeShadowImg_.height() : inActiveShadowImg_.height() );
             }
 
 
             //draw titleR text
-            painter2.setFont( options() ->font( isActive(), false ) );
-            painter2.setPen( options() ->color( KDecoration::ColorFont, isActive() ) );
+            painter.setFont( options() ->font( isActive(), false ) );
+            painter.setPen( options() ->color( KDecoration::ColorFont, isActive() ) );
 
             Qt::Alignment titleAlignBak = TITLEALIGN;
             if ( captionWidth > titleR.width() )
                 titleAlignBak = Qt::AlignLeft;
 
-            painter2.drawText( tx + MARGIN, ty, tw - ( MARGIN * 2 ), th, titleAlignBak | Qt::AlignVCenter, caption() );
+            painter.drawText( tx + MARGIN, ty, tw - ( MARGIN * 2 ), th, titleAlignBak | Qt::AlignVCenter, caption() );
         }
-        painter2.end();
-        painter.drawPixmap( 0, 0, pix );
 
 
         // draw frames
@@ -2127,12 +2119,6 @@ void DeKoratorClient::updateCaptionBuffer()
 // Window is being resized
 void DeKoratorClient::resizeEvent( QResizeEvent *e )
 {
-    if ( widget() ->isVisible() )
-    {
-        QRegion region = widget() ->rect();
-        region = region.subtract( titleBarSpacer_->geometry() );
-        widget() ->update( region );
-    }
     if ( USEMASKS )
     {
 
@@ -2155,7 +2141,6 @@ void DeKoratorClient::resizeEvent( QResizeEvent *e )
 // Window is being shown
 void DeKoratorClient::showEvent( QShowEvent * )
 {
-    widget() ->repaint();
     if ( USEMASKS )
         doShape();
 }

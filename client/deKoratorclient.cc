@@ -552,10 +552,26 @@ void DeKoratorFactory::loadPixmaps()
 
     for ( int i = 0; i < buttonTypeAllCount; ++i )
     {
-        for ( int j = 0; j < buttonStateCount; ++j )
+        QImage buttonsImage( btnPixDir + "/buttons" + buttonGlyphName[i] + ".png");
+
+        if ( !buttonsImage.isNull() && (buttonsImage.width() % 6) == 0 )
         {
-            buttonImage[ i ][ j ][ normal ] = QImage();
-            buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[j] + ".png" );
+            // we got 6 images (active normal/hover/press, inactive normal/hover/press)
+            // but we only read the first 3 images for now
+            int buttonWidth = buttonsImage.width() / 6;
+            for ( int j = 0; j < buttonStateCount; ++j )
+            {
+                buttonImage[ i ][ j ][ normal ] = buttonsImage.copy( j * buttonWidth, 0, buttonWidth, buttonsImage.height() );
+            }
+        }
+        else
+        // 0.2 compatibility
+        {
+            for ( int j = 0; j < buttonStateCount; ++j )
+            {
+                buttonImage[ i ][ j ][ normal ] = QImage();
+                buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[j] + ".png" );
+            }
         }
 
         // 0.1 compatibility

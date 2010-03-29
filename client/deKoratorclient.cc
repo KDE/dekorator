@@ -1826,8 +1826,6 @@ bool DeKoratorClient::eventFilter( QObject * obj, QEvent * e )
     case QEvent::MouseButtonPress:
         {
             processMousePressEvent( static_cast<QMouseEvent *>( e ) );
-            if ( USEMASKS )
-                doShape();
             return true;
         }
     case QEvent::Paint:

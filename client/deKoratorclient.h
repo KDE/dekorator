@@ -193,7 +193,7 @@ class DeKoratorButton : public QAbstractButton
 {
     Q_OBJECT
 public:
-    DeKoratorButton( bool isLeft, DeKoratorClient *parent = 0, const char *name = 0,
+    DeKoratorButton( DeKoratorClient *parent = 0, const char *name = 0,
                      const QString &tip = NULL, ButtonType type = ButtonHelp, buttonTypeAll btnType = restore );
     ~DeKoratorButton();
 
@@ -214,7 +214,6 @@ private:
     QImage chooseRightHoverEffect( const QImage &img, QString res );
 
 private:
-    bool isLeft_;
     int buttonWidth_;
     DeKoratorClient *client_;
     ButtonType type_;
@@ -272,7 +271,7 @@ public:
     virtual Position mousePosition( const QPoint &point ) const;
 
 private:
-    void addButtons( QBoxLayout* layout, const QString& buttons, bool isLeft );
+    void addButtons( QBoxLayout* layout, const QString& buttons );
 
     bool eventFilter( QObject *obj, QEvent *e );
     void mouseDoubleClickEvent( QMouseEvent *e );

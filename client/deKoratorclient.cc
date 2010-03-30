@@ -570,7 +570,6 @@ void DeKoratorFactory::loadPixmaps()
         if ( !buttonsImage.isNull() && (buttonsImage.width() % 6) == 0 )
         {
             // we got 6 images (active normal/hover/press, inactive normal/hover/press)
-            // but we only read the first 3 images for now
             int buttonWidth = buttonsImage.width() / 6;
             for ( int j = 0; j < buttonStateCount; ++j )
             {

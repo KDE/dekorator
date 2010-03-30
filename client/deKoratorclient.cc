@@ -1768,59 +1768,31 @@ QSize DeKoratorClient::minimumSize() const
 // Return logical mouse position
 KDecoration::Position DeKoratorClient::mousePosition( const QPoint & point ) const
 {
-    //    bool res = true;
-    Position pos;
+    int pos = PositionCenter;
     if ( isShade() )
     {
-        return PositionCenter;
+        return Position( pos );
     }
 
-    if ( point.y() <= 5 )
+    if ( point.x() >= ( width() - qMax( TITLESIZE, RIGHTFRAMESIZE ) ) )
     {
-        // inside top frame
-        if ( point.x() <= LEFTFRAMESIZE )
-            pos = PositionTopLeft;
-        else if ( point.x() >= ( width() - RIGHTFRAMESIZE ) )
-            pos = PositionTopRight;
-        else
-            pos = PositionTop;
+        pos |= PositionRight;
     }
-    else if ( point.y() >= ( height() - BOTTOMFRAMESIZE ) )
+    else if ( point.x() <= qMax( TITLESIZE, LEFTFRAMESIZE ) )
     {
-        // inside handle
-        if ( point.x() <= LEFTFRAMESIZE )
-            pos = PositionBottomLeft;
-        else if ( point.x() >= ( width() - RIGHTFRAMESIZE ) )
-            pos = PositionBottomRight;
-        else
-            pos = PositionBottom;
+        pos |= PositionLeft;
     }
-    else if ( point.x() <= LEFTFRAMESIZE )
+
+    if ( point.y() >= ( height() - qMax( TITLESIZE, BOTTOMFRAMESIZE ) ) )
     {
-        // on left frame
-        if ( point.y() <= TITLESIZE )
-            pos = PositionTopLeft;
-        else if ( point.y() >= ( height() - BOTTOMFRAMESIZE ) )
-            pos = PositionBottomLeft;
-        else
-            pos = PositionLeft;
+        pos |= PositionBottom;
     }
-    else if ( point.x() >= width() - RIGHTFRAMESIZE )
+    else if ( point.y() <= ( pos == PositionCenter ? 3 : TITLESIZE ) )
     {
-        // on right frame
-        if ( point.y() <= TITLESIZE )
-            pos = PositionTopRight;
-        else if ( point.y() >= ( height() - BOTTOMFRAMESIZE ) )
-            pos = PositionBottomRight;
-        else
-            pos = PositionRight;
+        pos |= PositionTop;
     }
-    else
-    {
-        // inside the frame
-        pos = PositionCenter;
-    }
-    return pos;
+
+    return Position( pos );
 }
 
 

@@ -528,20 +528,28 @@ void DeKoratorFactory::loadPixmaps()
 
     for ( int i = 0; i < decoCount; ++i )
     {
-        decoImage[ i ][ orig ] = QImage();
-        decoImage[ i ][ orig ].load( decoPixDir + '/' + decoPixName[i] + "Bg.png" );
+        decoImage[ i ][ WindowActive ][ ImageOriginal ] = QImage( decoPixDir + '/' + decoPixName[i] + "Bg.png" );
     }
 
     // 0.1 compatibility
-    if ( decoImage[ midLeftFrame ][ orig ].isNull() )
-        decoImage[ midLeftFrame ][ orig ].load( decoPixDir + "/leftFrameBg.png" );
-    if ( decoImage[ midRightFrame ][ orig ].isNull() )
-        decoImage[ midRightFrame ][ orig ].load( decoPixDir + "/rightFrameBg.png" );
-    if ( decoImage[ midBottomFrame ][ orig ].isNull() )
+    if ( decoImage[ midLeftFrame ][ WindowActive ][ ImageOriginal ].isNull() )
+        decoImage[ midLeftFrame ][ WindowActive ][ ImageOriginal ].load( decoPixDir + "/leftFrameBg.png" );
+    if ( decoImage[ midRightFrame ][ WindowActive ][ ImageOriginal ].isNull() )
+        decoImage[ midRightFrame ][ WindowActive ][ ImageOriginal ].load( decoPixDir + "/rightFrameBg.png" );
+    if ( decoImage[ midBottomFrame ][ WindowActive ][ ImageOriginal ].isNull() )
     {
-        decoImage[ leftBottomFrame ][ orig ].load( decoPixDir + "/buttomLeftCornerBg.png" );
-        decoImage[ midBottomFrame ][ orig ].load( decoPixDir + "/buttomFrameBg.png" );
-        decoImage[ rightBottomFrame ][ orig ].load( decoPixDir + "/buttomRightCornerBg.png" );
+        decoImage[ leftBottomFrame ][ WindowActive ][ ImageOriginal ].load( decoPixDir + "/buttomLeftCornerBg.png" );
+        decoImage[ midBottomFrame ][ WindowActive ][ ImageOriginal ].load( decoPixDir + "/buttomFrameBg.png" );
+        decoImage[ rightBottomFrame ][ WindowActive ][ ImageOriginal ].load( decoPixDir + "/buttomRightCornerBg.png" );
+    }
+
+    for ( int i = 0; i < decoCount; ++i )
+    {
+        decoImage[ i ][ WindowInactive ][ ImageOriginal ] = QImage( decoPixDir + "/inactive/" + decoPixName[i] + "Bg.png" );
+        if ( decoImage[ i ][ WindowInactive ][ ImageOriginal ].isNull() )
+        {
+            decoImage[ i ][ WindowInactive ][ ImageOriginal ] = decoImage[ i ][ WindowActive ][ ImageOriginal ];
+        }
     }
 
     // buttons
@@ -566,7 +574,8 @@ void DeKoratorFactory::loadPixmaps()
             int buttonWidth = buttonsImage.width() / 6;
             for ( int j = 0; j < buttonStateCount; ++j )
             {
-                buttonImage[ i ][ j ][ normal ] = buttonsImage.copy( j * buttonWidth, 0, buttonWidth, buttonsImage.height() );
+                buttonImage[ i ][ j ][ WindowActive ][ ImageOriginal ] = buttonsImage.copy( j * buttonWidth, 0, buttonWidth, buttonsImage.height() );
+                buttonImage[ i ][ j ][ WindowInactive ][ ImageOriginal ] = buttonsImage.copy( ( j + 3 ) * buttonWidth, 0, buttonWidth, buttonsImage.height() );
             }
         }
         else
@@ -574,33 +583,40 @@ void DeKoratorFactory::loadPixmaps()
         {
             for ( int j = 0; j < buttonStateCount; ++j )
             {
-                buttonImage[ i ][ j ][ normal ] = QImage();
-                buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[j] + ".png" );
+                buttonImage[ i ][ j ][ WindowActive ][ ImageOriginal ] = QImage( btnPixDir + buttonStatePath[j] + buttonGlyphName[i] + buttonStateName[j] + ".png" );
+                buttonImage[ i ][ j ][ WindowInactive ][ ImageOriginal ] = QImage();
             }
         }
 
         // 0.1 compatibility
-        if ( buttonImage[ i ][ regular][ normal ].isNull() )
+        if ( buttonImage[ i ][ regular][ WindowActive ][ ImageOriginal ].isNull() )
         {
-            buttonImage[ i ][ regular ][ normal ].load( btnPixDir + "/button" + buttonGlyphName[i] + ".png" );
-            if (buttonImage[ i ][ regular ][ normal ].isNull() )
+            buttonImage[ i ][ regular ][ WindowActive ][ ImageOriginal ].load( btnPixDir + "/button" + buttonGlyphName[i] + ".png" );
+            if (buttonImage[ i ][ regular ][ WindowActive ][ ImageOriginal ].isNull() )
             {
                 if (i == 0)
                 {
                     for ( int j = 0; j < buttonStateCount; ++j )
                     {
-                        buttonImage[ i ][ j ][ normal ] = QImage();
-                        buttonImage[ i ][ j ][ normal ].load( btnPixDir + buttonStatePath[j] + buttonGlyphName[2] + buttonStateName[j] + ".png" );
+                        buttonImage[ i ][ j ][ WindowActive ][ ImageOriginal ] = QImage( btnPixDir + buttonStatePath[j] + buttonGlyphName[2] + buttonStateName[j] + ".png" );
                     }
-                    if ( buttonImage[ i ][ regular][ normal ].isNull() )
+                    if ( buttonImage[ i ][ regular][ WindowActive ][ ImageOriginal ].isNull() )
                     {
-                        buttonImage[ i ][ regular ][ normal ].load( btnPixDir + "/button" + buttonGlyphName[2] + ".png" );
+                        buttonImage[ i ][ regular ][ WindowActive ][ ImageOriginal ].load( btnPixDir + "/button" + buttonGlyphName[2] + ".png" );
                     }
                 }
             }
             for ( int j = hover; j < buttonStateCount; ++j )
             {
-                buttonImage[ i ][ j ][ normal ] = buttonImage[ i ][ regular ][ normal ];
+                buttonImage[ i ][ j ][ WindowActive ][ ImageOriginal ] = buttonImage[ i ][ regular ][ WindowActive ][ ImageOriginal ];
+            }
+        }
+
+        for ( int j = 0; j < buttonStateCount; ++j )
+        {
+            if ( buttonImage[ i ][ j ][ WindowInactive ][ ImageOriginal ].isNull() )
+            {
+                buttonImage[ i ][ j ][ WindowInactive ][ ImageOriginal ] = buttonImage[ i ][ j ][ WindowActive ][ ImageOriginal ];
             }
         }
     }
@@ -633,36 +649,36 @@ void DeKoratorFactory::determineSizes()
     //MARGIN = midBottomFrameBg_.height();
 
     // frames
-    TITLESIZE = decoImage[ midTitle ][ orig ].height();
-    LEFTFRAMESIZE = decoImage[ midLeftFrame ][ orig ].width();
-    BOTTOMFRAMESIZE = decoImage[ midBottomFrame ][ orig ].height();
-    RIGHTFRAMESIZE = decoImage[ midRightFrame ][ orig ].width();
+    TITLESIZE = decoImage[ midTitle ][ WindowActive ][ ImageOriginal ].height();
+    LEFTFRAMESIZE = decoImage[ midLeftFrame ][ WindowActive ][ ImageOriginal ].width();
+    BOTTOMFRAMESIZE = decoImage[ midBottomFrame ][ WindowActive ][ ImageOriginal ].height();
+    RIGHTFRAMESIZE = decoImage[ midRightFrame ][ WindowActive ][ ImageOriginal ].width();
 
-    TOPLEFTCORNERWIDTH = decoImage[ topLeftCorner ][ orig ].width();
-    TOPRIGHTCORNERWIDTH = decoImage[ topRightCorner ][ orig ].width();
-    LEFTTITLEWIDTH = decoImage[ leftTitle ][ orig ].width();
-    RIGHTTITLEWIDTH = decoImage[ rightTitle ][ orig ].width();
-    TOPLEFTFRAMEHEIGHT = decoImage[ topLeftFrame ][ orig ].height();
-    BOTTOMLEFTFRAMEHEIGHT = decoImage[ bottomLeftFrame ][ orig ].height();
-    TOPRIGHTFRAMEHEIGHT = decoImage[ topRightFrame ][ orig ].height();
-    BOTTOMRIGHTFRAMEHEIGHT = decoImage[ bottomRightFrame ][ orig ].height();
-    LEFTBOTTOMFRAMEWIDTH = decoImage[ leftBottomFrame ][ orig ].width();
-    RIGHTBOTTOMFRAMEWIDTH = decoImage[ rightBottomFrame ][ orig ].width();
+    TOPLEFTCORNERWIDTH = decoImage[ topLeftCorner ][ WindowActive ][ ImageOriginal ].width();
+    TOPRIGHTCORNERWIDTH = decoImage[ topRightCorner ][ WindowActive ][ ImageOriginal ].width();
+    LEFTTITLEWIDTH = decoImage[ leftTitle ][ WindowActive ][ ImageOriginal ].width();
+    RIGHTTITLEWIDTH = decoImage[ rightTitle ][ WindowActive ][ ImageOriginal ].width();
+    TOPLEFTFRAMEHEIGHT = decoImage[ topLeftFrame ][ WindowActive ][ ImageOriginal ].height();
+    BOTTOMLEFTFRAMEHEIGHT = decoImage[ bottomLeftFrame ][ WindowActive ][ ImageOriginal ].height();
+    TOPRIGHTFRAMEHEIGHT = decoImage[ topRightFrame ][ WindowActive ][ ImageOriginal ].height();
+    BOTTOMRIGHTFRAMEHEIGHT = decoImage[ bottomRightFrame ][ WindowActive ][ ImageOriginal ].height();
+    LEFTBOTTOMFRAMEWIDTH = decoImage[ leftBottomFrame ][ WindowActive ][ ImageOriginal ].width();
+    RIGHTBOTTOMFRAMEWIDTH = decoImage[ rightBottomFrame ][ WindowActive ][ ImageOriginal ].width();
 
 
     // buttons
     BUTTONSHEIGHT = TITLESIZE;
 
-    buttonSize[ ButtonHelp ] = buttonImage[ help ][ regular ][ normal ].size();
-    buttonSize[ ButtonMax ] = buttonImage[ max ][ regular ][ normal ].size();
-    buttonSize[ ButtonMin ] = buttonImage[ min ][ regular ][ normal ].size();
-    buttonSize[ ButtonClose ] = buttonImage[ close ][ regular ][ normal ].size();
-    buttonSize[ ButtonMenu ] = buttonImage[ menu ][ regular ][ normal ].size();
-    buttonSize[ ButtonSticky ] = buttonImage[ sticky ][ regular ][ normal ].size();
-    buttonSize[ ButtonAbove ] = buttonImage[ above ][ regular ][ normal ].size();
-    buttonSize[ ButtonBelow ] = buttonImage[ below ][ regular ][ normal ].size();
-    buttonSize[ ButtonShade ] = buttonImage[ shade ][ regular ][ normal ].size();
-    buttonSize[ ButtonTabClose ] = buttonImage[ tabClose ][ regular ][ normal ].size();
+    buttonSize[ ButtonHelp ] = buttonImage[ help ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonMax ] = buttonImage[ max ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonMin ] = buttonImage[ min ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonClose ] = buttonImage[ close ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonMenu ] = buttonImage[ menu ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonSticky ] = buttonImage[ sticky ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonAbove ] = buttonImage[ above ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonBelow ] = buttonImage[ below ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonShade ] = buttonImage[ shade ][ regular ][ WindowActive ][ ImageOriginal ].size();
+    buttonSize[ ButtonTabClose ] = buttonImage[ tabClose ][ regular ][ WindowActive ][ ImageOriginal ].size();
 
     // masks
     TOPLEFTMASKWIDTH = topLeftCornerBitmap_.width();
@@ -686,10 +702,11 @@ void DeKoratorFactory::determineSizes()
 void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 {
     QColor col = options() ->palette( KDecoration::ColorTitleBar, isActive ).background().color();
+    WindowActivationState wa = isActive ? WindowActive : WindowInactive;
 
     for ( int i = 0; i < decoCount; ++i )
     {
-        decoImage[ i ][ isActive ? actCol : inActCol ] = colorizedImage( decoImage[ i ][ orig ], col, DECOCOLORIZE );
+        decoImage[ i ][ wa ][ ImageRecolored ] = colorizedImage( decoImage[ i ][ wa ][ ImageOriginal ], col, DECOCOLORIZE );
     }
 }
 
@@ -700,6 +717,7 @@ void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
 {
     QColor col = options() ->palette( KDecoration::ColorButtonBg, isActive ).background().color();
+    WindowActivationState wa = isActive ? WindowActive : WindowInactive;
 
     bool customColors = useCustomButtonsColors_ && ( isActive ? customColorsActiveButtons_ : customColorsInActiveButtons_ );
 
@@ -707,7 +725,7 @@ void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
     {
         for ( int j = 0; j < buttonStateCount; ++j )
         {
-            buttonImage[ i ][ j ][ isActive ? actCol : inActCol ] = colorizedImage( buttonImage[ i ][ j ][ normal ], customColors ? cusBtnCol_[ i ] : col, BUTTONSCOLORIZE );
+            buttonImage[ i ][ j ][ wa ][ ImageRecolored ] = colorizedImage( buttonImage[ i ][ j ][ wa ][ ImageOriginal ], customColors ? cusBtnCol_[ i ] : col, BUTTONSCOLORIZE );
         }
     }
 }
@@ -826,16 +844,16 @@ void DeKoratorFactory::chooseRightPixmaps()
 
     for ( i = 0; i < decoCount; ++i )
     {
-        decoPixmap[ i ][ WindowActive ] = QPixmap::fromImage( decoImage[ i ][ actCol ] );
-        decoPixmap[ i ][ WindowInactive ] = QPixmap::fromImage( decoImage[ i ][ inActCol ] );
+        decoPixmap[ i ][ WindowActive ] = QPixmap::fromImage( decoImage[ i ][ WindowActive ][ ImageRecolored ] );
+        decoPixmap[ i ][ WindowInactive ] = QPixmap::fromImage( decoImage[ i ][ WindowInactive ][ ImageRecolored] );
     }
 
     for ( i = 0; i < buttonTypeAllCount; ++i )
     {
         for ( j = 0; j < buttonStateCount; ++j )
         {
-            buttonStateImage[ i ][ j ][ WindowActive ] = buttonImage[ i ][ j ][ DeKoratorFactory::colorizeActButtons_ ? actCol : normal ];
-            buttonStateImage[ i ][ j ][ WindowInactive ] = buttonImage[ i ][ j ][ DeKoratorFactory::colorizeInActButtons_ ? inActCol : normal ];
+            buttonStateImage[ i ][ j ][ WindowActive ] = buttonImage[ i ][ j ][ WindowActive ][ DeKoratorFactory::colorizeActButtons_ ? ImageRecolored : ImageOriginal ];
+            buttonStateImage[ i ][ j ][ WindowInactive ] = buttonImage[ i ][ j ][ WindowInactive ][ DeKoratorFactory::colorizeInActButtons_ ? ImageRecolored : ImageOriginal ];
         }
     }
 }
@@ -849,8 +867,8 @@ void DeKoratorFactory::prepareDecoWithBgCol()
 
     for ( i = 0 ; i < decoCount ; ++i )
     {
-        decoImage[ i ][ actCol ] = decoImage[ i ][ DeKoratorFactory::colorizeActFrames_ ? actCol : orig ];
-        decoImage[ i ][ inActCol ] = decoImage[ i ][ DeKoratorFactory::colorizeInActFrames_ ? inActCol : orig ];
+        decoImage[ i ][ WindowActive ][ ImageRecolored ] = decoImage[ i ][ WindowActive ][ DeKoratorFactory::colorizeActFrames_ ? ImageRecolored : ImageOriginal ];
+        decoImage[ i ][ WindowInactive ][ ImageRecolored ] = decoImage[ i ][ WindowInactive ][ DeKoratorFactory::colorizeInActFrames_ ? ImageRecolored : ImageOriginal ];
     }
 }
 

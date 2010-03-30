@@ -106,12 +106,10 @@ enum ButtonType {
     ButtonTypeCount
 };
 
-enum pixType {
-    normal = 0,
-    actCol,
-    inActCol,
-    orig,
-    pixTypeCount
+enum ImageType {
+    ImageOriginal,
+    ImageRecolored,
+    ImageTypeCount
 };
 
 enum buttonState {
@@ -167,8 +165,8 @@ public:
     static bool colorizeActButtons_;
     static bool colorizeInActButtons_;
     static QColor cusBtnCol_[ buttonTypeAllCount ];
-    QImage decoImage[ decoCount ][ pixTypeCount ];
-    QImage buttonImage[ buttonTypeAllCount ][ buttonStateCount ][ pixTypeCount ];
+    QImage decoImage[ decoCount ][ WindowActivationStateCount ][ ImageTypeCount ];
+    QImage buttonImage[ buttonTypeAllCount ][ buttonStateCount ][ WindowActivationStateCount ][ ImageTypeCount ];
 };
 
 inline bool DeKoratorFactory::initialized()

@@ -168,10 +168,7 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
 {
     QString decoPath = themePath(localPath, QLatin1String("Deco"));
     QString masksPath = themePath(localPath, QLatin1String("Masks"));
-    QString buttonsPath = themePath(localPath, QLatin1String("Buttons/normal"));
-    if (buttonsPath.isEmpty()) {
-        buttonsPath = themePath(localPath, QLatin1String("Buttons"));
-    }
+    QString buttonsPath = themePath(localPath, QLatin1String("Buttons"));
 
     static const char * const tileNames[] = {
         "topLeftCorner", "leftButtons", "leftTitle", "midTitle",
@@ -179,14 +176,23 @@ static void paintThemePreview(QPainter *painter, const QStyleOption *option, con
         "topLeftFrame", "midLeftFrame",
         "topRightFrame", "midRightFrame",
         "topLeftCorner", "topRightCorner",
-        "buttonMin", "buttonMax", "buttonClose"
+    };
+    static const char * const buttonGlyphNames[] = {
+        "Min", "Max", "Close"
     };
     QImage buttonImage[3];
     int rightButtonsWidth = 0;
-    for (int i = 13; i < 16; ++i) {
-        QString imagePath = buttonsPath + QLatin1String("/") + QLatin1String(tileNames[i]) + QLatin1String(".png");
-        buttonImage[i - 13] = QImage(imagePath);
-        rightButtonsWidth += buttonImage[i - 13].width();
+    for (int i = 0; i < 3; i++) {
+        buttonImage[i] = QImage(buttonsPath + QLatin1String("/buttons") + QLatin1String(buttonGlyphNames[i]) + QLatin1String(".png"));
+        if (!buttonImage[i].isNull() && (buttonImage[i].width() % 6) == 0) {
+            buttonImage[i] = buttonImage[i].copy(0, 0, buttonImage[i].width() / 6, buttonImage[i].height());
+        } else {
+            buttonImage[i] = QImage(buttonsPath + QLatin1String("/normal/button") + QLatin1String(buttonGlyphNames[i]) + QLatin1String(".png"));
+            if (buttonImage[i].isNull()) {
+                buttonImage[i] = QImage(buttonsPath + QLatin1String("/button") + QLatin1String(buttonGlyphNames[i]) + QLatin1String(".png"));
+            }
+        }
+        rightButtonsWidth += buttonImage[i].width();
     }
     QRect rect, titleRect;
     int x = option->rect.left() + 5, y = option->rect.top() + 5;

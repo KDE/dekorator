@@ -799,13 +799,13 @@ QImage DeKoratorFactory::colorizedImage( const QImage &image, QColor c, QString 
         int current;
         int destR, destG, destB, alpha;
         int h, s, v, ch;
+        c.getHsv( &h, &s, &v );
+        ch = h;
         QColor col ;
 
         for ( current = 0; current < total; ++current )
         {
             col.setRgb( data[ current ] );
-            c.getHsv( &h, &s, &v );
-            ch = h;
             col.getHsv( &h, &s, &v );
             col.setHsv( ch, s, v );
             destR = col.red();

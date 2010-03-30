@@ -69,12 +69,6 @@ public slots:
     void defaults();
 
 
-protected slots:
-    void themeSelectionChanged();
-    void getNewThemes();
-    void installNewTheme();
-    void removeSelectedTheme();
-    void setTheme();
 private:
     KConfig *config_;
     IconThemesConfig *themes_;

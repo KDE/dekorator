@@ -283,18 +283,14 @@ QStringList deKoratorThemes::findThemeDirs( const QString &archiveName )
     for ( QStringList::Iterator it = entries.begin(); it != entries.end(); ++it )
     {
         QString name = ( QString ) * it;
-        QRegExp rxp = QRegExp( "*-theme", Qt::CaseSensitive, QRegExp::Wildcard );
-        bool i = name.contains( rxp );
-        if ( !i )
-        {
-        //    continue;
-        }
 
         possibleDir = const_cast<KArchiveEntry*>( themeDir->entry( *it ) );
         if ( possibleDir->isDirectory() )
         {
             subDir = dynamic_cast<KArchiveDirectory*>( possibleDir );
-            if ( subDir && ( subDir->entry( "deco" ) != NULL && subDir->entry( "buttons" ) != NULL && subDir->entry( "masks" ) != NULL ) )
+            if ( subDir
+                && ( ( subDir->entry( "deco" ) || subDir->entry( "Deco" ) )
+                && ( subDir->entry( "buttons" ) || subDir->entry( "Buttons" ) ) ) )
             {
                 foundThemes.append( subDir->name() );
             }

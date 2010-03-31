@@ -1318,7 +1318,7 @@ void DeKoratorClient::init()
     if ( isPreview() )
     {
         QWidget *previewLabel = new QLabel( "<p align=\"center\"><b>" + i18n( "deKorator")
-            + "</b> - " + i18n("Themable window decorator for KDE" ) + "</p><p align=\"center\">"
+            + ' ' + "0.5.1" + "</b> - " + i18n("Themable window decorator for KDE" ) + "</p><p align=\"center\">"
             + i18n("Click Configure icon to manage themes") + "</p>", widget() );
         previewLabel->setAutoFillBackground( true );
         midLayout_->addWidget( previewLabel );

@@ -53,7 +53,7 @@
 deKoratorThemes::deKoratorThemes(QWidget *parent)
     : KThemeSelector(parent)
 {
-    aboutData = new KAboutData("deKorator", 0, ki18n("deKorator"), "0.5.0",
+    aboutData = new KAboutData("deKorator", 0, ki18n("deKorator"), "0.5.1",
         ki18n("Themable window decorator for KDE"),
         KAboutData::License_GPL,
         ki18n("(c) 2005, Moty Rahamim"), KLocalizedString(),

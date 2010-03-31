@@ -1534,7 +1534,7 @@ void DeKoratorClient::activeChange()
 {
     for ( int n = 0; n < ButtonTypeCount; ++n )
         if ( button[ n ] )
-            button[ n ] ->reset();
+            button[ n ] ->update();
     widget() ->update();
 }
 
@@ -1635,7 +1635,7 @@ void DeKoratorClient::shadeChange()
     //mainlayout_->setRowSpacing( 3, isSetShade() ? 0 : MARGIN );
     for ( int n = 0; n < ButtonTypeCount; ++n )
         if ( button[ n ] )
-            button[ n ] ->reset();
+            button[ n ] ->update();
 
     //mainlayout_->setRowSpacing( 3, isSetShade() ? 0 : MARGIN );
     sizeChanged = true;

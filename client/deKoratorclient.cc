@@ -161,24 +161,6 @@ static QImage buttonStateImage[ buttonTypeAllCount ][ buttonStateCount ][ Window
 // DeKoratorFactory Class                                                     //
 //////////////////////////////////////////////////////////////////////////////
 
-bool DeKoratorFactory::initialized_ = false;
-bool DeKoratorFactory::colorizeActFrames_ = false;
-bool DeKoratorFactory::colorizeActButtons_ = false;
-bool DeKoratorFactory::colorizeInActFrames_ = false;
-bool DeKoratorFactory::colorizeInActButtons_ = false;
-
-bool DeKoratorFactory::useCustomButtonsColors_ = false;
-bool DeKoratorFactory::customColorsActiveButtons_ = false;
-bool DeKoratorFactory::customColorsInActiveButtons_ = false;
-QColor DeKoratorFactory::cusBtnCol_[ buttonTypeAllCount ];
-
-bool DeKoratorFactory::needInit_ = false;
-bool DeKoratorFactory::needReload_ = false;
-QString DeKoratorFactory::framesPath_ = "";
-QString DeKoratorFactory::buttonsPath_ = "";
-QString DeKoratorFactory::masksPath_ = "";
-
-
 extern "C" KDE_EXPORT KDecorationFactory* create_factory()
 {
     return new DeKorator::DeKoratorFactory();
@@ -190,8 +172,19 @@ extern "C" KDE_EXPORT KDecorationFactory* create_factory()
 // Constructor
 DeKoratorFactory::DeKoratorFactory()
 {
+    colorizeActFrames_ = false;
+    colorizeActButtons_ = false;
+    colorizeInActFrames_ = false;
+    colorizeInActButtons_ = false;
+
+    useCustomButtonsColors_ = false;
+    customColorsActiveButtons_ = false;
+    customColorsInActiveButtons_ = false;
+
+    needInit_ = false;
+    needReload_ = false;
+
     readConfig();
-    initialized_ = true;
 
     loadPixmaps();
 
@@ -204,7 +197,6 @@ DeKoratorFactory::DeKoratorFactory()
 // Destructor
 DeKoratorFactory::~DeKoratorFactory()
 {
-    initialized_ = false;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -262,10 +254,7 @@ bool DeKoratorFactory::reset( unsigned long changed )
 {
     //    captionBufferDirty_ = true;
     // read in the configuration
-    initialized_ = false;
     bool confchange = readConfig();
-    initialized_ = true;
-
 
     if ( confchange || ( changed & ( SettingDecoration | SettingButtons | SettingBorder | SettingColors ) ) )
     {
@@ -1014,9 +1003,6 @@ void DeKoratorButton::mouseReleaseEvent( QMouseEvent * e )
 // Draw the button
 void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
 {
-    if ( !DeKoratorFactory::initialized() )
-        return ;
-
     int dx = 0, dy = 0;
     bool act = client_->isActive();
     WindowActivationState waState = act ? WindowActive : WindowInactive;
@@ -1033,7 +1019,7 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
 
         if ( !IGNOREAPPICNCOL )
         {
-            DeKoratorFactory *factory = client_->decoFactory_;
+            DeKoratorFactory *factory = static_cast<DeKoratorFactory *>( client_->factory() );
 
             if ( factory->useCustomButtonsColors_ && ( act ? factory->customColorsActiveButtons_ : factory->customColorsInActiveButtons_ ) )
             {
@@ -1228,7 +1214,6 @@ DeKoratorClient::DeKoratorClient( KDecorationBridge * b, KDecorationFactory * f 
 {
     //captionBufferDirty_ = true;
     //maskDirty_ = true;
-    decoFactory_ = ( DeKoratorFactory* ) f;
 }
 
 DeKoratorClient::~DeKoratorClient()
@@ -1949,8 +1934,6 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
 {
     WindowActivationState waState = isActive() ? WindowActive : WindowInactive;
 
-    if ( !DeKoratorFactory::initialized() )
-        return ;
     if ( TITLESIZE )
     {
         if ( captionBufferDirty_ && USESHDTEXT )
@@ -2080,9 +2063,6 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
 //
 void DeKoratorClient::updateCaptionBuffer()
 {
-    if ( !DeKoratorFactory::initialized() )
-        return ;
-
     QPainter painter;
     QString c( caption() );
     QFontMetrics fm( options() ->font( isActive() ) );
@@ -2243,6 +2223,7 @@ void DeKoratorClient::doShape()
 
     if ( sizeChanged )
     {
+        DeKoratorFactory *decoFactory_ = static_cast<DeKoratorFactory *>( factory() );
         // top left
         QRegion mtr;
         QRegion m = QRegion( decoFactory_->topLeftCornerBitmap_ );

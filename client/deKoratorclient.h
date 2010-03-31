@@ -136,7 +136,6 @@ public:
     virtual bool reset( unsigned long changed );
     virtual bool supports( KDecorationDefines::Ability ) const;
     static QImage colorizedImage( const QImage &image, QColor color, QString colorizeMethod );
-    static bool initialized();
     QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, bottomLeftCornerBitmap_, bottomMidBitmap_, bottomRightCornerBitmap_;
 
 private:
@@ -150,29 +149,23 @@ private:
 
 private:
 
-    static bool colorizeActFrames_;
-    static bool colorizeInActFrames_;
-    static bool needInit_;
-    static bool needReload_;
-    static QString framesPath_;
-    static QString buttonsPath_;
-    static QString masksPath_;
+    bool colorizeActFrames_;
+    bool colorizeInActFrames_;
+    bool needInit_;
+    bool needReload_;
+    QString framesPath_;
+    QString buttonsPath_;
+    QString masksPath_;
 public:
-    static bool initialized_;
-    static bool useCustomButtonsColors_;
-    static bool customColorsActiveButtons_;
-    static bool customColorsInActiveButtons_;
-    static bool colorizeActButtons_;
-    static bool colorizeInActButtons_;
-    static QColor cusBtnCol_[ buttonTypeAllCount ];
+    bool useCustomButtonsColors_;
+    bool customColorsActiveButtons_;
+    bool customColorsInActiveButtons_;
+    bool colorizeActButtons_;
+    bool colorizeInActButtons_;
+    QColor cusBtnCol_[ buttonTypeAllCount ];
     QImage decoImage[ decoCount ][ WindowActivationStateCount ][ ImageTypeCount ];
     QImage buttonImage[ buttonTypeAllCount ][ buttonStateCount ][ WindowActivationStateCount ][ ImageTypeCount ];
 };
-
-inline bool DeKoratorFactory::initialized()
-{
-    return initialized_;
-}
 
 
 
@@ -303,8 +296,6 @@ private:
     QRegion mask_;
     bool sizeChanged;
     QSize oldSize_;
-public:
-    DeKoratorFactory *decoFactory_;
 };
 
 

@@ -14,7 +14,7 @@
         <widget class="KLineEdit" name="m_editFilter"/>
        </item>
        <item>
-        <widget class="QComboBox" name="m_viewModeChooser"/>
+        <widget class="KComboBox" name="m_viewModeChooser"/>
        </item>
       </layout>
      </item>
@@ -85,6 +85,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>KComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">KDE/KComboBox</header>
+  </customwidget>
   <customwidget>
    <class>KLineEdit</class>
    <extends>QLineEdit</extends>

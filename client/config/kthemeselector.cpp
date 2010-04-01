@@ -265,12 +265,12 @@ void KThemeSelector::Private::postInstallFiles(const QStringList &files)
 void KThemeSelector::Private::getNewClicked()
 {
 #if KDE_IS_VERSION(4, 4, 0)
-    KNS3::DownloadDialog dialog(m_configFileKNS, m_parent);
+    QPointer<KNS3::DownloadDialog> dialog = new KNS3::DownloadDialog(m_configFileKNS, m_parent);
 
-    if (dialog.exec()) {
-        KNS3::Entry::List entries = dialog.changedEntries();
+    if (dialog->exec()) {
+        KNS3::Entry::List entries = dialog->changedEntries();
         if (entries.size() > 0) {
-            KNS3::Entry::List entries = dialog.installedEntries();
+            KNS3::Entry::List entries = dialog->installedEntries();
             if (entries.size() > 0) {
                 foreach (const KNS3::Entry &entry, entries) {
                     postInstallFiles(entry.installedFiles());
@@ -279,6 +279,7 @@ void KThemeSelector::Private::getNewClicked()
             m_parent->rescanThemes();
         }
     }
+    delete dialog;
 #else
     KNS::Engine engine(m_parent);
 
@@ -520,7 +521,7 @@ QStringList KThemeSelector::scanInstalledThemes()
     foreach (const QString &directory, directories) {
         QDir dir(directory);
         QStringList entries = dir.entryList(QDir::Dirs | QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
-        foreach (QString entry, entries) {
+        foreach (const QString &entry, entries) {
             QString localPath = dir.absoluteFilePath(entry);
             if (isValidTheme(localPath)) {
                 themes.append(localPath);
@@ -528,7 +529,7 @@ QStringList KThemeSelector::scanInstalledThemes()
             if (true) {
                 QDir dir(localPath);
                 QStringList entries = dir.entryList(QDir::Dirs | QDir::Files | QDir::Readable | QDir::NoDotAndDotDot);
-                foreach (QString entry, entries) {
+                foreach (const QString &entry, entries) {
                     QString localPath = dir.absoluteFilePath(entry);
                     if (isValidTheme(localPath)) {
                         themes.append(localPath);

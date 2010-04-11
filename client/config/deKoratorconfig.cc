@@ -37,6 +37,8 @@
 #include <KDE/KConfigGroup>
 #include <KDE/KLocale>
 
+#include <QtCore/QDir>
+
 #include "deKoratorthemes.h"
 
 
@@ -60,9 +62,6 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     m_themes = new deKoratorThemes(dialog_);
     m_themes->layout()->setMargin(-1);
     dialog_->tabWidget2->insertTab(0, m_themes, i18n("Themes"));
-    dialog_->tabWidget2->removeTab(7);
-    dialog_->tabWidget2->removeTab(6);
-    dialog_->tabWidget2->removeTab(5);
     dialog_->tabWidget2->setCurrentIndex(0);
     dialog_->show();
 
@@ -81,6 +80,7 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     connect( dialog_->dblClkCloseChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->showBtmBorderChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->showMaximizedBordersChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
+    connect( dialog_->ignoreMasksChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->useShdtextChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
     connect( dialog_->activeShdtextXSpinBox, SIGNAL( valueChanged( int ) ), SIGNAL( changed() ) );
     connect( dialog_->activeShdtextYSpinBox, SIGNAL( valueChanged( int ) ), SIGNAL( changed() ) );
@@ -132,15 +132,6 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     connect( dialog_->belowDownClrBtn, SIGNAL( clicked( ) ), SIGNAL( changed() ) );
     connect( dialog_->shadeClrBtn, SIGNAL( clicked( ) ), SIGNAL( changed() ) );
     connect( dialog_->shadeDownClrBtn, SIGNAL( clicked( ) ), SIGNAL( changed() ) );
-
-    // path's
-    connect( dialog_->framesPathKurl, SIGNAL( textChanged( const QString& ) ), SIGNAL( changed() ) );
-    dialog_->framesPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
-    connect( dialog_->buttonsPathKurl, SIGNAL( textChanged( const QString& ) ), SIGNAL( changed() ) );
-    dialog_->buttonsPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
-    connect( dialog_->ignoreMasksChkBox, SIGNAL( clicked() ), SIGNAL( changed() ) );
-    connect( dialog_->masksPathKurl, SIGNAL( textChanged( const QString& ) ), SIGNAL( changed() ) );
-    dialog_->masksPathKurl->setMode( KFile::Directory | KFile::LocalOnly );
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -173,6 +164,7 @@ void DeKoratorConfig::load( const KConfigGroup & )
     dialog_->dblClkCloseChkBox->setChecked( config_->readEntry( "DblClkClose", false ) );
     dialog_->showBtmBorderChkBox->setChecked( config_->readEntry( "ShowBtmBorder", false ) );
     dialog_->showMaximizedBordersChkBox->setChecked( config_->readEntry( "ShowMaximizedBorders", false ) );
+    dialog_->ignoreMasksChkBox->setChecked( !config_->readEntry( "UseMasks", true ) );
     QColor color = QColor( 150, 150, 150 );
     dialog_->useShdtextChkBox->setChecked( config_->readEntry( "UseShdtext", false ) );
     dialog_->activeShdtextXSpinBox->setValue( config_->readEntry( "ActiveShdtextX", 0 ) );
@@ -236,11 +228,6 @@ void DeKoratorConfig::load( const KConfigGroup & )
         themePath.chop( 5 );
         m_themes->setSelectedTheme( themePath );
     }
-
-    dialog_->framesPathKurl->setUrl( config_->readEntry( "FramesPath", "" ) );
-    dialog_->buttonsPathKurl->setUrl( config_->readEntry( "ButtonsPath", "" ) );
-    dialog_->ignoreMasksChkBox->setChecked( !config_->readEntry( "UseMasks", true ) );
-    dialog_->masksPathKurl->setUrl( config_->readEntry( "MasksPath", "" ) );
 }
 
 static QString themePath(const QString &localPath, const QString &dirName)
@@ -374,6 +361,7 @@ void DeKoratorConfig::defaults()
     dialog_->dblClkCloseChkBox->setChecked( false );
     dialog_->showBtmBorderChkBox->setChecked( false );
     dialog_->showMaximizedBordersChkBox->setChecked( false );
+    dialog_->ignoreMasksChkBox->setChecked( false );
     dialog_->useShdtextChkBox->setChecked( false );
     dialog_->activeShdtextXSpinBox->setValue( 0 );
     dialog_->activeShdtextYSpinBox->setValue( 0 );
@@ -422,12 +410,6 @@ void DeKoratorConfig::defaults()
     dialog_->belowDownClrBtn->setColor( QColor( 150, 150, 150 ) );
     dialog_->shadeClrBtn->setColor( QColor( 150, 150, 150 ) );
     dialog_->shadeDownClrBtn->setColor( QColor( 150, 150, 150 ) );
-
-    // path's
-    dialog_->framesPathKurl->setUrl( KUrl() );
-    dialog_->buttonsPathKurl->setUrl( KUrl() );
-    dialog_->ignoreMasksChkBox->setChecked( false );
-    dialog_->masksPathKurl->setUrl( KUrl() );
 }
 
 //////////////////////////////////////////////////////////////////////////////

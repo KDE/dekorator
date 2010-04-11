@@ -39,7 +39,6 @@
 #include "ui_configdialog.h"
 
 class KConfig;
-class IconThemesConfig;
 class deKoratorThemes;
 class QListWidgetItem;
 
@@ -71,7 +70,6 @@ public slots:
 
 private:
     KConfig *config_;
-    IconThemesConfig *themes_;
     deKoratorThemes *m_themes;
     ConfigDialog *dialog_;
 };

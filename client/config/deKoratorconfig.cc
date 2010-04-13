@@ -132,6 +132,9 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
     connect( dialog_->belowDownClrBtn, SIGNAL( clicked( ) ), SIGNAL( changed() ) );
     connect( dialog_->shadeClrBtn, SIGNAL( clicked( ) ), SIGNAL( changed() ) );
     connect( dialog_->shadeDownClrBtn, SIGNAL( clicked( ) ), SIGNAL( changed() ) );
+
+    // path's
+    connect( m_themes, SIGNAL( themeSelected() ), SIGNAL( changed() ) );
 }
 
 //////////////////////////////////////////////////////////////////////////////

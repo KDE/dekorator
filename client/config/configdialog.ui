@@ -394,7 +394,7 @@
             <item>
              <widget class="QLabel" name="textLabel2_4">
               <property name="text">
-               <string>Deco's</string>
+               <string>Frames</string>
               </property>
               <property name="wordWrap">
                <bool>false</bool>

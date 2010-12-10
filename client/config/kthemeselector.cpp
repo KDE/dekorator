@@ -87,7 +87,15 @@ void KThemeSelectorDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     if (selector) {
         selector->paintThemeItem(painter, &option, localPath, selector->viewMode());
     } else {
-        painter->setPen(option.palette.color(option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text));
+        QPalette::ColorGroup cg;
+        if (!(option.state & QStyle::State_Enabled)) {
+            cg = QPalette::Disabled;
+        } else if (option.state & QStyle::State_Active) {
+            cg = QPalette::Active;
+        } else {
+            cg = QPalette::Inactive;
+        }
+        painter->setPen(option.palette.color(cg, option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text));
         painter->drawText(option.rect, Qt::AlignCenter, localPath);
     }
     painter->restore();
@@ -598,7 +606,15 @@ void KThemeSelector::paintThemeItem(QPainter *painter, const QStyleOptionViewIte
     painter->save();
     QRect rect = option->rect.adjusted(3, 0, -3, 0);
     QString text = option->fontMetrics.elidedText(themeName(localPath), Qt::ElideRight, rect.width());
-    painter->setPen(option->palette.color(option->state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text));
+    QPalette::ColorGroup cg;
+    if (!(option->state & QStyle::State_Enabled)) {
+        cg = QPalette::Disabled;
+    } else if (option->state & QStyle::State_Active) {
+        cg = QPalette::Active;
+    } else {
+        cg = QPalette::Inactive;
+    }
+    painter->setPen(option->palette.color(cg, option->state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text));
     painter->drawText(rect, Qt::AlignVCenter, text);
     painter->restore();
 }

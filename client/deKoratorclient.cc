@@ -1210,7 +1210,7 @@ void DeKoratorButton::animate()
 // ---------------
 // Constructor
 DeKoratorClient::DeKoratorClient( KDecorationBridge * b, KDecorationFactory * f )
-        : KDecoration( b, f ), mainLayout_( NULL ), titleLayout_( NULL ), midLayout_( NULL ) , leftTitleBarSpacer_( NULL ), titleBarSpacer_( NULL ), rightTitleBarSpacer_( NULL ), leftSpacer_( NULL ), rightSpacer_( NULL ), bottomSpacer_( NULL ), captionBufferDirty_( true )
+        : KDecoration( b, f ), mainLayout_( NULL ), titleLayout_( NULL ), midLayout_( NULL ) , leftTitleBarSpacer_( NULL ), titleBarSpacer_( NULL ), rightTitleBarSpacer_( NULL ), leftSpacer_( NULL ), rightSpacer_( NULL ), bottomSpacer_( NULL ), captionBufferDirty_( true ), closing_( false )
 {
     //captionBufferDirty_ = true;
     //maskDirty_ = true;
@@ -2178,10 +2178,10 @@ void DeKoratorClient::menuButtonPressed()
     static DeKoratorClient* lastClient = NULL;
     if ( t == NULL )
         t = new QTime;
-    bool dbl = ( lastClient == this && t->elapsed() <= QApplication::doubleClickInterval() );
+    bool dbl = ( t->isValid() && DBLCLKCLOSE && lastClient == this && t->elapsed() <= QApplication::doubleClickInterval() );
     lastClient = this;
     t->start();
-    if ( !dbl || !DBLCLKCLOSE )
+    if ( !dbl && !DBLCLKCLOSE )
     {
         QPoint p( button[ ButtonMenu ] ->rect().bottomLeft().x(),
                   button[ ButtonMenu ] ->rect().bottomLeft().y() );
@@ -2191,7 +2191,7 @@ void DeKoratorClient::menuButtonPressed()
             return ; // decoration was destroyed
         button[ ButtonMenu ] ->setDown( false );
     }
-    else
+    else if ( dbl )
         closing_ = true;
 }
 

@@ -134,10 +134,12 @@ public:
     DeKoratorFactory();
     virtual ~DeKoratorFactory();
     virtual KDecoration *createDecoration( KDecorationBridge *b );
-    virtual bool reset( unsigned long changed );
     virtual bool supports( KDecorationDefines::Ability ) const;
     static QImage colorizedImage( const QImage &image, QColor color, QString colorizeMethod );
     QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, bottomLeftCornerBitmap_, bottomMidBitmap_, bottomRightCornerBitmap_;
+
+public Q_SLOTS:
+    void reset();
 
 private:
     bool readConfig();

@@ -194,6 +194,8 @@ DeKoratorFactory::DeKoratorFactory()
     loadPixmaps();
 
     chooseRightPixmaps();
+
+    connect(KDecorationOptions::self(), &KDecorationOptions::configChanged, this, &DeKoratorFactory::reset);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -246,25 +248,23 @@ KDecoration* DeKoratorFactory::createDecoration( KDecorationBridge* b )
 // -------
 // Reset the handler. Returns true if decorations need to be remade, false if
 // only a repaint is necessary
-bool DeKoratorFactory::reset( unsigned long changed )
+void DeKoratorFactory::reset()
 {
     //    captionBufferDirty_ = true;
     // read in the configuration
     bool confchange = readConfig();
 
-    if ( confchange || ( changed & ( SettingDecoration | SettingButtons | SettingBorder | SettingColors ) ) )
+    if ( confchange )
     {
         if ( DeKoratorFactory::needReload_ )
         {
             loadPixmaps();
         }
         chooseRightPixmaps();
-        return true;
     }
     else
     {
-        resetDecorations( changed );
-        return false;
+        emit recreateDecorations();
     }
 }
 

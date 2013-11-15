@@ -52,7 +52,6 @@ DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
 {
     // create the configuration object
     config_ = new KConfig( "kwindeKoratorrc" );
-    KGlobal::locale()->insertCatalog( "kwin3_deKorator" );
 
 
 

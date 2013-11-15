@@ -685,7 +685,7 @@ void DeKoratorFactory::determineSizes()
 //
 void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 {
-    QColor col = options() ->palette( KDecoration::ColorTitleBar, isActive ).background().color();
+    QColor col = KDecorationOptions::self() ->palette( KDecoration::ColorTitleBar, isActive ).background().color();
     WindowActivationState wa = isActive ? WindowActive : WindowInactive;
 
     for ( int i = 0; i < decoCount; ++i )
@@ -700,7 +700,7 @@ void DeKoratorFactory::colorizeDecoPixmaps( bool isActive )
 //
 void DeKoratorFactory::colorizeButtonsPixmaps( bool isActive )
 {
-    QColor col = options() ->palette( KDecoration::ColorButtonBg, isActive ).background().color();
+    QColor col = KDecorationOptions::self() ->palette( KDecoration::ColorButtonBg, isActive ).background().color();
     WindowActivationState wa = isActive ? WindowActive : WindowInactive;
 
     bool customColors = useCustomButtonsColors_ && ( isActive ? customColorsActiveButtons_ : customColorsInActiveButtons_ );
@@ -1023,7 +1023,7 @@ void DeKoratorButton::paintEvent( QPaintEvent * /*e*/ )
             }
             else if ( act ? factory->colorizeActButtons_ : factory->colorizeInActButtons_ )
             {
-                QColor col = factory->options() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
+                QColor col = KDecorationOptions::self() ->palette( KDecoration::ColorButtonBg, act ).color( QPalette::Window );
 
                 image = DeKoratorFactory::colorizedImage( image, col, BUTTONSCOLORIZE );
             }
@@ -1303,9 +1303,9 @@ void DeKoratorClient::init()
     // setup titlebar buttons
     for ( int n = 0; n < ButtonTypeCount; ++n )
         button[ n ] = 0;
-    addButtons( titleLayout_, options() ->titleButtonsLeft() );
+    addButtons( titleLayout_, KDecorationOptions::self() ->titleButtonsLeft() );
     titleLayout_->addItem( titleBarSpacer_ );
-    addButtons( titleLayout_, options() ->titleButtonsRight() );
+    addButtons( titleLayout_, KDecorationOptions::self() ->titleButtonsRight() );
     //right spacer
     titleLayout_->addItem( rightTitleBarSpacer_ );
 
@@ -1977,7 +1977,7 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
 
 
             QString c( caption() );
-            QFontMetrics fm( options() ->font( isActive() ) );
+            QFontMetrics fm( KDecorationOptions::self() ->font( isActive() ) );
             int captionWidth = fm.width( c );
             // shadow text effect
             if ( USESHDTEXT )
@@ -2007,8 +2007,8 @@ void DeKoratorClient::paintEvent( QPaintEvent* )
 
 
             //draw titleR text
-            painter.setFont( options() ->font( isActive(), false ) );
-            painter.setPen( options() ->color( KDecoration::ColorFont, isActive() ) );
+            painter.setFont( KDecorationOptions::self() ->font( isActive(), false ) );
+            painter.setPen( KDecorationOptions::self() ->color( KDecoration::ColorFont, isActive() ) );
 
             Qt::Alignment titleAlignBak = TITLEALIGN;
             if ( captionWidth > titleR.width() )
@@ -2061,7 +2061,7 @@ void DeKoratorClient::updateCaptionBuffer()
 {
     QPainter painter;
     QString c( caption() );
-    QFontMetrics fm( options() ->font( isActive() ) );
+    QFontMetrics fm( KDecorationOptions::self() ->font( isActive() ) );
     int captionWidth = fm.width( c );
     int captionHeight = fm.height( );
 
@@ -2069,7 +2069,7 @@ void DeKoratorClient::updateCaptionBuffer()
     QImage textImage( captionWidth + ( MARGIN * 2 ) , captionHeight, QImage::Format_ARGB32 ); // 2*2 px shadow space
     textImage.fill( 0 );
     painter.begin( &textImage );
-    painter.setFont( options() ->font( isActive(), false ) );
+    painter.setFont( KDecorationOptions::self() ->font( isActive(), false ) );
     painter.setPen( Qt::white );
     painter.drawText( textImage.rect(), Qt::AlignCenter, caption() );
     painter.end();

@@ -34,7 +34,6 @@
 
 #include "deKoratorthemes.h"
 
-#include <KDE/KApplication>
 #include <KDE/KLocale>
 #include <KDE/KMessageBox>
 #include <KDE/KProgressDialog>
@@ -43,6 +42,7 @@
 
 #include <KDE/KIO/NetAccess>
 
+#include <QApplication>
 #include <QUrl>
 
 
@@ -112,7 +112,7 @@ bool deKoratorThemes::installThemes( const QStringList &themes, const QString &a
 
     KTar archive( archiveName );
     archive.open( QIODevice::ReadOnly );
-    kapp->processEvents();
+    qApp->processEvents();
 
     const KArchiveDirectory* rootDir = archive.directory();
 
@@ -122,7 +122,7 @@ bool deKoratorThemes::installThemes( const QStringList &themes, const QString &a
         progressDiag.setLabelText(
             i18n( "<qt>Installing <strong>%1</strong> theme</qt>", *it )
             );
-        kapp->processEvents();
+        qApp->processEvents();
 
         if ( progressDiag.wasCancelled() )
             break;

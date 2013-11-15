@@ -1342,182 +1342,182 @@ void DeKoratorClient::init()
 // addButtons()
 // ------------
 // Add buttons to title layout
-void DeKoratorClient::addButtons( QBoxLayout * layout, const QString & s )
+void DeKoratorClient::addButtons( QBoxLayout * layout,const QList<DecorationButton> & s )
 {
     QString tip;
     buttonTypeAll btnType;
 
-    if ( s.length() > 0 )
+    for ( auto it = s.constBegin(); it != s.constEnd(); ++it )
     {
-        for ( int n = 0; n < s.length(); ++n )
+        switch ( *it )
         {
-            switch ( s[ n ].toAscii() )
+        case DecorationButtonMenu:
+            // Menu button
+            if ( !button[ ButtonMenu ] )
             {
-            case 'M':
-                // Menu button
-                if ( !button[ ButtonMenu ] )
-                {
-                    button[ ButtonMenu ] =
-                        new DeKoratorButton( this, "menu", i18n( "Menu" ), ButtonMenu, menu );
-                    connect( button[ ButtonMenu ], SIGNAL( pressed() ),
-                             this, SLOT( menuButtonPressed() ) );
-                    connect( button[ ButtonMenu ], SIGNAL( released() ), this, SLOT( menuButtonReleased() ) );
+                button[ ButtonMenu ] =
+                    new DeKoratorButton( this, "menu", i18n( "Menu" ), ButtonMenu, menu );
+                connect( button[ ButtonMenu ], SIGNAL( pressed() ),
+                            this, SLOT( menuButtonPressed() ) );
+                connect( button[ ButtonMenu ], SIGNAL( released() ), this, SLOT( menuButtonReleased() ) );
 
-                    layout->addWidget( button[ ButtonMenu ] );
-                }
-                break;
-
-            case 'S':
-                // Sticky button
-                if ( !button[ ButtonSticky ] )
-                {
-                    bool d = isOnAllDesktops();
-                    if ( d )
-                    {
-                        btnType = stickydown;
-                    }
-                    else
-                    {
-                        btnType = sticky;
-                    }
-                    button[ ButtonSticky ] =
-                        new DeKoratorButton( this, "sticky", d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ), ButtonSticky, btnType );
-                    connect( button[ ButtonSticky ], SIGNAL( clicked() ),
-                             this, SLOT( toggleOnAllDesktops() ) );
-                    layout->addWidget( button[ ButtonSticky ] );
-                }
-                break;
-
-            case 'H':
-                // Help button
-                if ( ( !button[ ButtonHelp ] ) && providesContextHelp() )
-                {
-                    button[ ButtonHelp ] =
-                        new DeKoratorButton( this, "help-contents", i18n( "Help" ),
-                                             ButtonHelp, help );
-                    connect( button[ ButtonHelp ], SIGNAL( clicked() ),
-                             this, SLOT( showContextHelp() ) );
-                    layout->addWidget( button[ ButtonHelp ] );
-                }
-                break;
-
-            case 'I':
-                // Minimize button
-                if ( ( !button[ ButtonMin ] ) && isMinimizable() )
-                {
-                    button[ ButtonMin ] =
-                        new DeKoratorButton( this, "iconify", i18n( "Minimize" ), ButtonMin, min );
-                    connect( button[ ButtonMin ], SIGNAL( clicked() ),
-                             this, SLOT( minimize() ) );
-                    layout->addWidget( button[ ButtonMin ] );
-                }
-                break;
-
-            case 'A':
-                // Maximize button
-                if ( ( !button[ ButtonMax ] ) && isMaximizable() )
-                {
-                    bool m = ( maximizeMode() == MaximizeFull );
-                    if ( m )
-                    {
-                        btnType = restore;
-                    }
-                    else
-                    {
-                        btnType = max;
-                    }
-                    button[ ButtonMax ] =
-                        new DeKoratorButton( this, "maximize", m ? i18n( "Restore" ) : i18n( "Maximize" ),
-                                             ButtonMax, btnType );
-                    connect( button[ ButtonMax ], SIGNAL( clicked() ),
-                             this, SLOT( maxButtonPressed() ) );
-                    layout->addWidget( button[ ButtonMax ] );
-                }
-                break;
-
-            case 'X':
-                // Close button
-                if ( ( !button[ ButtonClose ] ) && isCloseable() )
-                {
-                    button[ ButtonClose ] =
-                        new DeKoratorButton( this, "close", i18n( "Close" ),
-                                             ButtonClose, close );
-                    connect( button[ ButtonClose ], SIGNAL( clicked() ),
-                             this, SLOT( closeWindow() ) );
-                    layout->addWidget( button[ ButtonClose ] );
-                }
-                break;
-
-            case 'F':
-                // Above button
-                if ( ( !button[ ButtonAbove ] ) )
-                {
-                    bool a = keepAbove();
-                    if ( a )
-                    {
-                        btnType = abovedown;
-                    }
-                    else
-                    {
-                        btnType = above;
-                    }
-                    button[ ButtonAbove ] =
-                        new DeKoratorButton( this, "above",
-                                             i18n( "Keep Above Others" ), ButtonAbove, btnType );
-                    connect( button[ ButtonAbove ], SIGNAL( clicked() ),
-                             this, SLOT( aboveButtonPressed() ) );
-                    layout->addWidget( button[ ButtonAbove ] );
-                }
-                break;
-
-            case 'B':
-                // Below button
-                if ( ( !button[ ButtonBelow ] ) )
-                {
-                    bool b = keepBelow();
-                    if ( b )
-                    {
-                        btnType = belowdown;
-                    }
-                    else
-                    {
-                        btnType = below;
-                    }
-                    button[ ButtonBelow ] =
-                        new DeKoratorButton( this, "below",
-                                             i18n( "Keep Below Others" ), ButtonBelow, btnType );
-                    connect( button[ ButtonBelow ], SIGNAL( clicked() ),
-                             this, SLOT( belowButtonPressed() ) );
-                    layout->addWidget( button[ ButtonBelow ] );
-                }
-                break;
-
-            case 'L':
-                // Shade button
-                if ( ( !button[ ButtonShade && isShadeable() ] ) )
-                {
-                    bool s = isSetShade();
-                    if ( s )
-                    {
-                        btnType = shadedown;
-                    }
-                    else
-                    {
-                        btnType = shade;
-                    }
-                    button[ ButtonShade ] =
-                        new DeKoratorButton( this, "shade", s ? i18n( "Unshade" ) : i18n( "Shade" ),
-                                             ButtonShade, btnType );
-                    connect( button[ ButtonShade ], SIGNAL( clicked() ),
-                             this, SLOT( shadeButtonPressed() ) );
-                    layout->addWidget( button[ ButtonShade ] );
-                }
-                break;
-
-            case '_':
-                // Spacer item
-                layout->addSpacing( 3 );
+                layout->addWidget( button[ ButtonMenu ] );
             }
+            break;
+
+        case DecorationButtonOnAllDesktops:
+            // Sticky button
+            if ( !button[ ButtonSticky ] )
+            {
+                bool d = isOnAllDesktops();
+                if ( d )
+                {
+                    btnType = stickydown;
+                }
+                else
+                {
+                    btnType = sticky;
+                }
+                button[ ButtonSticky ] =
+                    new DeKoratorButton( this, "sticky", d ? i18n( "Sticky" ) : i18n( "Un-Sticky" ), ButtonSticky, btnType );
+                connect( button[ ButtonSticky ], SIGNAL( clicked() ),
+                            this, SLOT( toggleOnAllDesktops() ) );
+                layout->addWidget( button[ ButtonSticky ] );
+            }
+            break;
+
+        case DecorationButtonQuickHelp:
+            // Help button
+            if ( ( !button[ ButtonHelp ] ) && providesContextHelp() )
+            {
+                button[ ButtonHelp ] =
+                    new DeKoratorButton( this, "help-contents", i18n( "Help" ),
+                                            ButtonHelp, help );
+                connect( button[ ButtonHelp ], SIGNAL( clicked() ),
+                            this, SLOT( showContextHelp() ) );
+                layout->addWidget( button[ ButtonHelp ] );
+            }
+            break;
+
+        case DecorationButtonMinimize:
+            // Minimize button
+            if ( ( !button[ ButtonMin ] ) && isMinimizable() )
+            {
+                button[ ButtonMin ] =
+                    new DeKoratorButton( this, "iconify", i18n( "Minimize" ), ButtonMin, min );
+                connect( button[ ButtonMin ], SIGNAL( clicked() ),
+                            this, SLOT( minimize() ) );
+                layout->addWidget( button[ ButtonMin ] );
+            }
+            break;
+
+        case DecorationButtonMaximizeRestore:
+            // Maximize button
+            if ( ( !button[ ButtonMax ] ) && isMaximizable() )
+            {
+                bool m = ( maximizeMode() == MaximizeFull );
+                if ( m )
+                {
+                    btnType = restore;
+                }
+                else
+                {
+                    btnType = max;
+                }
+                button[ ButtonMax ] =
+                    new DeKoratorButton( this, "maximize", m ? i18n( "Restore" ) : i18n( "Maximize" ),
+                                            ButtonMax, btnType );
+                connect( button[ ButtonMax ], SIGNAL( clicked() ),
+                            this, SLOT( maxButtonPressed() ) );
+                layout->addWidget( button[ ButtonMax ] );
+            }
+            break;
+
+        case DecorationButtonClose:
+            // Close button
+            if ( ( !button[ ButtonClose ] ) && isCloseable() )
+            {
+                button[ ButtonClose ] =
+                    new DeKoratorButton( this, "close", i18n( "Close" ),
+                                            ButtonClose, close );
+                connect( button[ ButtonClose ], SIGNAL( clicked() ),
+                            this, SLOT( closeWindow() ) );
+                layout->addWidget( button[ ButtonClose ] );
+            }
+            break;
+
+        case DecorationButtonKeepAbove:
+            // Above button
+            if ( ( !button[ ButtonAbove ] ) )
+            {
+                bool a = keepAbove();
+                if ( a )
+                {
+                    btnType = abovedown;
+                }
+                else
+                {
+                    btnType = above;
+                }
+                button[ ButtonAbove ] =
+                    new DeKoratorButton( this, "above",
+                                            i18n( "Keep Above Others" ), ButtonAbove, btnType );
+                connect( button[ ButtonAbove ], SIGNAL( clicked() ),
+                            this, SLOT( aboveButtonPressed() ) );
+                layout->addWidget( button[ ButtonAbove ] );
+            }
+            break;
+
+        case DecorationButtonKeepBelow:
+            // Below button
+            if ( ( !button[ ButtonBelow ] ) )
+            {
+                bool b = keepBelow();
+                if ( b )
+                {
+                    btnType = belowdown;
+                }
+                else
+                {
+                    btnType = below;
+                }
+                button[ ButtonBelow ] =
+                    new DeKoratorButton( this, "below",
+                                            i18n( "Keep Below Others" ), ButtonBelow, btnType );
+                connect( button[ ButtonBelow ], SIGNAL( clicked() ),
+                            this, SLOT( belowButtonPressed() ) );
+                layout->addWidget( button[ ButtonBelow ] );
+            }
+            break;
+
+        case DecorationButtonShade:
+            // Shade button
+            if ( ( !button[ ButtonShade && isShadeable() ] ) )
+            {
+                bool s = isSetShade();
+                if ( s )
+                {
+                    btnType = shadedown;
+                }
+                else
+                {
+                    btnType = shade;
+                }
+                button[ ButtonShade ] =
+                    new DeKoratorButton( this, "shade", s ? i18n( "Unshade" ) : i18n( "Shade" ),
+                                            ButtonShade, btnType );
+                connect( button[ ButtonShade ], SIGNAL( clicked() ),
+                            this, SLOT( shadeButtonPressed() ) );
+                layout->addWidget( button[ ButtonShade ] );
+            }
+            break;
+
+        case DecorationButtonExplicitSpacer:
+            // Spacer item
+            layout->addSpacing( 3 );
+            break;
+        default:
+            break;
         }
     }
 }

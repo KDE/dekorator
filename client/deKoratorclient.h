@@ -258,7 +258,7 @@ public:
     virtual Position mousePosition( const QPoint &point ) const;
 
 private:
-    void addButtons( QBoxLayout* layout, const QString& buttons );
+    void addButtons( QBoxLayout* layout, const QList<DecorationButton>& buttons );
 
     bool eventFilter( QObject *obj, QEvent *e );
     void mouseDoubleClickEvent( QMouseEvent *e );

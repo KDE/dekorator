@@ -133,8 +133,8 @@ class DeKoratorFactory: public KDecorationFactory
 public:
     DeKoratorFactory();
     virtual ~DeKoratorFactory();
-    virtual KDecoration *createDecoration( KDecorationBridge *b );
-    virtual bool supports( KDecorationDefines::Ability ) const;
+    virtual KDecoration *createDecoration( KDecorationBridge *b ) override;
+    virtual bool supports( KDecorationDefines::Ability ) const override;
     static QImage colorizedImage( const QImage &image, QColor color, QString colorizeMethod );
     QBitmap topLeftCornerBitmap_, topMidBitmap_, topRightCornerBitmap_, bottomLeftCornerBitmap_, bottomMidBitmap_, bottomRightCornerBitmap_;
 
@@ -245,12 +245,12 @@ public:
     DeKoratorClient( KDecorationBridge *b, KDecorationFactory *f );
     virtual ~DeKoratorClient();
 
-    virtual void init();
+    virtual void init() override;
 
-    virtual void borders( int &l, int &r, int &t, int &b ) const;
-    virtual void resize( const QSize &size );
-    virtual QSize minimumSize() const;
-    virtual Position mousePosition( const QPoint &point ) const;
+    virtual void borders( int &l, int &r, int &t, int &b ) const override;
+    virtual void resize( const QSize &size ) override;
+    virtual QSize minimumSize() const override;
+    virtual Position mousePosition( const QPoint &point ) const override;
 
 private:
     void addButtons( QBoxLayout* layout, const QList<DecorationButton>& buttons );

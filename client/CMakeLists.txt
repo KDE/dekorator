@@ -2,8 +2,16 @@ project (kwin-deKorator)
 
 set (kwin_deKorator_SOURCES deKoratorclient.cc shadow.cpp)
 
-kde4_add_plugin (kwin3_deKorator ${kwin_deKorator_SOURCES})
-target_link_libraries (kwin3_deKorator ${KDE4_KDEUI_LIBS} ${QIMAGEBLITZ_LIBRARIES} kdecorations)
+add_library(kwin3_deKorator MODULE ${kwin_deKorator_SOURCES})
+target_link_libraries(kwin3_deKorator
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::X11Extras
+    KF5::KIconThemes
+    KF5::KI18n
+    ${QIMAGEBLITZ_LIBRARIES}
+    KDE4Workspace__kdecorations
+)
 install (TARGETS kwin3_deKorator DESTINATION ${PLUGIN_INSTALL_DIR})
 install (FILES deKorator.desktop DESTINATION ${DATA_INSTALL_DIR}/kwin)
 

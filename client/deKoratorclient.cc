@@ -37,7 +37,7 @@
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KIconEffect>
-#include <KDE/KLocale>
+#include <KDE/KLocalizedString>
 
 #include <QSettings>
 #include <QTime>
@@ -2309,4 +2309,4 @@ void DeKoratorClient::doShape()
 }
 
 
-#include "deKoratorclient.moc"
+#include "moc_deKoratorclient.cpp"

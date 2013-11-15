@@ -1,8 +1,14 @@
 set (kwin_deKorator_config_SOURCES deKoratorconfig.cc deKoratorthemes.cpp themes.cpp kthemeselector.cpp)
-kde4_add_ui_files (kwin_deKorator_config_SOURCES configdialog.ui kthemeselectorwidgets.ui)
+qt5_wrap_ui (kwin_deKorator_config_SOURCES configdialog.ui kthemeselectorwidgets.ui)
 
-kde4_add_plugin (kwin_deKorator_config ${kwin_deKorator_config_SOURCES})
-target_link_libraries (kwin_deKorator_config ${KDE4_KDEUI_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KNEWSTUFF2_LIBS} ${KDE4_KNEWSTUFF3_LIBS})
+add_library (kwin_deKorator_config MODULE ${kwin_deKorator_config_SOURCES})
+target_link_libraries (kwin_deKorator_config
+    Qt5::Widgets
+    KF5::KArchive
+    KF5::KI18n
+    KF5::KDE4Support
+    KF5::knewstuff3
+)
 
 install (TARGETS kwin_deKorator_config DESTINATION ${PLUGIN_INSTALL_DIR})
 install (FILES deKoratorthemes.knsrc DESTINATION ${CONFIG_INSTALL_DIR})

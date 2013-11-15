@@ -213,7 +213,6 @@ bool DeKoratorFactory::supports( KDecorationDefines::Ability ability ) const
     {
         // announce
         case AbilityAnnounceButtons:
-        case AbilityAnnounceColors:
         // buttons
         case AbilityButtonMenu:
         case AbilityButtonOnAllDesktops:
@@ -226,14 +225,6 @@ bool DeKoratorFactory::supports( KDecorationDefines::Ability ability ) const
         case AbilityButtonBelowOthers:
         case AbilityButtonShade:
         case AbilityButtonResize:
-        // colors
-        case AbilityColorTitleBack:
-        case AbilityColorTitleFore:
-        case AbilityColorTitleBlend:
-        case AbilityColorFrame:
-        case AbilityColorHandle:
-        case AbilityColorButtonBack:
-        case AbilityColorButtonFore:
             return true;
         default:
             return false;

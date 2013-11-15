@@ -43,7 +43,7 @@ class deKoratorThemes : public KThemeSelector
         ~deKoratorThemes();
 
     public:
-        QString installTheme(const KUrl &themeUrl);
+        QString installTheme(const QUrl &themeUrl) override;
 
     protected:
         virtual bool isValidTheme(const QString &localPath) const;

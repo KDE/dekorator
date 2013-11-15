@@ -25,7 +25,6 @@
 #include <QWidget>
 
 class KAboutData;
-class KUrl;
 class QStyleOptionViewItem;
 
 
@@ -73,7 +72,7 @@ class KThemeSelector : public QWidget
         void createClicked();
 
     public:
-        virtual QString installTheme(const KUrl &themeUrl);
+        virtual QString installTheme(const QUrl &themeUrl);
         virtual void addTheme(const QString &localPath);
         virtual bool removeTheme(const QString &localPath);
 

@@ -43,8 +43,10 @@
 
 #include <KDE/KIO/NetAccess>
 
+#include <QUrl>
 
-QString deKoratorThemes::installTheme(const KUrl &themeURL)
+
+QString deKoratorThemes::installTheme(const QUrl &themeURL)
 {
     // themeTmpFile contains the name of the downloaded file
     QString themeTmpFile;
@@ -54,10 +56,10 @@ QString deKoratorThemes::installTheme(const KUrl &themeURL)
     {
         QString sorryText;
         if ( themeURL.isLocalFile() )
-            sorryText = i18n( "Unable to find the deKorator theme archive %1.", themeURL.prettyUrl() );
+            sorryText = i18n( "Unable to find the deKorator theme archive %1.", themeURL.toDisplayString() );
         else
             sorryText = i18n( "Unable to download deKorator theme archive;\n"
-                    "please check that address %1 is correct.", themeURL.prettyUrl() );
+                    "please check that address %1 is correct.", themeURL.toDisplayString() );
         KMessageBox::sorry( parent_, sorryText );
         return QString();
     }

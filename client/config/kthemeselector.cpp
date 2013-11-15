@@ -41,7 +41,6 @@
 #include <KDE/KLocale>
 #include <KDE/KMessageBox>
 #include <KDE/KStandardDirs>
-#include <KDE/KUrl>
 #include <KDE/KUrlRequesterDialog>
 
 #include <KDE/KIO/Job>
@@ -208,7 +207,7 @@ void KThemeSelector::Private::configureClicked()
 
 void KThemeSelector::Private::installClicked()
 {
-    KUrl themeUrl = KUrlRequesterDialog::getUrl(QString(), m_parent, i18n("Drag or Type Theme URL"));
+    QUrl themeUrl = KUrlRequesterDialog::getUrl(QUrl(), m_parent, i18n("Drag or Type Theme URL"));
 
     if (themeUrl.url().isEmpty()) {
         return;
@@ -258,7 +257,7 @@ void KThemeSelector::Private::postInstallFiles(const QStringList &files)
         if (file.endsWith(QLatin1String(".tar.bz2"), Qt::CaseInsensitive)
             || file.endsWith(QLatin1String(".tar.gz"), Qt::CaseInsensitive)
             || file.endsWith(QLatin1String(".tar.xz"), Qt::CaseInsensitive)) {
-            QString installed = m_parent->installTheme(file);
+            QString installed = m_parent->installTheme(QUrl::fromLocalFile(file));
             if (!installed.isEmpty()) {
                 setSelected(installed);
             }
@@ -481,7 +480,7 @@ void KThemeSelector::rescanThemes()
  *
  */
 
-QString KThemeSelector::installTheme(const KUrl &themeUrl)
+QString KThemeSelector::installTheme(const QUrl &themeUrl)
 {
     // TODO
     return themeUrl.url();
@@ -490,7 +489,7 @@ QString KThemeSelector::installTheme(const KUrl &themeUrl)
 
 bool KThemeSelector::removeTheme(const QString &localPath)
 {
-    KIO::NetAccess::del(KUrl(localPath), this);
+    KIO::NetAccess::del(QUrl::fromLocalFile(localPath), this);
     return true;
 }
 

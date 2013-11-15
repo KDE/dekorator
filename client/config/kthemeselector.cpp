@@ -40,7 +40,6 @@
 #include <KDE/KHelpMenu>
 #include <KDE/KLocale>
 #include <KDE/KMessageBox>
-#include <KDE/KStandardDirs>
 #include <KDE/KUrlRequesterDialog>
 
 #include <KDE/KIO/Job>
@@ -502,7 +501,9 @@ void KThemeSelector::addTheme(const QString &localPath)
 
 QStringList KThemeSelector::scanInstalledThemes()
 {
-    QStringList directories = d->m_componentData.dirs()->findDirs("appdata", "themes");
+    QStringList directories = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation,
+                                                        QStringLiteral("deKorator/themes"),
+                                                        QStandardPaths::LocateDirectory);
     QStringList themes;
 
     foreach (const QString &directory, directories) {

@@ -34,8 +34,10 @@
 
 #include "deKoratorconfig.h"
 
+#include <KDE/KConfig>
 #include <KDE/KConfigGroup>
-#include <KDE/KLocale>
+#include <KDE/KLocalizedString>
+#include <kdemacros.h>
 
 #include <QtCore/QDir>
 

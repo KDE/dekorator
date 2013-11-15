@@ -39,6 +39,7 @@
 #include "ui_configdialog.h"
 
 class KConfig;
+class KConfigGroup;
 class deKoratorThemes;
 class QListWidgetItem;
 

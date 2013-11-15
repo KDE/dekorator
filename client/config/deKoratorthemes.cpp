@@ -38,7 +38,7 @@
 #include <KDE/KAboutData>
 #include <KDE/KComponentData>
 #include <KDE/KConfigGroup>
-#include <KDE/KLocale>
+#include <KDE/KLocalizedString>
 
 #include <QFileInfo>
 #include <QDir>

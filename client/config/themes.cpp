@@ -34,7 +34,7 @@
 
 #include "deKoratorthemes.h"
 
-#include <KDE/KLocale>
+#include <KDE/KLocalizedString>
 #include <KDE/KMessageBox>
 #include <KDE/KProgressDialog>
 #include <KDE/KStandardDirs>

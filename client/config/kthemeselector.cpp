@@ -38,14 +38,12 @@
 
 #include <KDE/KAboutData>
 #include <KDE/KHelpMenu>
-#include <KDE/KLocale>
+#include <KDE/KLocalizedString>
 #include <KDE/KMessageBox>
 #include <KDE/KUrlRequesterDialog>
 
 #include <KDE/KIO/Job>
 #include <KDE/KIO/NetAccess>
-
-#include <kdeversion.h>
 
 #include <KDE/KNS3/DownloadDialog>
 

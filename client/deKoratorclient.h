@@ -129,6 +129,7 @@ enum WindowActivationState {
 
 class DeKoratorFactory: public KDecorationFactory
 {
+    Q_OBJECT
 public:
     DeKoratorFactory();
     virtual ~DeKoratorFactory();

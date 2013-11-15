@@ -175,6 +175,7 @@ extern "C" KDE_EXPORT int decoration_version() {
 // ----------------
 // Constructor
 DeKoratorFactory::DeKoratorFactory()
+    : KDecorationFactory()
 {
     colorizeActFrames_ = false;
     colorizeActButtons_ = false;

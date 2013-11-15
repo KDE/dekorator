@@ -166,6 +166,10 @@ extern "C" KDE_EXPORT KDecorationFactory* create_factory()
     return new DeKorator::DeKoratorFactory();
 }
 
+extern "C" KDE_EXPORT int decoration_version() {
+    return KWIN_DECORATION_API_VERSION;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // DeKoratorFactory()
 // ----------------

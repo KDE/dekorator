@@ -247,13 +247,6 @@ public:
 
     virtual void init();
 
-    virtual void activeChange();
-    virtual void desktopChange();
-    virtual void captionChange();
-    virtual void iconChange();
-    virtual void maximizeChange();
-    virtual void shadeChange();
-
     virtual void borders( int &l, int &r, int &t, int &b ) const;
     virtual void resize( const QSize &size );
     virtual QSize minimumSize() const;
@@ -281,6 +274,13 @@ private Q_SLOTS:
     void keepAboveChange( bool );
     void keepBelowChange( bool );
     void menuButtonReleased();
+
+    void activeChange();
+    void desktopChange();
+    void captionChange();
+    void iconChange();
+    void maximizeChange();
+    void shadeChange();
 
 private:
     DeKoratorButton *button[ ButtonTypeCount ];

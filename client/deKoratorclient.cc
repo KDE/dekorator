@@ -1210,6 +1210,13 @@ DeKoratorClient::DeKoratorClient( KDecorationBridge * b, KDecorationFactory * f 
 {
     //captionBufferDirty_ = true;
     //maskDirty_ = true;
+
+    connect(this, &KDecoration::activeChanged,   this, &DeKoratorClient::activeChange);
+    connect(this, &KDecoration::desktopChanged,  this, &DeKoratorClient::desktopChange);
+    connect(this, &KDecoration::captionChanged,  this, &DeKoratorClient::captionChange);
+    connect(this, &KDecoration::iconChanged,     this, &DeKoratorClient::iconChange);
+    connect(this, &KDecoration::maximizeChanged, this, &DeKoratorClient::maximizeChange);
+    connect(this, &KDecoration::shadeChanged,    this, &DeKoratorClient::shadeChange);
 }
 
 DeKoratorClient::~DeKoratorClient()

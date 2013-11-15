@@ -49,11 +49,7 @@
 
 #include <kdeversion.h>
 
-#if KDE_IS_VERSION(4, 4, 0)
 #include <KDE/KNS3/DownloadDialog>
-#else
-#include <KDE/KNS/Engine>
-#endif
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -272,7 +268,6 @@ void KThemeSelector::Private::postInstallFiles(const QStringList &files)
 
 void KThemeSelector::Private::getNewClicked()
 {
-#if KDE_IS_VERSION(4, 4, 0)
     QPointer<KNS3::DownloadDialog> dialog = new KNS3::DownloadDialog(m_configFileKNS, m_parent);
 
     if (dialog->exec()) {
@@ -288,21 +283,6 @@ void KThemeSelector::Private::getNewClicked()
         }
     }
     delete dialog;
-#else
-    KNS::Engine engine(m_parent);
-
-    if (engine.init(m_configFileKNS)) {
-        KNS::Entry::List entries = engine.downloadDialogModal(m_parent);
-        if (entries.size() > 0) {
-            foreach (KNS::Entry *entry, entries) {
-                if (entry->status() == KNS::Entry::Installed) {
-                    postInstallFiles(entry->installedFiles());
-                }
-            }
-            m_parent->rescanThemes();
-        }
-    }
-#endif
 }
 
 

@@ -24,7 +24,7 @@
 
 #include <QWidget>
 
-class KComponentData;
+class KAboutData;
 class KUrl;
 class QStyleOptionViewItem;
 
@@ -91,7 +91,7 @@ class KThemeSelector : public QWidget
         virtual QSize sizeHintThemeItem(const QStyleOptionViewItem *option,
                                         const QString &localPath, int viewMode) const;
         int viewMode() const;
-        void setup(const KComponentData &componentData);
+        void setup(KAboutData *data);
 
     private:
         class Private;

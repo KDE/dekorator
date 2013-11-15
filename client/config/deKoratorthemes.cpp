@@ -53,20 +53,19 @@
 deKoratorThemes::deKoratorThemes(QWidget *parent)
     : KThemeSelector(parent)
 {
-    aboutData = new KAboutData("deKorator", 0, ki18n("deKorator"), "0.5.1",
-        ki18n("Themable window decorator for KDE"),
+    aboutData = new KAboutData(QStringLiteral("deKorator"), QString(), i18n("deKorator"), QStringLiteral("0.5.1"),
+        i18n("Themable window decorator for KDE"),
         KAboutData::License_GPL,
-        ki18n("(c) 2005, Moty Rahamim"), KLocalizedString(),
-        "http://www.kde-look.org/content/show.php/?content=87921");
-    aboutData->addAuthor(ki18n("Moty Rahamim"), ki18n("Developer"), "moty.rahamim@gmail.com");
-    aboutData->addAuthor(ki18n("Christoph Feck"), ki18n("KDE 4 port"), "christoph@maxiom.de");
-    aboutData->addCredit(ki18n("Jon 'ArbitraryReason' Clarke"), ki18n("Art Designer"), "jjclarke2003@yahoo.com");
-    aboutData->addCredit(ki18n("Zoran 'the-error' Karavla"), ki18n("Theme contributor"), "webmaster@the-error.net");
-    aboutData->addCredit(ki18n("David Johnson"), ki18n("Window decoration example"), "david@usermode.org");
-    aboutData->addCredit(ki18n("Sandro Giessl"), ki18n("Plastik window decoration"), "sandro@giessl.com");
-    aboutData->addCredit(ki18n("Antonio Larrosa"), ki18n("Icon theme KCM"), "larrosa@kde.org");
-    componentData = new KComponentData(aboutData);
-    setup(*componentData);
+        i18n("(c) 2005, Moty Rahamim"), QString(),
+        QStringLiteral("http://www.kde-look.org/content/show.php/?content=87921"));
+    aboutData->addAuthor(i18n("Moty Rahamim"), i18n("Developer"), QStringLiteral("moty.rahamim@gmail.com"));
+    aboutData->addAuthor(i18n("Christoph Feck"), i18n("KDE 4 port"), QStringLiteral("christoph@maxiom.de"));
+    aboutData->addCredit(i18n("Jon 'ArbitraryReason' Clarke"), i18n("Art Designer"), QStringLiteral("jjclarke2003@yahoo.com"));
+    aboutData->addCredit(i18n("Zoran 'the-error' Karavla"), i18n("Theme contributor"), QStringLiteral("webmaster@the-error.net"));
+    aboutData->addCredit(i18n("David Johnson"), i18n("Window decoration example"), QStringLiteral("david@usermode.org"));
+    aboutData->addCredit(i18n("Sandro Giessl"), i18n("Plastik window decoration"), QStringLiteral("sandro@giessl.com"));
+    aboutData->addCredit(i18n("Antonio Larrosa"), i18n("Icon theme KCM"), QStringLiteral("larrosa@kde.org"));
+    setup(aboutData);
     setConfigFileKNS("deKoratorthemes.knsrc");
     setCreateAllowed(false);
     KConfig config("deKoratorrc");
@@ -80,7 +79,6 @@ deKoratorThemes::~deKoratorThemes()
     KConfig config("deKoratorrc");
     KConfigGroup group(&config, "General");
     group.writeEntry("ThemeSelectorState", saveState());
-    delete componentData;
     delete aboutData;
 }
 

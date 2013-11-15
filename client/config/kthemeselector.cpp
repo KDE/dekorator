@@ -113,7 +113,7 @@ QSize KThemeSelectorDelegate::sizeHint(const QStyleOptionViewItem &option, const
 /*------------------------------------------------------------------------*/
 
 KThemeSelector::Private::Private(QObject *parent)
-    : QObject(parent), m_themesScanned(false), m_viewMode(0), m_delegate(new KThemeSelectorDelegate(parent))
+    : QObject(parent), m_aboutData(nullptr), m_themesScanned(false), m_viewMode(0), m_delegate(new KThemeSelectorDelegate(parent))
 {
     /* */
 }
@@ -162,10 +162,10 @@ void KThemeSelector::Private::setup(KThemeSelector *widget)
     m_buttonConfigure->setEnabled(false);
     m_buttonRemove->setEnabled(false);
     m_buttonGetNew->setVisible(false);
-    KHelpMenu *helpMenu = new KHelpMenu(m_buttonAbout, m_componentData.aboutData());
+    KHelpMenu *helpMenu = new KHelpMenu(m_buttonAbout, *m_aboutData);
     QMenu *menu = (QMenu *) helpMenu->menu();
     m_buttonAbout->setMenu(menu);
-    m_buttonAbout->setText(i18n("About %1", m_componentData.aboutData()->appName()));
+    m_buttonAbout->setText(i18n("About %1", m_aboutData->displayName()));
 
     m_parent->rescanThemes();
 }
@@ -317,7 +317,6 @@ void KThemeSelector::Private::selectionChanged()
 KThemeSelector::KThemeSelector(QWidget *parent)
     : QWidget(parent), d(new Private)
 {
-    d->m_componentData = KGlobal::mainComponent();
 }
 
 
@@ -327,9 +326,9 @@ KThemeSelector::~KThemeSelector()
 }
 
 
-void KThemeSelector::setup(const KComponentData &componentData)
+void KThemeSelector::setup(KAboutData *data)
 {
-    d->m_componentData = componentData;
+    d->m_aboutData = data;
     d->setup(this);
 }
 

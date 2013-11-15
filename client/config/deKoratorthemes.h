@@ -24,7 +24,6 @@
 
 #include "kthemeselector.h"
 class KAboutData;
-class KComponentData;
 
 
 class deKoratorThemes : public KThemeSelector
@@ -63,7 +62,6 @@ class deKoratorThemes : public KThemeSelector
 
     private:
         KAboutData *aboutData;
-        KComponentData *componentData;
 };
 
 #endif

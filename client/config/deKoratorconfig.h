@@ -59,10 +59,10 @@ public:
     DeKoratorConfig( KConfig* config, QWidget* parent );
     ~DeKoratorConfig();
 
-signals:
+Q_SIGNALS:
     void changed();
 
-public slots:
+public Q_SLOTS:
     void load( const KConfigGroup &conf);
     void save( KConfigGroup &conf );
     void defaults();

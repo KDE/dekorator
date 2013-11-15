@@ -193,7 +193,7 @@ public:
     Qt::MouseButton lastMousePress() const;
     void reset();
 
-protected slots:
+protected Q_SLOTS:
     void animate();
 
 private:
@@ -269,7 +269,7 @@ private:
     void updateCaptionBuffer();
 
 
-private slots:
+private Q_SLOTS:
     void maxButtonPressed();
     void menuButtonPressed();
     void aboveButtonPressed();

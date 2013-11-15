@@ -39,15 +39,15 @@
 #include <KDE/KIconEffect>
 #include <KDE/KLocale>
 
-#include <QtCore/QSettings>
-#include <QtCore/QTime>
-#include <QtCore/QTimer>
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QPainter>
-#include <QtGui/QVBoxLayout>
+#include <QSettings>
+#include <QTime>
+#include <QTimer>
+#include <QApplication>
+#include <QBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPainter>
+#include <QVBoxLayout>
 
 #include <qimageblitz.h>
 

@@ -38,9 +38,9 @@
 #include <kdecorationfactory.h>
 #include <kdecoration.h>
 
-#include <QtGui/QAbstractButton>
-#include <QtGui/QBitmap>
-#include <QtGui/QImage>
+#include <QAbstractButton>
+#include <QBitmap>
+#include <QImage>
 
 class QBoxLayout;
 class QHBoxLayout;

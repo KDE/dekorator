@@ -22,7 +22,7 @@
 #ifndef KTHEMESELECTOR_H
 #define KTHEMESELECTOR_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class KComponentData;
 class KUrl;

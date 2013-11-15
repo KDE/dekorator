@@ -34,7 +34,7 @@
 #ifndef DEKORATORCONFIG_H
 #define DEKORATORCONFIG_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 #include "ui_configdialog.h"
 

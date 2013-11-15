@@ -51,10 +51,11 @@
 
 #include <KDE/KNS3/DownloadDialog>
 
-#include <QtCore/QDir>
-#include <QtCore/QFileInfo>
-#include <QtGui/QPainter>
-#include <QtGui/QStyle>
+#include <QDir>
+#include <QFileInfo>
+#include <QPainter>
+#include <QStandardPaths>
+#include <QStyle>
 
 
 /*------------------------------------------------------------------------*/

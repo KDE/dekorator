@@ -25,7 +25,7 @@
 #include "kthemeselector.h"
 #include "ui_kthemeselectorwidgets.h"
 #include <KDE/KComponentData>
-#include <QtGui/QStyledItemDelegate>
+#include <QStyledItemDelegate>
 
 
 class KThemeSelectorDelegate : public QStyledItemDelegate

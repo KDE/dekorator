@@ -40,12 +40,12 @@
 #include <KDE/KConfigGroup>
 #include <KDE/KLocale>
 
-#include <QtCore/QFileInfo>
-#include <QtCore/QDir>
-#include <QtGui/QBitmap>
-#include <QtGui/QPainter>
-#include <QtGui/QPixmapCache>
-#include <QtGui/QStyleOptionViewItem>
+#include <QFileInfo>
+#include <QDir>
+#include <QBitmap>
+#include <QPainter>
+#include <QPixmapCache>
+#include <QStyleOptionViewItem>
 
 
 /*------------------------------------------------------------------------*/

@@ -38,6 +38,7 @@
 #include <KDE/KConfigGroup>
 #include <KDE/KIconEffect>
 #include <KDE/KLocalizedString>
+#include <kdemacros.h>
 
 #include <QSettings>
 #include <QTime>

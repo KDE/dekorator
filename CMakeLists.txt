@@ -21,10 +21,9 @@ find_package(Qt5DBus REQUIRED NO_MODULE)
 find_package(Qt5Widgets REQUIRED NO_MODULE)
 find_package(Qt5X11Extras REQUIRED NO_MODULE)
 
-find_package(KF5 NO_MODULE REQUIRED COMPONENTS KArchive KIO KConfig KI18n KIconThemes KPrintUtils )
+find_package(KF5 NO_MODULE REQUIRED COMPONENTS Archive KIO Config I18n IconThemes NewStuff PrintUtils WindowSystem )
 find_package(KDE4Workspace REQUIRED NO_MODULE)
-find_package(KDE4Support REQUIRED NO_MODULE)
-find_package(KNewStuff REQUIRED NO_MODULE)
+find_package(KF5KDE4Support REQUIRED NO_MODULE)
 find_package(QImageBlitz REQUIRED MODULE)
 
 add_definitions(${Qt5Core_DEFINITIONS})

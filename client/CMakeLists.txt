@@ -7,8 +7,11 @@ target_link_libraries(kwin3_deKorator
     Qt5::Core
     Qt5::Widgets
     Qt5::X11Extras
-    KF5::KIconThemes
-    KF5::KI18n
+    KF5::ConfigCore
+    KF5::IconThemes
+    KF5::I18n
+    KF5::WindowSystem
+    KF5::KDE4Support
     ${QIMAGEBLITZ_LIBRARIES}
     KDE4Workspace__kdecorations
 )

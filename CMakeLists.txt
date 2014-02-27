@@ -22,7 +22,7 @@ find_package(Qt5Widgets REQUIRED NO_MODULE)
 find_package(Qt5X11Extras REQUIRED NO_MODULE)
 
 find_package(KF5 NO_MODULE REQUIRED COMPONENTS Archive KIO Config I18n IconThemes NewStuff PrintUtils WindowSystem )
-find_package(KDE4Workspace REQUIRED NO_MODULE)
+find_package(KDecorations REQUIRED NO_MODULE)
 find_package(KF5KDE4Support REQUIRED NO_MODULE)
 find_package(QImageBlitz REQUIRED MODULE)
 
@@ -30,7 +30,9 @@ add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0)
 remove_definitions(-DQT_NO_CAST_FROM_ASCII -DQT_STRICT_ITERATORS -DQT_NO_CAST_FROM_BYTEARRAY -DQT_NO_KEYWORDS)
 
-include_directories(${KDE4WORKSPACE_INCLUDE_DIR} ${QIMAGEBLITZ_INCLUDES})
+include_directories(${QIMAGEBLITZ_INCLUDES})
 
 add_subdirectory (client)
+
+feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
 

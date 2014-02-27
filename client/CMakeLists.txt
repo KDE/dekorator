@@ -13,7 +13,7 @@ target_link_libraries(kwin3_deKorator
     KF5::WindowSystem
     KF5::KDE4Support
     ${QIMAGEBLITZ_LIBRARIES}
-    KDE4Workspace__kdecorations
+    kdecorations
 )
 install (TARGETS kwin3_deKorator DESTINATION ${PLUGIN_INSTALL_DIR})
 install (FILES deKorator.desktop DESTINATION ${DATA_INSTALL_DIR}/kwin)

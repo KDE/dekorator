@@ -8,6 +8,7 @@ target_link_libraries (kwin_deKorator_config
     KF5::I18n
     KF5::KDE4Support
     KF5::NewStuff
+    KF5::Service
 )
 
 install (TARGETS kwin_deKorator_config DESTINATION ${PLUGIN_INSTALL_DIR})

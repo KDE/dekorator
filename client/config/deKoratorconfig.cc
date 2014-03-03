@@ -37,6 +37,7 @@
 #include <KDE/KConfig>
 #include <KDE/KConfigGroup>
 #include <KDE/KLocalizedString>
+#include <KPluginFactory>
 #include <kdemacros.h>
 
 #include <QtCore/QDir>
@@ -49,7 +50,15 @@
 // -------------
 // Constructor
 
-DeKoratorConfig::DeKoratorConfig( KConfig* /*config*/, QWidget* parent )
+K_PLUGIN_FACTORY(DeKoratorConfigPlugin, registerPlugin<DeKoratorConfig>(QString(), &DeKoratorConfig::create); )
+
+
+QObject *DeKoratorConfig::create(QWidget *parentWidget, QObject *, const QList<QVariant> &)
+{
+    return new DeKoratorConfig(parentWidget);
+}
+
+DeKoratorConfig::DeKoratorConfig( QWidget* parent )
         : QObject( parent ), config_( 0 ), dialog_( 0 )
 {
     // create the configuration object
@@ -414,18 +423,6 @@ void DeKoratorConfig::defaults()
     dialog_->belowDownClrBtn->setColor( QColor( 150, 150, 150 ) );
     dialog_->shadeClrBtn->setColor( QColor( 150, 150, 150 ) );
     dialog_->shadeDownClrBtn->setColor( QColor( 150, 150, 150 ) );
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Plugin Stuff                                                             //
-//////////////////////////////////////////////////////////////////////////////
-
-extern "C"
-{
-    KDE_EXPORT QObject * allocate_config( KConfig * config, QWidget * parent )
-    {
-        return ( new DeKoratorConfig( config, parent ) );
-    }
 }
 
 #include "deKoratorconfig.moc"

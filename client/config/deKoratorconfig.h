@@ -57,8 +57,10 @@ class DeKoratorConfig : public QObject
 {
     Q_OBJECT
 public:
-    DeKoratorConfig( KConfig* config, QWidget* parent );
+    DeKoratorConfig( QWidget* parent );
     ~DeKoratorConfig();
+
+    static QObject *create(QWidget *parentWidget, QObject *parent, const QList<QVariant> &arguments);
 
 Q_SIGNALS:
     void changed();
